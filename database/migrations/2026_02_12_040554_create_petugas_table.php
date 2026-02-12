@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('pangkat');
             $table->string('gol');
             $table->string('phone');
+            $table->rememberToken();
+
 
             $table->timestamps();
         });

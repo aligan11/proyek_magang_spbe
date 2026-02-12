@@ -15,7 +15,7 @@ class adminSeeder extends Seeder
      */
     public function run(): void
     {
-        Petugas::create(
+        $data = [
             [
                 'name'     => 'Afghan Almufq',
                 'email'    => 'afghan12@gmail.com',
@@ -28,8 +28,25 @@ class adminSeeder extends Seeder
                 'pangkat'  => 'Penata Muda',
                 'gol'      => 'III/a',
                 'phone'    => '6281234567890', // Gunakan format 62 agar langsung sinkron ke Fonnte
+            ],
+            [
+                'name'     => 'gan matkuso',
+                'email'    => 'gan12@gmail.com',
+                'unitKerja'    => 'Seksi Teknologi Informasi dan Komunikasi',
+                'role'    => 'pimpinan',
+                'daerah'   => null,
+                'password' => Hash::make('pimpinan123'), // Jangan lupa di-hash
+                'nip'      => '199501012023011002',
+                'jabatan'  => 'Pranata Komputer',
+                'pangkat'  => 'Penata Muda',
+                'gol'      => 'III/b',
+                'phone'    => '6281234567892', // Gunakan format 62 agar langsung sinkron ke Fonnte
             ]
-        );
+        ];
+
+        foreach ($data as $item) {
+            Petugas::create($item);
+        }
         //
     }
 }

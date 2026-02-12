@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Models\Petugas;
 use App\Rules\loginCheck;
 use Illuminate\Http\Request;
@@ -24,13 +25,24 @@ class authController extends Controller
             'password' => ['required', new loginCheck($request)],
         ]);
 
-        $role = session()->get('role');
+        $credentials = $request->only('email', 'password');
 
-        if ($role == 'pimpinan') {
-            return redirect()->route('pimpinan.dashboard');
-        } elseif ($role == 'petugas') {
-            return redirect()->route('petugas.index');
-        } else {
+        $remember = $request->has('remember');
+
+
+        if (FacadesAuth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+
+            $user = FacadesAuth::user();
+            $role = $user->role;
+
+
+            if ($role == 'pimpinan') {
+                return redirect()->route('pimpinan.index');
+            } elseif ($role == 'petugas') {
+                return redirect()->route('petugas.index');
+            } else {
+            }
         }
     }
 

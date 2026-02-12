@@ -1,25 +1,38 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Petugas;
 
+use App\Http\Controllers\Controller;
+use App\Models\Petugas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class PimpinanController extends Controller
+class petugasController extends Controllera
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
-        return view('pimpinan.DashboardPimpinan');
+        // $dataPetugas =  Petugas::where('email', session()->get('email'));
+        $email = session()->get('user_email');
+        $dataPetugas = Petugas::where('email', $email)->first();
+
+
+        return view('petugas.DashboardPetugas', [
+            'title' => 'Dashboard Petugas',
+            'dataPetugas' => $dataPetugas,
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
+
+        return view('petugas.create');
         //
     }
 

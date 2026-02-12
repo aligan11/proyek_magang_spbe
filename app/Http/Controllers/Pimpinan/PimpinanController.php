@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Pimpinan;
 
+use App\Http\Controllers\Controller;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class petugasController extends Controller
+class PimpinanController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,12 +18,12 @@ class petugasController extends Controller
         $dataPetugas = Petugas::where('email', $email)->first();
 
 
-        return view('petugas.DashboardPetugas', [
+        return view('pimpinan.DashboardPimpinan', [
             'title' => 'Dashboard Petugas',
             'dataPetugas' => $dataPetugas,
         ]);
+        //
     }
-
 
     /**
      * Show the form for creating a new resource.
