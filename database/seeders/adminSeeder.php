@@ -17,7 +17,7 @@ class adminSeeder extends Seeder
     {
         $data = [
             [
-                'name'     => 'Afghan Almufq',
+                'name'     => 'Afghan Almufqi',
                 'email'    => 'afghan12@gmail.com',
                 'unitKerja'    => 'Seksi Teknologi Informasi dan Komunikasi',
                 'role'    => 'petugas',

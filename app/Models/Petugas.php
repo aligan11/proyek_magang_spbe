@@ -47,4 +47,20 @@ class Petugas extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+
+    public function ticket()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function mandate()
+    {
+        return $this->hasMany(Mandate::class);
+    }
+
+    public function mandate_petugas()
+    {
+        return $this->belongsToMany(Mandate::class);
+    }
 }
