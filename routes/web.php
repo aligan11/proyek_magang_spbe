@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Auth\authController;
-use App\Http\Controllers\Petugas\petugasController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Petugas\PetugasController;
 use App\Http\Controllers\Pimpinan\PimpinanController;
 use App\Http\Middleware\loginCheck;
 use Illuminate\Support\Facades\Route;
@@ -22,17 +22,16 @@ Route::get('password/reset/{token}', [ForgotPasswordController::class, 'showRese
 Route::post('password/reset', [ForgotPasswordController::class, 'reset'])->name('password.update');
 
 
-
 Route::middleware(loginCheck::class)->group(function () {
-
-    route::get('/', [authController::class, 'showLoginForm'])->name('login');
-    route::post('/login', [authController::class, 'login'])->name('login.post');
+    route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
+    route::post('/login', [AuthController::class, 'login'])->name('login.post');
 });
 
 route::middleware('check.role:petugas')->group(function () {
-    route::resource('petugas', petugasController::class);
+    route::resource('petugas', PetugasController::class);
 });
 
 route::middleware('check.role:pimpinan')->group(function () {
+    Route::get('pimpinan/profile', [PimpinanController::class, 'showProfile'])->name('pimpinan.profile');
     route::resource('pimpinan', PimpinanController::class);
 });

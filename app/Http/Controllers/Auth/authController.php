@@ -8,7 +8,7 @@ use App\Rules\loginCheck;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 
-class authController extends Controller
+class AuthController extends Controller
 {
 
 

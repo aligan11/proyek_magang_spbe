@@ -7,7 +7,7 @@ use App\Models\Petugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class petugasController extends Controllera
+class PetugasController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -47,10 +47,7 @@ class petugasController extends Controllera
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
-    {
-        //
-    }
+    public function show(string $id) {}
 
     /**
      * Show the form for editing the specified resource.

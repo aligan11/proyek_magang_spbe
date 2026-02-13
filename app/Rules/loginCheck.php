@@ -45,6 +45,7 @@ class loginCheck implements ValidationRule
             $petugasData =  Petugas::where('email', $email)->first();
             session()->put('login_status', true);
             session()->put('user_email', $email);
+            session()->put('id_petugas', $petugasData->id);
             session()->put('role', $petugasData->role);
         } else {
             session()->put('login_status', false);

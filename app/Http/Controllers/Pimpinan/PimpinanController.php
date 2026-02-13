@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Pimpinan;
 use App\Http\Controllers\Controller;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\Mime\Email;
 
 class PimpinanController extends Controller
 {
@@ -15,12 +17,15 @@ class PimpinanController extends Controller
     {
         // $dataPetugas =  Petugas::where('email', session()->get('email'));
         $email = session()->get('user_email');
+
         $dataPetugas = Petugas::where('email', $email)->first();
+        $Firstname = str($dataPetugas->name)->before(' ')->toString();
 
 
         return view('pimpinan.DashboardPimpinan', [
-            'title' => 'Dashboard Petugas',
+            'title' => 'Dashboard Pimpinan',
             'dataPetugas' => $dataPetugas,
+            'firstname' => $Firstname,
         ]);
         //
     }
@@ -40,13 +45,20 @@ class PimpinanController extends Controller
     {
         //
     }
+    public function show($id) {}
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function showProfile()
+
     {
+        $idPetugas = session('id_petugas');
+        $dataPetugas = Petugas::FindOrFail($idPetugas);
+
         //
+
+        return view('pimpinan.ShowProfilePimpinan', ['title' => 'Dashboard Pimpinan', 'data' => $dataPetugas], compact('dataPetugas'));
     }
 
     /**

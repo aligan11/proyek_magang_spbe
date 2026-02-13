@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
 use Symfony\Component\HttpFoundation\Response;
 
 class loginCheck
@@ -17,11 +18,13 @@ class loginCheck
     {
         $loginStatus = session()->get('login_status');
         $role = session()->get('role');
-        if ($loginStatus || $role == 'petugas') {
-            return redirect()->route('petugas.index');
-        }
-        if ($loginStatus || $role == 'pimpinan') {
-            return redirect()->route('pimpinan.index');
+        if ($loginStatus) {
+            if ($role == 'pimpinan') {
+                return redirect()->route('pimpinan.index');
+            }
+            if ($role == 'petugas') {
+                return redirect()->route('petugas.index');
+            }
         }
         return $next($request);
     }
