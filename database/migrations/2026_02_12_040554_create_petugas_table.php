@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('unitKerja');
             $table->string('email')->unique();
-            $table->enum('role', ['admin', 'pimpinan', 'petugas']);
+            $table->enum('role', ['opd', 'pimpinan', 'petugas']);
             $table->string('daerah')->nullable();
             $table->string('password');
             $table->string('nip')->unique();
@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('phone');
             $table->rememberToken();
 
+            $table->timestamp('last_seen')->nullable();
 
             $table->timestamps();
         });

@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title }} | Executive Dashboard</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="https://cdn.jsdelivr.net" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net"></script>
+
     <script src="{{ asset('js/index.js') }}"></script>
 
 
@@ -62,7 +65,7 @@
                     class="flex items-center gap-3 bg-blue-600/10 text-blue-400 px-4 py-3 rounded-xl font-medium border border-blue-600/20">
                     <i data-lucide="home" class="w-5 h-5"></i> Dashboard
                 </a>
-                <a href="#"
+                <a href="{{ route('mandate.index') }}"
                     class="flex items-center gap-3 text-slate-400 hover:bg-slate-800 hover:text-white px-4 py-3 rounded-xl">
                     <i data-lucide="landmark" class="w-5 h-5"></i>
                     Request OPD

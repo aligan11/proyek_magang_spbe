@@ -6,9 +6,8 @@ use App\Http\Controllers\Pimpinan\PimpinanController;
 use App\Http\Middleware\loginCheck;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-
-
-
+use App\Http\Controllers\MandateController;
+use App\Http\Controllers\RequestOpdController;
 
 route::post('/logout', [authController::class, 'logout'])->name('logout');
 // web.php (Route)
@@ -34,4 +33,6 @@ route::middleware('check.role:petugas')->group(function () {
 route::middleware('check.role:pimpinan')->group(function () {
     Route::get('pimpinan/profile', [PimpinanController::class, 'showProfile'])->name('pimpinan.profile');
     route::resource('pimpinan', PimpinanController::class);
+
+    route::resource('mandate', MandateController::class);
 });

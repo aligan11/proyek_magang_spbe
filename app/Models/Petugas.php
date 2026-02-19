@@ -23,6 +23,7 @@ class Petugas extends Authenticatable
         'pangkat',
         'gol',
         'phone',
+        'last_seen',
     ];
 
     /**
@@ -62,5 +63,10 @@ class Petugas extends Authenticatable
     public function mandate_petugas()
     {
         return $this->belongsToMany(Mandate::class);
+    }
+
+    public function isOnline()
+    {
+        return $this->last_seen && $this->last_seen->diffInMinutes(now()) < 5;
     }
 }
