@@ -61,21 +61,35 @@
 
             <!-- nav -->
             <nav class="flex-1 px-4 space-y-2 mt-4">
-                <a href="#"
-                    class="flex items-center gap-3 bg-blue-600/10 text-blue-400 px-4 py-3 rounded-xl font-medium border border-blue-600/20">
+                <!-- Dashboard -->
+                <a href="{{ route('pimpinan.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300
+        {{ request()->routeIs('pimpinan.index')
+            ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
+            : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
                     <i data-lucide="home" class="w-5 h-5"></i> Dashboard
                 </a>
-                <a href="{{ route('mandate.index') }}"
-                    class="flex items-center gap-3 text-slate-400 hover:bg-slate-800 hover:text-white px-4 py-3 rounded-xl">
+
+                <!-- Request OPD (Aktif jika route-nya indexMandat) -->
+                <a href="{{ route('indexMandat', 1) }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300
+        {{ request()->routeIs('indexMandat')
+            ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20 shadow-sm shadow-blue-500/10'
+            : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
                     <i data-lucide="landmark" class="w-5 h-5"></i>
                     Request OPD
                 </a>
+
+                <!-- Manajemen Petugas -->
                 <a href="#"
-                    class="flex items-center gap-3 text-slate-400 hover:bg-slate-800 hover:text-white px-4 py-3 rounded-xl">
+                    class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300
+        {{ request()->is('petugas*')
+            ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
+            : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
                     <i data-lucide="users" class="w-5 h-5"></i> Manajemen Petugas
                 </a>
-
             </nav>
+
             <!-- Sidebar Footer with Logout -->
             <div class="p-4 border-t border-slate-800 space-y-2">
                 <div class="bg-slate-800/50 rounded-2xl p-4 mb-2">

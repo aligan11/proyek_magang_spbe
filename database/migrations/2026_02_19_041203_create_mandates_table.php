@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('mandates', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('service_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->foreignId('ticket_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('service_id')->nullable()->constrained('jenis_layanan_spbe')->cascadeOnDelete();
+            $table->foreignId('ticket_id')->constrained('layanan_spbe')->cascadeOnDelete();
             $table->foreignId('pimpinan_id')->constrained('petugas')->cascadeOnDelete();
             $table->string('deskripsi');
-            $table->enum('status', ['pending', 'proses', 'selesai'])->default('pending');
+            $table->enum('status', ['pending', 'selesai'])->default('pending');
 
             $table->timestamps();
         });

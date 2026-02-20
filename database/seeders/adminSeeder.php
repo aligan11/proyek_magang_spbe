@@ -21,13 +21,14 @@ class adminSeeder extends Seeder
                 'email'    => 'afghan12@gmail.com',
                 'unitKerja'    => 'Seksi Teknologi Informasi dan Komunikasi',
                 'role'    => 'petugas',
+
                 'daerah'   => null,
                 'password' => Hash::make('password123'), // Jangan lupa di-hash
                 'nip'      => '199501012023011001',
                 'jabatan'  => 'Pranata Komputer',
                 'pangkat'  => 'Penata Muda',
                 'gol'      => 'III/a',
-                'phone'    => '6281234567890', // Gunakan format 62 agar langsung sinkron ke Fonnte
+                'phone'    => '0895417380105', // Gunakan format 62 agar langsung sinkron ke Fonnte
             ],
             [
                 'name'     => 'gan matkuso',
@@ -82,7 +83,7 @@ class adminSeeder extends Seeder
                 'phone'    => '6281399887766',
             ],
             [
-                'name'     => 'Rina Pratama',
+                'name'     => 'Hilal',
                 'email'    => 'rina.petugas@gmail.com',
                 'unitKerja'    => 'Seksi Aplikasi Dasar',
                 'role'    => 'petugas',
@@ -92,7 +93,7 @@ class adminSeeder extends Seeder
                 'jabatan'  => 'Programmer',
                 'pangkat'  => 'Penata Muda',
                 'gol'      => 'III/a',
-                'phone'    => '6287755443322',
+                'phone'    => '082178099027',
             ],
             [
                 'name'     => 'Dedi Kurniawan',
@@ -108,7 +109,7 @@ class adminSeeder extends Seeder
                 'phone'    => '6281988776655',
             ],
             [
-                'name'     => 'Linda Sari',
+                'name'     => 'Pinkan',
                 'email'    => 'linda.petugas@gmail.com',
                 'unitKerja'    => 'Seksi Keamanan Informasi',
                 'role'    => 'petugas',
@@ -118,7 +119,7 @@ class adminSeeder extends Seeder
                 'jabatan'  => 'Analis Keamanan Siber',
                 'pangkat'  => 'Penata Muda',
                 'gol'      => 'III/a',
-                'phone'    => '6285344332211',
+                'phone'    => '081293172600',
             ],
             [
                 'name'     => 'Agus Mulyadi',

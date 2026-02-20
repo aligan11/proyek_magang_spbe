@@ -35,4 +35,8 @@ route::middleware('check.role:pimpinan')->group(function () {
     route::resource('pimpinan', PimpinanController::class);
 
     route::resource('mandate', MandateController::class);
+    route::get('create-mandate/{noreg}', [MandateController::class, 'createMandate'])->name('pimpinan.mandat')->where('noreg', '.*');
+    route::get('mandat-index/{status}', [MandateController::class, 'indexMandat'])->name('indexMandat');
+
+    route::get('ticket-show/{noreg}', [MandateController::class, 'showTicket'])->name('showTicket')->where('noreg', '.*');
 });

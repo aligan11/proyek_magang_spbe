@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Layanan_spbe;
 use App\Models\Mandate;
 use App\Models\Petugas;
 use App\Models\Ticket;
@@ -16,53 +17,81 @@ class MandateController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+
+    public function index() {}
+    public function indexMandat($status)
     {
         $idPetugas = session('id_petugas');
-        $dataPetugas = Petugas::FindOrFail($idPetugas)->first();
+        $dataPetugas = Petugas::findOrFail($idPetugas); // Hapus ->first() karena FindOrFail sudah mengembalikan objek tunggal
         $firstname = str($dataPetugas->name)->before(' ')->toString();
-        $pendingTickets = Ticket::where('status', 'proses')->latest()->get();
-        $totalTickets = Ticket::latest()->get()->count();
-        $pendingTicketsCount = Ticket::where('status', 'pending')->get()->count();
-        $ongoingTicketsCount = Ticket::where('status', 'proses')->get()->count();
+
+        // Menggunakan Model Layanan_spbe sesuai struktur baru Anda
+        // Filter status 'proses' (atau angka 2 jika Anda menggunakan sistem integer)
+        $pendingTickets = Layanan_spbe::with('jenis_layanan')
+            ->where('status', $status)->latest()->get();
+        if ($status == 1) {
+            // Keadaan: Menampilkan Filter 'Belum Ditugaskan' (Aktif)
+            $warna      = 'bg-emerald-600'; // Hijau Emerald Utama
+            $warnaText  = 'text-white';
+
+            $warna2     = 'bg-white';
+            $warnaText2 = 'text-slate-600'; // Abu-abu gelap agar lebih mewah dari hitam pekat
+        } else {
+            // Keadaan: Menampilkan Filter 'Selesai' (Aktif)
+            $warna      = 'bg-white';
+            $warnaText  = 'text-slate-600';
+
+            $warna2     = 'bg-emerald-600';
+            $warnaText2 = 'text-white';
+        }
+
+
+        $totalTickets = Layanan_spbe::count();
+        $pendingTicketsCount = Layanan_spbe::where('status', 1)->count();
+        $ongoingTicketsCount = Layanan_spbe::where('status', 0)->count();
+        $completedTicketsCount = Layanan_spbe::where('status', 2)->count();
+
         $availablePetugas = Petugas::where('role', 'petugas')->get();
-        $petugasOnline = Petugas::where('role', 'petugas')->where('last_seen', '>=', now()->subMinutes(5))->get();
+        $petugasOnline = Petugas::where('role', 'petugas')
+            ->where('last_seen', '>=', now()->subMinutes(5))
+            ->get();
 
-        $completedTicketsCount = Ticket::where('status', 'selesai')->get()->count();
-
-        return view('pimpinan.RequestOpd', [
-            'firstname' => $firstname,
-            'dataPetugas' => $dataPetugas,
-            'pendingTickets' => $pendingTickets,
-            'pendingTicketsCount' => $pendingTicketsCount,
-            'ongoingTicketsCount' => $ongoingTicketsCount,
-            'completedTicketsCount' => $completedTicketsCount,
-            'totalTickets' => $totalTickets,
-            'availablePetugas' => $availablePetugas,
-            'petugasOnline' => $petugasOnline,
-
-
+        return view('pimpinan.RequestOpd', compact(
+            'firstname',
+            'dataPetugas',
+            'pendingTickets',
+            'pendingTicketsCount',
+            'ongoingTicketsCount',
+            'completedTicketsCount',
+            'totalTickets',
+            'availablePetugas',
+            'petugasOnline',
+            'warna',
+            'warna2',
+            'warnaText',
+            'warnaText2',
+            'status',
+        ) + [
             'title' => 'Layanan List Mandat Pimpinan',
         ]);
     }
 
+    public function create() {}
+
+
+
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function createMandate(Request $request, $noreg)
     {
         $idPetugas = session('id_petugas');
-        $searchTicket = $request->input('searchTicket');
         $searchPetugas = $request->input('searchPetugas');
 
         // Cukup satu variabel untuk Tiket dengan filter
-        $pendingTickets = Ticket::with('service')
-            ->where('status', 'proses')
-            ->when($searchTicket, function ($query, $searchTicket) {
-                return $query->where('judul_request', 'LIKE', "%{$searchTicket}%")
-                    ->orWhere('no_ticket', 'LIKE', "%{$searchTicket}%"); // Tambahkan orWhere agar lebih fleksibel
-            })
-            ->latest()->get();
+        $pendingTickets = Layanan_spbe::with('jenis_layanan')
+            ->where('noreg', $noreg)
+            ->firstOrFail();
 
         // Cukup satu variabel untuk Petugas dengan filter
         $availablePetugas = Petugas::where('role', 'petugas')
@@ -87,59 +116,95 @@ class MandateController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
-            'ticket_id' => 'required|exists:tickets,id',
+            'ticket_id' => 'required|exists:layanan_spbe,id',
             'petugas_ids' => 'required|array|min:1',
             'petugas_ids.*' => 'required|exists:petugas,id',
             'deskripsi' => 'required|string|min:10',
         ]);
 
+        // 1. Ambil data ticket terlebih dahulu
+        $ticket = Layanan_spbe::findOrFail($request->ticket_id);
+
         $mandate = Mandate::create([
             'ticket_id' => $request->ticket_id,
             'pimpinan_id' => session('id_petugas'),
             'deskripsi' => $request->deskripsi,
-            'status' => 'pending',
-        ]);
-
-        $petugas = Petugas::whereIn('id', $request->petugas_ids)->get();
-
-        $mandate->mandate_petugas()->attach($request->petugas_ids);
-        $targetNumbers = $petugas->pluck('phone')->filter()->implode(',');
-
-        $ticket = Ticket::where('id', $request->ticket_id);
-
-        $ticket->update([
             'status' => 'selesai',
         ]);
 
+        $petugas = Petugas::whereIn('id', $request->petugas_ids)->get();
+        $mandate->mandate_petugas()->attach($request->petugas_ids);
+        $targetNumbers = $petugas->pluck('phone')->filter()->implode(',');
 
+        // 2. Susun format pesan untuk WhatsApp
+        // Gunakan *text* untuk menebalkan teks di WhatsApp
+        $urlDetail = route('login'); // Sesuaikan nama route detail kamu
+
+        $pesanWhatsapp = "Yth. Petugas Layanan,\n\n" .
+            "Terdapat permohonan baru dengan No. Registrasi: *{$ticket->noreg}*\n" .
+            "Perihal: {$ticket->nama_permohonan}\n\n" . // Sesuaikan nama kolom permohonan
+            "Deskripsi Pimpinan: {$request->deskripsi}\n\n" .
+            "Silahkan akses detail permohonan pada link berikut:\n" .
+            $urlDetail . "\n\n" .
+            "Terima kasih.";
+
+        $ticket->update([
+            'status' => 2,
+        ]);
 
         if ($targetNumbers) {
             $response = FacadesHttp::withHeaders([
                 'authorization' => env('FONNTE_TOKEN'),
             ])->post('https://api.fonnte.com/send', [
                 'target' => $targetNumbers,
-                'message' => $request->deskripsi,
+                'message' => $pesanWhatsapp, // Gunakan variabel pesan yang baru dibuat
             ]);
 
             if ($response->successful()) {
-                return redirect()->route('mandate.index')->with('success', 'Pesan anda berhasil di kirim ke' . $petugas->count() . 'orang');
-                // dd($response->json());
+                return redirect()->route('mandate.index')->with('success', 'Pesan berhasil dikirim ke ' . $petugas->count() . ' petugas');
             }
         }
 
-        return redirect()->route('mandate.create')->withErrors('failed', 'Pesan gagal dikirim');
-        //
+        return redirect()->route('mandate.create')->withErrors('Pesan gagal dikirim');
     }
+
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
+        $mandate = Mandate::with('ticket')->where('id', $id)->firstOrFail();
+        $dataPetugas = Petugas::where('id', session('id_petugas'))->firstOrFail();
+
+
+
+        return view('pimpinan.showMandate', compact('mandate', 'dataPetugas'), [
+            'title' => 'show mandate',
+        ]);
         //
     }
+
+    public function showTicket($noreg)
+    {
+        $dataPetugas = Petugas::where('id', session('id_petugas'))->first();
+
+        // dd($noreg);
+
+        $ticket = Layanan_spbe::where('noreg', $noreg)->firstOrFail();
+        $status = $ticket->status;
+        return view('pimpinan.ShowTicket', [
+            'ticket' => $ticket,
+            'title' => "Informasi detail untuk tiket",
+            'dataPetugas' => $dataPetugas,
+            'status' => $status,
+        ]);
+
+
+        // return redirect()->route('showTicket');
+    }
+
 
     /**
      * Show the form for editing the specified resource.

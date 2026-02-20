@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Jenis_layanan_spbe;
+use App\Models\Kebutuhan_layanan_spbe;
+use App\Models\Layanan_spbe;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -28,6 +31,9 @@ class DatabaseSeeder extends Seeder
                 adminSeeder::class,
                 ServiceSeeder::class,
                 TicketSeeder::class,
+                jenisLayananSeeder::class,
+                kebutuhan_layanan_seeder::class,
+                layanan_spbe_seeder::class,
             ]
         );
     }

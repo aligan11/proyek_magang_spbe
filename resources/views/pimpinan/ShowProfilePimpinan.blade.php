@@ -7,7 +7,7 @@
             <!-- Header / Navigation -->
             <div class="flex items-center justify-between mb-10">
                 <div class="flex items-center gap-5">
-                    <a href="{{ route('pimpinan.index') }}"
+                    <a href="{{ route('indexMandat', 1) }}"
                         class="group p-3 bg-white rounded-2xl shadow-sm border border-slate-200 hover:bg-blue-600 hover:border-blue-600 transition-all duration-300">
                         <i data-lucide="arrow-left"
                             class="w-5 h-5 text-slate-600 group-hover:text-white transition-colors"></i>

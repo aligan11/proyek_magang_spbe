@@ -17,12 +17,12 @@ class Mandate extends Model
 
     public function service()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(Jenis_layanan_spbe::class);
     }
 
     public function ticket()
     {
-        return $this->belongsTo(Ticket::class);
+        return $this->belongsTo(Layanan_spbe::class);
     }
 
     public function pimpinan()

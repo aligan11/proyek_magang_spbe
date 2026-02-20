@@ -19,31 +19,76 @@
 
         <!-- Strategic Stats (Tetap Sesuai Desain Kamu) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
-            <div class="bg-white p-6 rounded-4xl shadow-sm border border-slate-100 relative overflow-hidden">
+            <!-- Card 1: Total Masuk (Static) -->
+            <div class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 relative overflow-hidden group">
                 <div class="relative z-10">
-                    <p class="text-slate-400 text-sm font-medium">Total Masuk</p>
-                    <h3 class="text-3xl font-black text-slate-900 mt-1">{{ $totalTickets ?? '0' }}</h3>
+                    <div
+                        class="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center mb-3 group-hover:bg-slate-100 transition-colors">
+                        <i data-lucide="inbox" class="w-5 h-5 text-slate-400"></i>
+                    </div>
+                    <p class="text-slate-500 text-sm font-semibold tracking-wide">Total Masuk</p>
+                    <h3 class="text-4xl font-black text-slate-900 mt-1 tracking-tight">{{ $totalTickets ?? '0' }}</h3>
                 </div>
-                <i data-lucide="inbox" class="absolute -bottom-2 -right-2 w-24 h-24 text-slate-50 opacity-10"></i>
+                <!-- Background Icon Dekoratif -->
+                <i data-lucide="inbox"
+                    class="absolute -bottom-4 -right-4 w-28 h-28 text-slate-100 opacity-40 transform group-hover:scale-110 transition-transform duration-500"></i>
             </div>
 
-            <div class="bg-white p-6 rounded-4xl shadow-sm border border-slate-100">
-                <p class="text-slate-400 text-sm font-medium">Belum Ditugaskan</p>
-                <h3 class="text-3xl font-black text-amber-500 mt-1">{{ $pendingTicketsCount ?? '0' }}</h3>
-                <p class="text-[10px] text-slate-400 mt-2 font-bold">BUTUH MANDAT SEGERA</p>
+            <!-- Card 2: Belum Ditugaskan (Navigatif/Clickable) -->
+            <div onclick="window.location.href='{{ route('indexMandat', ['status' => 1]) }}'"
+                class="{{ $warna }} p-6 rounded-[2.5rem] shadow-lg relative overflow-hidden cursor-pointer transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl group border border-transparent">
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start">
+                        <p class="{{ $warnaText }} text-sm font-bold opacity-80 tracking-wide">Belum Ditugaskan</p>
+                        <!-- Badge Pulse untuk Status Urgent -->
+                        @if ($status == 1)
+                            <span class="flex h-3 w-3 relative">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                            </span>
+                        @endif
+                    </div>
+                    <h3
+                        class="text-4xl font-black {{ $status == 1 ? 'text-white' : 'text-amber-500' }} mt-1 tracking-tight">
+                        {{ $pendingTicketsCount ?? '0' }}
+                    </h3>
+                    <div class="flex items-center gap-2 mt-3">
+                        <span
+                            class="px-2 py-1 rounded-lg bg-black/5 text-[10px] {{ $warnaText }} font-black tracking-widest uppercase">
+                            Butuh Mandat Segera
+                        </span>
+                    </div>
+                </div>
+                <!-- Glow Effect -->
+                <div
+                    class="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all">
+                </div>
             </div>
 
-            <div class="bg-white p-6 rounded-4xl shadow-sm border border-slate-100">
-                <p class="text-slate-400 text-sm font-medium">Sedang Proses</p>
-                <h3 class="text-3xl font-black text-blue-600 mt-1">{{ $ongoingTicketsCount ?? '0' }}</h3>
-            </div>
-
-            <div class="bg-emerald-600 p-6 rounded-4xl shadow-xl shadow-emerald-100">
-                <p class="text-emerald-100 text-sm font-medium">Selesai (Success)</p>
-                <h3 class="text-3xl font-black text-white mt-1">{{ $completedTicketsCount ?? '0' }}</h3>
-                <i data-lucide="check-circle" class="absolute -bottom-2 -right-2 w-24 h-24 text-white opacity-10"></i>
+            <!-- Card 3: Selesai (Navigatif/Clickable) -->
+            <div onclick="window.location.href='{{ route('indexMandat', ['status' => 2]) }}'"
+                class="{{ $warna2 }} p-6 rounded-[2.5rem] shadow-lg relative overflow-hidden cursor-pointer transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl group border border-transparent">
+                <div class="relative z-10">
+                    <p class="{{ $warnaText2 }} text-sm font-bold opacity-80 tracking-wide">Selesai (Success)</p>
+                    <h3 class="text-4xl font-black {{ $warnaText2 }} mt-1 tracking-tight">
+                        {{ $completedTicketsCount ?? '0' }}</h3>
+                    <div class="flex items-center gap-2 mt-3">
+                        <span
+                            class="px-2 py-1 rounded-lg bg-white/10 text-[10px] {{ $warnaText2 }} font-black tracking-widest uppercase">
+                            Terverifikasi Sistem
+                        </span>
+                    </div>
+                </div>
+                <!-- Icon dengan Animasi Putar saat Hover -->
+                <div
+                    class="absolute -bottom-4 -right-4 transition-all duration-500 transform group-hover:scale-110 group-hover:-rotate-12">
+                    <i data-lucide="check-circle"
+                        class="w-32 h-32 {{ $status == 2 ? 'text-white' : 'text-emerald-500' }} opacity-10"></i>
+                </div>
             </div>
         </div>
+
 
         <!-- Main Section: Daftar Request OPD -->
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
@@ -71,27 +116,57 @@
                             @foreach ($pendingTickets as $ticket)
                                 <tr class="group hover:bg-slate-50 transition-all duration-300">
                                     <td class="px-4 py-4 rounded-l-2xl border-y border-l border-slate-50 bg-slate-50/30">
-                                        <span class="text-sm font-bold text-slate-700">#{{ $ticket->no_ticket }}</span>
+                                        <span class="text-sm font-bold text-slate-700">#{{ $ticket->noreg }}</span>
                                     </td>
                                     <td class="px-4 py-4 border-y border-slate-50 bg-slate-50/30">
-                                        <div class="text-sm font-bold text-slate-900">{{ $ticket->service->nama_layanan }}
+                                        <div class="text-sm font-bold text-slate-900">
+                                            {{ $ticket->jenis_layanan->namajenis }}
                                         </div>
                                         <div class="text-[10px] text-slate-400 truncate w-32">{{ $ticket->judul_request }}
                                         </div>
                                     </td>
                                     <td
                                         class="px-4 py-4 border-y border-slate-50 bg-slate-50/30 text-sm font-medium text-slate-600">
-                                        {{ $ticket->opd->name }}
+                                        {{ $ticket->nama_pemohon }}
                                     </td>
-                                    <td class="px-4 py-4 rounded-r-2xl border-y border-r border-slate-50 bg-slate-50/30">
-                                        <a href="{{ route('mandate.create') }}">
 
-                                            <button
-                                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-[10px] font-bold transition cursor-pointer">
-                                                BERIKAN MANDAT
-                                            </button>
-                                        </a>
+                                    <td class="px-4 py-4 rounded-r-2xl border-y border-r border-slate-50 bg-slate-50/30">
+                                        <div class="flex items-center gap-2">
+                                            {{-- TOMBOL SHOW --}}
+                                            @if ($status == 1)
+                                                <a href="{{ route('showTicket', $ticket->noreg) }}">
+                                                    <button
+                                                        class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-xl text-[10px] font-bold transition cursor-pointer flex items-center gap-1">
+                                                        <i data-lucide="eye" class="w-3 h-3"></i>
+                                                        SHOW
+                                                    </button>
+                                                </a>
+                                            @else
+                                                <a href="{{ route('showTicket', $ticket->noreg) }}">
+                                                    <button
+                                                        class="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black tracking-wider transition-all duration-300 transform active:scale-95 shadow-sm hover:shadow-md cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:-translate-y-0.5">
+                                                        <i data-lucide="eye" class="w-3 h-3"></i>
+                                                        SHOW
+                                                    </button>
+                                                </a>
+                                            @endif
+
+
+                                            @if ($status == 1)
+                                                {{-- TOMBOL MANDAT --}}
+                                                <a href="{{ route('pimpinan.mandat', $ticket->noreg) }}">
+                                                    <button
+                                                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-[10px] font-bold transition cursor-pointer flex items-center gap-1">
+                                                        <i data-lucide="send" class="w-3 h-3"></i>
+                                                        MANDAT
+                                                    </button>
+                                                </a>
+                                            @else
+                                            @endif
+
+                                        </div>
                                     </td>
+
                                 </tr>
                             @endforeach
                         </tbody>
