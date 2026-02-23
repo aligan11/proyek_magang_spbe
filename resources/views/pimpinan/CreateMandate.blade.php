@@ -107,18 +107,23 @@
                         class="w-full bg-slate-50 border border-slate-200 rounded-3xl p-5 text-sm text-slate-700 h-40 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all resize-none shadow-inner"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
-                    <a href="{{ route('mandate.index') }}"
-                        class="text-slate-500 hover:text-slate-800 text-sm font-bold px-6 py-3 transition-colors">
-                        Batal
-                    </a>
-                    <button type="submit"
-                        class="bg-slate-900 hover:bg-black text-white font-black py-4 px-10 rounded-2xl text-sm transition-all shadow-xl hover:shadow-2xl active:scale-95">
-                        Kirim Mandat Sekarang
-                    </button>
-                </div>
-            </form>
+
+                @if ($statusMandat == 'selesai')
+                @else
+                    <div class="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
+                        <a href="{{ route('mandate.index') }}"
+                            class="text-slate-500 hover:text-slate-800 text-sm font-bold px-6 py-3 transition-colors">
+                            Batal
+                        </a>
+                        <button type="submit"
+                            class="bg-slate-900 hover:bg-black text-white font-black py-4 px-10 rounded-2xl text-sm transition-all shadow-xl hover:shadow-2xl active:scale-95">
+                            Kirim Mandat Sekarang
+                        </button>
+                @endif
+
         </div>
+        </form>
+    </div>
     </div>
 
     <script>

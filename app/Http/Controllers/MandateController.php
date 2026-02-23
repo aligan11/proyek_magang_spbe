@@ -93,6 +93,8 @@ class MandateController extends Controller
             ->where('noreg', $noreg)
             ->firstOrFail();
 
+        $statusMandat = Mandate::where('ticket_id', $pendingTickets->id)->value('status');
+
         // Cukup satu variabel untuk Petugas dengan filter
         $availablePetugas = Petugas::where('role', 'petugas')
             ->when($searchPetugas, function ($query, $searchPetugas) {
@@ -107,6 +109,7 @@ class MandateController extends Controller
             'availablePetugas' => $availablePetugas,
             'dataPetugas'      => $dataPetugas,
             'title'            => 'Layanan Tambah Mandat',
+            'statusMandat' => $statusMandat,
         ]);
     }
 
@@ -141,12 +144,17 @@ class MandateController extends Controller
         // Gunakan *text* untuk menebalkan teks di WhatsApp
         $urlDetail = route('login'); // Sesuaikan nama route detail kamu
 
+        $urlBerkas = $ticket->berkas ? asset('storage/doc/' . $ticket->berkas) : 'Tidak ada berkas lampiran';
+
+        // 2. Susun format pesan untuk WhatsApp
         $pesanWhatsapp = "Yth. Petugas Layanan,\n\n" .
             "Terdapat permohonan baru dengan No. Registrasi: *{$ticket->noreg}*\n" .
-            "Perihal: {$ticket->nama_permohonan}\n\n" . // Sesuaikan nama kolom permohonan
+            "Perihal: {$ticket->nama_kebutuhan}\n\n" .
             "Deskripsi Pimpinan: {$request->deskripsi}\n\n" .
             "Silahkan akses detail permohonan pada link berikut:\n" .
             $urlDetail . "\n\n" .
+            "Lihat/Unduh Berkas Lampiran:\n" .
+            $urlBerkas . "\n\n" . // Menampilkan link berkas di sini
             "Terima kasih.";
 
         $ticket->update([
@@ -162,11 +170,11 @@ class MandateController extends Controller
             ]);
 
             if ($response->successful()) {
-                return redirect()->route('mandate.index')->with('success', 'Pesan berhasil dikirim ke ' . $petugas->count() . ' petugas');
+                return redirect()->route('indexMandat', 2)->with('success', 'Pesan berhasil dikirim ke ' . $petugas->count() . ' petugas');
             }
         }
 
-        return redirect()->route('mandate.create')->withErrors('Pesan gagal dikirim');
+        return redirect()->route('pimpinan.mandat', $ticket->noreg)->withErrors('Pesan gagal dikirim');
     }
 
 
