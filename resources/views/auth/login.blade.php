@@ -1,109 +1,205 @@
-    <!DOCTYPE html>
-    <html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <title>Login Internal | DISKOMINFO</title>
-        <style>
-            @import url('https://fonts.googleapis.com');
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <title>Login Internal | DISKOMINFO</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #004a99;
+            background-image: radial-gradient(at 0% 0%, hsla(210, 100%, 23%, 1) 0, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(201, 100%, 35%, 1) 0, transparent 50%);
+        }
 
-            body {
-                font-family: 'Plus Jakarta Sans', sans-serif;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .input-focus-effect:focus {
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
             }
-        </style>
-    </head>
 
-    <body class="bg-[#0057ae]">
+            50% {
+                transform: translateY(-8px);
+            }
+        }
 
-        <div class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-            <!-- Background Decor (Circles) -->
-            <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600 rounded-full opacity-10 blur-3xl"></div>
-            <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-800 rounded-full opacity-10 blur-3xl">
-            </div>
+        @keyframes glow {
 
-            <div class="bg-white rounded-[2rem]  shadow-2xl w-full max-w-md p-10 border border-slate-100 z-10">
-                <!-- Brand Header -->
-                <div class="text-center mb-10">
-                    <div class="inline-flex p-4 bg-blue-50 rounded-2xl mb-4">
-                        <!-- Icon Shield/Lock -->
-                        <svg xmlns="http://www.w3.org" class="h-10 w-10 text-blue-600" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                        </svg>
-                    </div>
-                    <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">DISKOMINFO</h1>
-                    <p class="text-slate-500 mt-2 font-medium">Sistem Informasi Manajemen Terpadu</p>
-                    <div class="mt-4 h-1 w-12 bg-blue-600 mx-auto rounded-full"></div>
-                </div>
+            0%,
+            100% {
+                box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+            }
 
-                <!-- Form Login -->
-                <form method="POST" action="{{ route('login.post') }}" class="space-y-6">
-                    @csrf
+            50% {
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            }
+        }
 
-                    <!-- Email Field -->
-                    <div class="space-y-2">
-                        <label for="email" class="block text-sm font-bold text-slate-700 ml-1">Email
-                            Kedinasan</label>
-                        <div class="relative group">
-                            <input type="email" id="email" name="email" value="{{ old('email') }}"
-                                class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none transition-all duration-300 @error('email') border-red-500 @enderror"
-                                placeholder="nama@babelprov.go.id" required>
-                        </div>
-                        @error('email')
-                            <p class="text-red-500 text-xs mt-1 font-semibold italic">{{ $message }}</p>
-                        @enderror
-                    </div>
 
-                    <!-- Password Field -->
-                    <div class="space-y-2">
-                        <div class="flex justify-between items-center ml-1">
-                            <label for="password" class="block text-sm font-bold text-slate-700">Kata Sandi</label>
-                            <a href="{{ route('password.request') }}"
-                                class="text-xs font-bold text-blue-600 hover:text-blue-800 transition">Lupa
-                                Sandi?</a>
-                        </div>
-                        <input type="password" id="password" name="password"
-                            class="w-full px-5 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none transition-all duration-300 @error('password') border-red-500 @enderror"
-                            placeholder="••••••••" required>
-                        @error('password')
-                            <p class="text-red-500 text-xs mt-1 font-semibold italic">{{ $message }}</p>
-                        @enderror
-                    </div>
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
 
-                    <!-- Remember Me Logika -->
-                    <div class="flex items-center ml-1">
-                        <label class="relative flex items-center cursor-pointer">
-                            <input type="checkbox" id="remember" name="remember"
-                                class="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-500">
-                            <span class="ml-2 text-sm font-medium text-slate-600 select-none">Ingat sesi saya di
-                                perangkat
-                                ini</span>
-                        </label>
-                    </div>
+        .animate-glow {
+            animation: glow 3s ease-in-out infinite;
+        }
 
-                    <!-- Login Button -->
-                    <button type="submit"
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-blue-200 transition-all duration-300 transform active:scale-[0.98]">
-                        Masuk ke Portal
-                    </button>
-                </form>
+        .animate-rotate-slow {
+            animation: rotateSlow 12s linear infinite;
+        }
+    </style>
+</head>
 
-                <!-- Formal Footer -->
-                <div class="mt-12 text-center">
-                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mb-1">Pusat Data dan
-                        Informasi
-                    </p>
-                    <p class="text-[10px] text-slate-400 font-medium tracking-wide">Pemerintah Provinsi Kep. Bangka
-                        Belitung
-                    </p>
+<body class="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+
+    <!-- Elemen Dekoratif Background (Floating Blobs) -->
+    <div
+        class="absolute top-0 -left-20 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob">
+    </div>
+    <div
+        class="absolute bottom-0 -right-20 w-96 h-96 bg-cyan-400 rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob animation-delay-2000">
+    </div>
+
+    <div class="w-full max-w-[480px] z-10">
+        <!-- Logo/Badge Atas -->
+        <div class="flex justify-center mb-8">
+
+            <!-- Outer container -->
+            <div
+                class="bg-white/10 p-3 rounded-3xl backdrop-blur-md border border-white/20 
+                    animate-float animate-glow transition-all duration-300 hover:scale-110">
+
+                <!-- Inner -->
+                <div
+                    class="bg-white p-3 rounded-2xl shadow-lg 
+                        transition duration-300 hover:shadow-2xl">
+
+                    <!-- Icon -->
+                    <svg class="h-6 w-6 text-blue-600 animate-rotate-slow hover:animate-none transition duration-300"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="M12 8v4m0 4h.01" stroke-linecap="round" />
+
+                    </svg>
                 </div>
             </div>
+
         </div>
 
-    </body>
+        <div class="glass-card rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] p-10 md:p-12">
+            <!-- Header Section -->
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-800 text-slate-900 tracking-tight mb-2">Portal Internal</h1>
+                <p class="text-slate-500 font-medium">Masuk ke Sistem Informasi Terpadu</p>
+                <div class="flex justify-center mt-4">
+                    <span class="h-1.5 w-12 bg-blue-600 rounded-full"></span>
+                    <span class="h-1.5 w-2 bg-blue-200 rounded-full ml-1"></span>
+                </div>
+            </div>
 
-    </html>
+            <!-- Form -->
+            <form method="POST" action="{{ route('login.post') }}" class="space-y-6">
+                @csrf
+
+                <!-- Email -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Email
+                        Kedinasan</label>
+                    <div class="group relative">
+                        <div
+                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <input type="email" name="email" value="{{ old('email') }}" required
+                            class="w-full pl-12 pr-5 py-4 bg-slate-100/50 border border-slate-200 rounded-2xl text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-600 focus:outline-none input-focus-effect transition-all duration-300"
+                            placeholder="username@babelprov.go.id">
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center ml-1">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-widest">Kata
+                            Sandi</label>
+                        <a href="{{ route('password.request') }}"
+                            class="text-xs font-bold text-blue-600 hover:text-blue-800">Lupa?</a>
+                    </div>
+                    <div class="group relative">
+                        <div
+                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-blue-600 transition-colors">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <input type="password" name="password" required
+                            class="w-full pl-12 pr-5 py-4 bg-slate-100/50 border border-slate-200 rounded-2xl text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-blue-600 focus:outline-none input-focus-effect transition-all duration-300"
+                            placeholder="••••••••">
+                    </div>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="flex items-center justify-between py-2">
+                    <label class="flex items-center group cursor-pointer">
+                        <div class="relative">
+                            <input type="checkbox" class="peer sr-only" name="remember">
+                            <div
+                                class="w-10 h-6 bg-slate-200 rounded-full peer peer-checked:bg-blue-600 transition-all duration-300">
+                            </div>
+                            <div
+                                class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 peer-checked:translate-x-4">
+                            </div>
+                        </div>
+                        <span class="ml-3 text-sm font-semibold text-slate-600">Ingat Saya</span>
+                    </label>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-[0_10px_20px_rgba(37,99,235,0.3)] transition-all duration-300 transform active:scale-95 flex items-center justify-center space-x-2">
+                    <span>Masuk ke Dashboard</span>
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path d="M13 7l5 5m0 0l-5 5m5-5H6" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-10 text-center">
+            <p class="text-[11px] text-white/60 font-bold uppercase tracking-[0.3em] mb-2">DISKOMINFO PROV. KEP. BABEL
+            </p>
+            <div class="flex items-center justify-center space-x-4">
+                <span class="h-[1px] w-8 bg-white/20"></span>
+                <p class="text-[10px] text-white/40 font-medium tracking-wider italic">Protected by Secure Gateway 2.0
+                </p>
+                <span class="h-[1px] w-8 bg-white/20"></span>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

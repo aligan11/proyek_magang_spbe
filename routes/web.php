@@ -23,7 +23,13 @@ Route::post('password/reset', [ForgotPasswordController::class, 'reset'])->name(
 
 Route::middleware(loginCheck::class)->group(function () {
     route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
+    route::get('/login-pemohon', [AuthController::class, 'showLoginPemohon'])->name('loginPemohon');
     route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    route::get('/register-pemohon', [AuthController::class, 'registerPemohonPage'])->name('registerPage');
+    route::post('/register-pemohon', [AuthController::class, 'registerPemohon'])->name('registerPemohon');
+
+    Route::get('/generate-captcha', [AuthController::class, 'generateCaptcha']);
+    Route::post('/login-pemohon', [AuthController::class, 'loginPemohon'])->name('loginPemohon');
 });
 
 route::middleware('check.role:petugas')->group(function () {
