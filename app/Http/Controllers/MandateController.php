@@ -6,6 +6,7 @@ use App\Models\Layanan_spbe;
 use App\Models\Mandate;
 use App\Models\Petugas;
 use App\Models\Ticket;
+use App\Models\User;
 use GuzzleHttp\Psr7\Query;
 use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
@@ -22,7 +23,7 @@ class MandateController extends Controller
     public function indexMandat($status)
     {
         $idPetugas = session('id_petugas');
-        $dataPetugas = Petugas::findOrFail($idPetugas); // Hapus ->first() karena FindOrFail sudah mengembalikan objek tunggal
+        $dataPetugas = User::findOrFail($idPetugas); // Hapus ->first() karena FindOrFail sudah mengembalikan objek tunggal
         $firstname = str($dataPetugas->name)->before(' ')->toString();
 
         // Menggunakan Model Layanan_spbe sesuai struktur baru Anda
@@ -51,8 +52,8 @@ class MandateController extends Controller
         $ongoingTicketsCount = Layanan_spbe::where('status', 0)->count();
         $completedTicketsCount = Layanan_spbe::where('status', 2)->count();
 
-        $availablePetugas = Petugas::where('role', 'petugas')->get();
-        $petugasOnline = Petugas::where('role', 'petugas')
+        $availablePetugas = User::where('role', 'staff')->get();
+        $petugasOnline = User::where('role', 'staff')
             ->where('last_seen', '>=', now()->subMinutes(5))
             ->get();
 
@@ -96,13 +97,13 @@ class MandateController extends Controller
         $statusMandat = Mandate::where('ticket_id', $pendingTickets->id)->value('status');
 
         // Cukup satu variabel untuk Petugas dengan filter
-        $availablePetugas = Petugas::where('role', 'petugas')
+        $availablePetugas = User::where('role', 'staff')
             ->when($searchPetugas, function ($query, $searchPetugas) {
                 return $query->where('name', 'LIKE', "%{$searchPetugas}%");
             })
             ->latest()->get();
 
-        $dataPetugas = Petugas::findOrFail($idPetugas);
+        $dataPetugas = User::findOrFail($idPetugas);
 
         return view('pimpinan.CreateMandate', [
             'pendingTickets'   => $pendingTickets, // Variabel ini sekarang sudah terfilter
@@ -122,7 +123,7 @@ class MandateController extends Controller
         $request->validate([
             'ticket_id' => 'required|exists:layanan_spbe,id',
             'petugas_ids' => 'required|array|min:1',
-            'petugas_ids.*' => 'required|exists:petugas,id',
+            'petugas_ids.*' => 'required|exists:users,id',
             'deskripsi' => 'required|string|min:10',
         ]);
 
@@ -136,7 +137,7 @@ class MandateController extends Controller
             'status' => 'selesai',
         ]);
 
-        $petugas = Petugas::whereIn('id', $request->petugas_ids)->get();
+        $petugas = User::whereIn('id', $request->petugas_ids)->get();
         $mandate->mandate_petugas()->attach($request->petugas_ids);
         $targetNumbers = $petugas->pluck('phone')->filter()->implode(',');
 
@@ -184,7 +185,7 @@ class MandateController extends Controller
     public function show($id)
     {
         $mandate = Mandate::with('ticket')->where('id', $id)->firstOrFail();
-        $dataPetugas = Petugas::where('id', session('id_petugas'))->firstOrFail();
+        $dataPetugas = User::where('id', session('id_petugas'))->firstOrFail();
 
 
 
@@ -196,7 +197,7 @@ class MandateController extends Controller
 
     public function showTicket($noreg)
     {
-        $dataPetugas = Petugas::where('id', session('id_petugas'))->first();
+        $dataPetugas = User::where('id', session('id_petugas'))->first();
 
         // dd($noreg);
 

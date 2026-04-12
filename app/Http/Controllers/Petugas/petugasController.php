@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Petugas;
 
 use App\Http\Controllers\Controller;
-use App\Models\Petugas;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PetugasController extends Controller
 {
-    /**
+    /**a
      * Display a listing of the resource.
      */
     public function index()
     {
         // $dataPetugas =  Petugas::where('email', session()->get('email'));
         $email = session()->get('user_email');
-        $dataPetugas = Petugas::where('email', $email)->first();
+        $dataPetugas = User::where('email', $email)->first();
 
 
         return view('petugas.DashboardPetugas', [

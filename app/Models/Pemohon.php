@@ -12,8 +12,11 @@ class Pemohon extends Authenticatable
 {
     //
     use HasFactory, Notifiable;
+    protected $table = 'pemohon';
     protected $fillable = [
         'nik',
+        'tipe_user',
+
         'nama_lengkap',
         'email',
         'password',
@@ -45,5 +48,10 @@ class Pemohon extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function instansi()
+    {
+        return $this->belongsTo(Instansi::class, 'id_instansi');
     }
 }

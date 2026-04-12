@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
                 jenisLayananSeeder::class,
                 kebutuhan_layanan_seeder::class,
                 layanan_spbe_seeder::class,
+                instansiSeeder::class,
             ]
         );
     }

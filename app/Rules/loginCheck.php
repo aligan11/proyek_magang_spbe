@@ -3,6 +3,7 @@
 namespace App\Rules;
 
 use App\Models\Petugas;
+use App\Models\User;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Hash;
@@ -27,10 +28,10 @@ class loginCheck implements ValidationRule
         $passwordInput = $this->request->input('password');
         $loginStatus = false;
 
-        $emailPetugasCheck = Petugas::where('email', $email)->count();
+        $emailPetugasCheck = User::where('email', $email)->count();
 
         if ($emailPetugasCheck > 0) {
-            $passwordDb = Petugas::where('email', $email)->value('password');
+            $passwordDb = User::where('email', $email)->value('password');
 
             if (Hash::check($passwordInput, $passwordDb)) {
                 $loginStatus = true;
@@ -42,7 +43,7 @@ class loginCheck implements ValidationRule
         }
 
         if ($loginStatus) {
-            $petugasData =  Petugas::where('email', $email)->first();
+            $petugasData =  User::where('email', $email)->first();
             session()->put('login_status', true);
             session()->put('user_email', $email);
             session()->put('id_petugas', $petugasData->id);

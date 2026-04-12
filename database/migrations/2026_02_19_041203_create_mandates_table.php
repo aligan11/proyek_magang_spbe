@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('service_id')->nullable()->constrained('jenis_layanan_spbe')->cascadeOnDelete();
             $table->foreignId('ticket_id')->constrained('layanan_spbe')->cascadeOnDelete();
-            $table->foreignId('pimpinan_id')->constrained('petugas')->cascadeOnDelete();
+            $table->foreignId('pimpinan_id')->constrained('users')->cascadeOnDelete();
             $table->string('deskripsi');
             $table->enum('status', ['pending', 'selesai'])->default('pending');
 

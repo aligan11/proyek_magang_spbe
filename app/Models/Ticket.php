@@ -24,7 +24,7 @@ class Ticket extends Model
 
     public function opd()
     {
-        return $this->belongsTo(Petugas::class);
+        return $this->belongsTo(User::class);
     }
 
     public function service()

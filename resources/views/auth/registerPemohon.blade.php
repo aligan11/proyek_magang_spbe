@@ -124,17 +124,19 @@
                             placeholder="Masukkan NIP" :required="tipe === 'internal'">
                     </div>
                     <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">Instansi /
-                            OPD</label>
+                        <label class="block text-xs font-bold text-slate-700 ml-1 uppercase tracking-wider">
+                            Instansi / OPD
+                        </label>
                         <select name="id_instansi"
                             class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none transition-all"
                             :required="tipe === 'internal'">
                             <option value="">Pilih Instansi</option>
-                            <option value="1">DISKOMINFO</option>
-                            <option value="2">BAPPEDA</option>
-                            <option value="3">DPPKAD</option>
+                            @foreach ($instansi as $item)
+                                <option value="{{ $item->id }}"> {{ $item->nama_instansi }} </option>
+                            @endforeach
                         </select>
                     </div>
+
                 </div>
 
                 <!-- Baris 4: No HP & Alamat -->

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,12 +20,16 @@ class loginCheck
         $loginStatus = session()->get('login_status');
         $role = session()->get('role');
         if ($loginStatus) {
-            if ($role == 'pimpinan') {
+            if ($role == 'kabid') {
                 return redirect()->route('pimpinan.index');
             }
-            if ($role == 'petugas') {
+            if ($role == 'staff') {
                 return redirect()->route('petugas.index');
             }
+        }
+
+        if (Auth::guard('pemohon')->check()) {
+            return redirect()->route('dashboardPemohon')->with('error', 'gagal');
         }
         return $next($request);
     }

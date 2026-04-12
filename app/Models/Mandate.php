@@ -27,11 +27,11 @@ class Mandate extends Model
 
     public function pimpinan()
     {
-        return $this->belongsTo(Petugas::class);
+        return $this->belongsTo(User::class);
     }
 
     public function mandate_petugas()
     {
-        return $this->belongsToMany(Petugas::class);
+        return $this->belongsToMany(User::class);
     }
 }

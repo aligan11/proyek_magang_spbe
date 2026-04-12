@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthenticatePemohon;
 use App\Http\Middleware\CheckPetugas;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Foundation\Application;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'pimpinan',
             'check.role' => CheckRole::class,
+            'check.pemohon' => AuthenticatePemohon::class,
 
         ]);
     })

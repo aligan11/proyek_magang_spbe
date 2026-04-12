@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Petugas;
+use App\Models\User;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class UpdateLastseen
     public function handle(Request $request, Closure $next): Response
     {
         $idPetugas = session('id_petugas');
-        $pimpinan = Petugas::where('id', $idPetugas)->get();
+        $pimpinan = User::where('id', $idPetugas)->get();
         if ($pimpinan::check()) {
             $pimpinan::update([
                 'last_seen' => now(),

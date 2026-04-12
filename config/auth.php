@@ -21,7 +21,7 @@ return [
     'providers' => [
         'petugas' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Petugas::class,
+            'model' => App\Models\User::class,
         ],
 
         'pemohon' => [

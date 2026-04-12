@@ -44,6 +44,10 @@ class Layanan_spbe extends Model
         'berkasver',
     ];
 
+    protected $casts = [
+        'tgl_permohonan' => 'datetime',
+    ];
+
     public function jenis_layanan()
     {
         return $this->belongsTo(Jenis_layanan_spbe::class, 'id_jenis_layanan');

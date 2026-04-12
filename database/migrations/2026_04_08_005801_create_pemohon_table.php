@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pemohons', function (Blueprint $table) {
+        Schema::create('pemohon', function (Blueprint $table) {
             $table->id();
             $table->enum('tipe_user', ['internal', 'eksternal'])->default('eksternal');
 

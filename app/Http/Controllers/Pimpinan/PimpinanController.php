@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Pimpinan;
 
 use App\Http\Controllers\Controller;
-use App\Models\Petugas;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Mime\Email;
@@ -18,7 +18,7 @@ class PimpinanController extends Controller
         // $dataPetugas =  Petugas::where('email', session()->get('email'));
         $email = session()->get('user_email');
 
-        $dataPetugas = Petugas::where('email', $email)->first();
+        $dataPetugas = User::where('email', $email)->first();
         $Firstname = str($dataPetugas->name)->before(' ')->toString();
 
 
@@ -54,7 +54,7 @@ class PimpinanController extends Controller
 
     {
         $idPetugas = session('id_petugas');
-        $dataPetugas = Petugas::FindOrFail($idPetugas);
+        $dataPetugas = User::FindOrFail($idPetugas);
 
         //
 

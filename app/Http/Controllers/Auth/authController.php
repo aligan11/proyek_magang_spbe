@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Instansi;
 use App\Models\Pemohon;
 use App\Models\Petugas;
 use App\Rules\loginCheck;
@@ -10,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth as FacadesAuth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\Concerns\Has;
 
 class AuthController extends Controller
 {
@@ -33,6 +35,8 @@ class AuthController extends Controller
 
     public function loginPemohon(Request $request)
     {
+
+        // dd($request->all());
         // 1. Validasi Input Dasar
         $request->validate([
             'email' => 'required|email',
@@ -48,12 +52,16 @@ class AuthController extends Controller
         // 3. Logika Login (Contoh Auth Laravel)
         $credentials = $request->only('email', 'password');
 
-        if (FacadesAuth::attempt($credentials)) {
+        $remember = $request->has('remember');
+
+
+        if (FacadesAuth::guard('pemohon')->attempt($credentials, $remember)) {
+
             $request->session()->regenerate();
             // Hapus captcha setelah berhasil login
             session()->forget('captcha_code');
 
-            return redirect()->intended('dashboard');
+            return redirect()->intended('dashboard-pemohon');
         }
 
         return back()->withErrors([
@@ -79,16 +87,16 @@ class AuthController extends Controller
         $remember = $request->has('remember');
 
 
-        if (FacadesAuth::attempt($credentials, $remember)) {
+        if (FacadesAuth::guard('petugas')->attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
             $user = FacadesAuth::user();
             $role = $user->role;
 
 
-            if ($role == 'pimpinan') {
+            if ($role == 'kabid') {
                 return redirect()->route('pimpinan.index');
-            } elseif ($role == 'petugas') {
+            } elseif ($role == 'staff') {
                 return redirect()->route('petugas.index');
             } else {
             }
@@ -103,9 +111,9 @@ class AuthController extends Controller
         // ✅ rules dasar
         $rules = [
             'tipe_user' => 'required|in:internal,eksternal',
-            'nik' => 'required|digits:16|unique:pemohons,nik',
+            'nik' => 'required|digits:16|unique:pemohon,nik',
             'nama_lengkap' => 'required|string|max:255',
-            'email' => 'required|email|unique:pemohons,email',
+            'email' => 'required|email|unique:pemohon,email',
             'password' => 'required|min:6',
             'no_hp' => 'required',
             'captcha' => 'required'
@@ -113,8 +121,8 @@ class AuthController extends Controller
 
         // ✅ tambahan berdasarkan tipe
         if ($request->tipe_user === 'internal') {
-            $rules['nip'] = 'required|digits:18|unique:pemohons,nip';
-            $rules['id_instansi'] = 'required|exists:instansis,id';
+            $rules['nip'] = 'required|digits:18|unique:pemohon,nip';
+            $rules['id_instansi'] = 'required|exists:instansi,id';
         }
 
         if ($request->tipe_user === 'eksternal') {
@@ -144,7 +152,7 @@ class AuthController extends Controller
         session()->forget('captcha');
 
         return redirect()
-            ->route('registerPage')
+            ->route('loginPemohon')
             ->with('success', 'Akun berhasil didaftarkan');
     }
 
@@ -153,8 +161,9 @@ class AuthController extends Controller
         $captcha = strtoupper(Str::random(5));
 
         session(['captcha' => $captcha]);
+        $instansi = Instansi::orderBy('nama_instansi', 'asc')->get();
 
-        return view('Auth.registerPemohon', compact('captcha'));
+        return view('Auth.registerPemohon', compact('captcha', 'instansi'));
     }
 
 
@@ -168,6 +177,17 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    public function logoutPemohon(Request $request)
+    {
+        FacadesAuth::guard('pemohon')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect()->route('loginPemohon');
     }
     //
 }

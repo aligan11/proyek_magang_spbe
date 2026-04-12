@@ -2,25 +2,28 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    use HasFactory, Notifiable;
     protected $fillable = [
         'name',
         'email',
+        'role',
+        'daerah',
+        'unitKerja',
         'password',
+        'nip',
+        'jabatan',
+        'pangkat',
+        'gol',
+        'phone',
+        'last_seen',
     ];
 
     /**
@@ -44,5 +47,26 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+
+    public function ticket()
+    {
+        return $this->hasMany(Ticket::class);
+    }
+
+    public function mandate()
+    {
+        return $this->hasMany(Mandate::class);
+    }
+
+    public function mandate_petugas()
+    {
+        return $this->belongsToMany(Mandate::class);
+    }
+
+    public function isOnline()
+    {
+        return $this->last_seen && $this->last_seen->diffInMinutes(now()) < 5;
     }
 }

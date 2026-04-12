@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Petugas;
 use App\Models\Service;
 use App\Models\Ticket;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -17,7 +18,7 @@ class TicketSeeder extends Seeder
      */
     public function run(): void
     {
-        $opdIds =  Petugas::pluck('id')->toArray();
+        $opdIds =  User::pluck('id')->toArray();
         $serviceIds = Service::pluck('id')->toArray();
 
         $tickets = [
