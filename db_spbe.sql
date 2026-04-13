@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Waktu pembuatan: 13 Apr 2026 pada 03.06
+-- Waktu pembuatan: 13 Apr 2026 pada 07.09
 -- Versi server: 8.0.30
 -- Versi PHP: 8.4.16
 
@@ -129,16 +129,16 @@ CREATE TABLE `jenis_layanan_spbe` (
 --
 
 INSERT INTO `jenis_layanan_spbe` (`id`, `kode`, `namajenis`, `alias`, `linkna`, `modelna`, `referensi`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'LYN001', 'Layanan Perizinan Online', 'E-Izin', 'https://izin.spbe.go.id', 'App\\Models\\Perizinan', 'Perpres No 95 Tahun 2018', 'aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(2, 'LYN002', 'Layanan Pengadaan Barang', 'LPSE', 'https://lpse.spbe.go.id', 'App\\Models\\Pengadaan', 'Perka LKPP 1/2021', 'aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(3, 'LYN003', 'Layanan Kepegawaian', 'SIMPEG', 'https://simpeg.spbe.go.id', 'App\\Models\\Pegawai', 'UU ASN No 5/2014', 'aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(4, 'LYN004', 'Layanan Pengaduan Publik', 'Lapor', 'https://lapor.spbe.go.id', 'App\\Models\\Aspirasi', 'Permenpan RB 62/2018', 'aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(5, 'LYN005', 'Layanan Pajak Daerah', 'E-Pajak', 'https://pajak.spbe.go.id', 'App\\Models\\Pajak', 'Perda No 12/2023', 'aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(6, 'LYN006', 'Layanan Kependudukan', 'SIAK', 'https://dukcapil.spbe.go.id', 'App\\Models\\Penduduk', 'Permendagri 109/2019', 'aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(7, 'LYN007', 'Layanan Anggaran', 'E-Budgeting', 'https://budget.spbe.go.id', 'App\\Models\\Anggaran', 'Permendagri 77/2020', 'aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(8, 'LYN008', 'Layanan Kesehatan', 'E-Health', 'https://health.spbe.go.id', 'App\\Models\\Kesehatan', 'UU Kesehatan 2023', 'non-aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(9, 'LYN009', 'Layanan Pendidikan', 'E-Siswa', 'https://sekolah.spbe.go.id', 'App\\Models\\Pendidikan', 'Permendikbud 1/2021', 'aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(10, 'LYN010', 'Layanan Arsip Digital', 'Srikandi', 'https://arsip.spbe.go.id', 'App\\Models\\Arsip', 'Anri No 4/2021', 'aktif', '2026-02-20 00:57:39', '2026-02-20 00:57:39');
+(1, 'SC01', 'Belanja T.I.K', 'tikbelanja', NULL, 'App\\Models\\Tikbelanja', 'kategori_belanja', '1', NULL, '2026-02-28 09:07:41'),
+(2, 'SC02', 'Pembangunan Aplikasi', 'tikdevapp', NULL, 'App\\Models\\Tiksiskom', NULL, '1', NULL, NULL),
+(3, 'SC03', 'Pusat Data', 'tikpusatdata', NULL, 'App\\Models\\Tiksiskom', NULL, '1', NULL, NULL),
+(4, 'SC04', 'Jaringan Intra Pemda', 'tikjaringan', NULL, 'App\\Models\\Tikjaringan', 'kebutuhan_jaringan', '1', NULL, NULL),
+(5, 'SC05', 'Sistem Penghubung Layanan Pemda', 'tiksispeng', NULL, 'App\\Models\\Tiksiskom', NULL, '1', NULL, NULL),
+(6, 'SC06', 'Manajemen Keamanan Informasi', 'tikkeamanan', NULL, 'App\\Models\\Tiksiskom', NULL, '1', NULL, NULL),
+(7, 'SC07', 'Audit TIK', 'tikaudit', NULL, 'App\\Models\\Tiksiskom', NULL, '1', NULL, NULL),
+(8, 'SC08', 'Sistem Komunikasi Intra Pemda', 'tiksiskom', NULL, 'App\\Models\\Tiksiskom', 'kebutuhan_intra', '1', NULL, NULL),
+(9, 'SC09', 'Pejabat Pengelola Informasi & Dokumentasi', 'tikpejpeng', NULL, 'App\\Models\\Tiksiskom', NULL, '1', NULL, NULL),
+(99, 'VS99', 'Kunjungan', 'tikvisit', NULL, 'App\\Models\\Tikvisit', 'kebutuhan_kunjungan', '1', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -189,24 +189,23 @@ CREATE TABLE `kebutuhan_layanan_spbe` (
   `status` char(1) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ket` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data untuk tabel `kebutuhan_layanan_spbe`
 --
 
-INSERT INTO `kebutuhan_layanan_spbe` (`id`, `id_jenis_layanan_spbe`, `no_kebutuhan`, `nama_kebutuhan`, `status`, `ket`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 'Modul Tanda Tangan Elektronik (TTE)', '1', 'Integrasi dengan BSRE untuk validasi dokumen.', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(2, 2, 2, 'Fitur Reverse Auction', '1', 'Penambahan fitur penawaran harga terbalik.', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(3, 3, 3, 'Update Database SKP 2024', '1', 'Penyesuaian format penilaian kinerja terbaru.', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(4, 4, 4, 'Integrasi WhatsApp Gateway', '1', 'Notifikasi otomatis ke pelapor via WA.', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(5, 5, 1, 'Payment Gateway QRIS', '1', 'Sedang dalam tahap koordinasi dengan Bank.', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(6, 6, 2, 'Sinkronisasi Data Pusat', '1', 'Backup rutin data kependudukan ke server pusat.', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(7, 7, 3, 'Input RKA Perubahan', '1', 'Pembukaan akses input untuk anggaran perubahan.', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(8, 1, 4, 'Tracking Status Berkas', '1', 'Fitur monitoring progres izin oleh pemohon.', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(9, 9, 1, 'Modul PPDB Online', '1', 'Persiapan pendaftaran siswa baru tahun ajaran depan.', '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(10, 10, 2, 'Migrasi Arsip Fisik ke Digital', '1', 'Proses scan dan input dokumen tahun 2020-2023.', '2026-02-20 00:57:39', '2026-02-20 00:57:39');
+INSERT INTO `kebutuhan_layanan_spbe` (`id`, `id_jenis_layanan_spbe`, `no_kebutuhan`, `nama_kebutuhan`, `status`, `ket`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 4, 1, 'Perancangan interkoneksi jaringan intra pemerintah daerah', '1', '-', '2026-02-14 07:21:30', '2026-02-14 07:21:30', NULL),
+(2, 4, 2, 'Pembangunan/pengembangan jaringan intra pemerintah daerah', '1', '-', '2026-02-14 07:22:00', '2026-02-14 07:22:00', NULL),
+(3, 4, 3, 'Perbaikan dan atau pemeliharaan jaringan intra pemerintah daerah', '1', NULL, '2026-02-14 07:23:58', '2026-02-14 07:23:58', NULL),
+(4, 4, 4, 'Rekomendasi kebutuhan peralatan jaringan intra pemerintah daerah', '1', '-', '2026-02-14 07:24:23', '2026-02-14 07:24:23', NULL),
+(5, 8, 1, 'E-mail', '1', NULL, '2026-02-14 07:27:14', '2026-02-14 07:28:17', NULL),
+(6, 8, 2, 'Video Conference (Zoom Meeting)', '1', NULL, '2026-02-14 07:27:40', '2026-02-14 07:27:40', NULL),
+(7, 8, 3, 'Service Desk', '1', '-', '2026-02-14 07:28:03', '2026-02-14 07:28:03', NULL),
+(8, 8, 4, 'Whatsapp Service Desk', '1', NULL, '2026-02-14 07:28:40', '2026-02-14 07:28:40', NULL);
 
 -- --------------------------------------------------------
 
@@ -217,7 +216,7 @@ INSERT INTO `kebutuhan_layanan_spbe` (`id`, `id_jenis_layanan_spbe`, `no_kebutuh
 CREATE TABLE `layanan_spbe` (
   `id` bigint UNSIGNED NOT NULL,
   `id_jenis_layanan` bigint UNSIGNED DEFAULT NULL,
-  `id_kebutuhan` bigint UNSIGNED DEFAULT NULL,
+  `id_kebutuhan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `is_eksternal` char(1) COLLATE utf8mb4_unicode_ci DEFAULT '1',
   `tahunanggaran` year NOT NULL,
   `periode` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -255,23 +254,8 @@ CREATE TABLE `layanan_spbe` (
 --
 
 INSERT INTO `layanan_spbe` (`id`, `id_jenis_layanan`, `id_kebutuhan`, `is_eksternal`, `tahunanggaran`, `periode`, `noreg`, `tgl_permohonan`, `id_instansi`, `nama_instansi`, `unitKerja`, `lokasi`, `nama_kebutuhan`, `nama_pemohon`, `nama_penanggungjawab`, `nip_penanggungjawab`, `nohp_penanggungjawab`, `jabatan_penanggungjawab`, `unitkerja_penanggungjawab`, `email_penanggungjawab`, `ket`, `berkas`, `status`, `inputby`, `tglinput`, `status_ver`, `verby`, `tglver`, `nover`, `ketver`, `berkasver`, `created_at`, `updated_at`) VALUES
-(1, 3, 7, '1', '2024', 'Triwulan I', 'REG/2024/0001', '2026-02-13', 5, 'Diskominfo', 'Bidang Teknologi Informasi', 'Gedung A Lantai 2', 'Pengembangan Sistem Informasi 1', 'Pemohon User 1', 'Bpk/Ibu Pejabat 1', '198501012010011001', '08123456781', 'Kepala Bidang', 'Diskominfo', 'pj1@instansi.go.id', 'Keterangan permohonan ke-1', 'tes.pdf', '2', 'Admin System', '2026-02-20 00:57:39', 'pending', NULL, NULL, NULL, NULL, NULL, '2026-02-20 00:57:39', '2026-02-20 01:04:05'),
-(2, 2, 7, '0', '2024', 'Triwulan I', 'REG/2024/0002', '2026-02-10', 5, 'Dinas Pendidikan', 'Bidang Teknologi Informasi', 'Gedung A Lantai 5', 'Pengembangan Sistem Informasi 2', 'Pemohon User 2', 'Bpk/Ibu Pejabat 2', '198501012010011002', '08123456782', 'Kepala Bidang', 'Dinas Pendidikan', 'pj2@instansi.go.id', 'Keterangan permohonan ke-2', 'tes.pdf', '2', 'Admin System', '2026-02-20 00:57:39', 'disetujui', 'Verifikator Utama', '2026-02-20 00:57:39', 'V/2024/ABC/2', 'Dokumen lengkap dan sesuai.', NULL, '2026-02-20 00:57:39', '2026-02-20 08:02:44'),
-(3, 3, 1, '0', '2024', 'Triwulan I', 'REG/2024/0003', '2026-02-05', 1, 'Bappeda', 'Bidang Teknologi Informasi', 'Gedung A Lantai 4', 'Pengembangan Sistem Informasi 3', 'Pemohon User 3', 'Bpk/Ibu Pejabat 3', '198501012010011003', '08123456783', 'Kepala Bidang', 'Bappeda', 'pj3@instansi.go.id', 'Keterangan permohonan ke-3', 'tes.pdf', '2', 'Admin System', '2026-02-20 00:57:39', 'pending', NULL, NULL, NULL, NULL, NULL, '2026-02-20 00:57:39', '2026-02-20 08:15:11'),
-(4, 2, 9, '0', '2024', 'Triwulan I', 'REG/2024/0004', '2026-01-22', 5, 'Dinas Pendidikan', 'Bidang Teknologi Informasi', 'Gedung A Lantai 2', 'Pengembangan Sistem Informasi 4', 'Pemohon User 4', 'Bpk/Ibu Pejabat 4', '198501012010011004', '08123456784', 'Kepala Bidang', 'Dinas Pendidikan', 'pj4@instansi.go.id', 'Keterangan permohonan ke-4', 'berkas_permohonan_4.pdf', '2', 'Admin System', '2026-02-20 00:57:39', 'disetujui', 'Verifikator Utama', '2026-02-20 00:57:39', 'V/2024/ABC/4', 'Dokumen lengkap dan sesuai.', NULL, '2026-02-20 00:57:39', '2026-02-22 18:52:28'),
-(5, 5, 6, '1', '2024', 'Triwulan I', 'REG/2024/0005', '2026-02-06', 1, 'Dinas Kesehatan', 'Bidang Teknologi Informasi', 'Gedung A Lantai 2', 'Pengembangan Sistem Informasi 5', 'Pemohon User 5', 'Bpk/Ibu Pejabat 5', '198501012010011005', '08123456785', 'Kepala Bidang', 'Dinas Kesehatan', 'pj5@instansi.go.id', 'Keterangan permohonan ke-5', 'tes.pdf', '2', 'Admin System', '2026-02-20 00:57:39', 'pending', NULL, NULL, NULL, NULL, NULL, '2026-02-20 00:57:39', '2026-02-22 19:16:34'),
-(6, 2, 6, '0', '2024', 'Triwulan I', 'REG/2024/0006', '2026-02-18', 3, 'DPMPTSP', 'Bidang Teknologi Informasi', 'Gedung A Lantai 5', 'Pengembangan Sistem Informasi 6', 'Pemohon User 6', 'Bpk/Ibu Pejabat 6', '198501012010011006', '08123456786', 'Kepala Bidang', 'DPMPTSP', 'pj6@instansi.go.id', 'Keterangan permohonan ke-6', 'berkas_permohonan_6.pdf', '1', 'Admin System', '2026-02-20 00:57:39', 'disetujui', 'Verifikator Utama', '2026-02-20 00:57:39', 'V/2024/ABC/6', 'Dokumen lengkap dan sesuai.', NULL, '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(7, 2, 1, '1', '2024', 'Triwulan I', 'REG/2024/0007', '2026-01-27', 3, 'Dinas Pendidikan', 'Bidang Teknologi Informasi', 'Gedung A Lantai 5', 'Pengembangan Sistem Informasi 7', 'Pemohon User 7', 'Bpk/Ibu Pejabat 7', '198501012010011007', '08123456787', 'Kepala Bidang', 'Dinas Pendidikan', 'pj7@instansi.go.id', 'Keterangan permohonan ke-7', 'berkas_permohonan_7.pdf', '1', 'Admin System', '2026-02-20 00:57:39', 'pending', NULL, NULL, NULL, NULL, NULL, '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(8, 2, 9, '1', '2024', 'Triwulan I', 'REG/2024/0008', '2026-01-28', 4, 'Diskominfo', 'Bidang Teknologi Informasi', 'Gedung A Lantai 4', 'Pengembangan Sistem Informasi 8', 'Pemohon User 8', 'Bpk/Ibu Pejabat 8', '198501012010011008', '08123456788', 'Kepala Bidang', 'Diskominfo', 'pj8@instansi.go.id', 'Keterangan permohonan ke-8', 'berkas_permohonan_8.pdf', '1', 'Admin System', '2026-02-20 00:57:39', 'disetujui', 'Verifikator Utama', '2026-02-20 00:57:39', 'V/2024/ABC/8', 'Dokumen lengkap dan sesuai.', NULL, '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(9, 2, 10, '1', '2024', 'Triwulan I', 'REG/2024/0009', '2026-01-29', 1, 'Dinas Kesehatan', 'Bidang Teknologi Informasi', 'Gedung A Lantai 4', 'Pengembangan Sistem Informasi 9', 'Pemohon User 9', 'Bpk/Ibu Pejabat 9', '198501012010011009', '08123456789', 'Kepala Bidang', 'Dinas Kesehatan', 'pj9@instansi.go.id', 'Keterangan permohonan ke-9', 'berkas_permohonan_9.pdf', '1', 'Admin System', '2026-02-20 00:57:39', 'pending', NULL, NULL, NULL, NULL, NULL, '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(10, 1, 6, '0', '2024', 'Triwulan I', 'REG/2024/0010', '2026-01-26', 5, 'Diskominfo', 'Bidang Teknologi Informasi', 'Gedung A Lantai 5', 'Pengembangan Sistem Informasi 10', 'Pemohon User 10', 'Bpk/Ibu Pejabat 10', '198501012010011010', '081234567810', 'Kepala Bidang', 'Diskominfo', 'pj10@instansi.go.id', 'Keterangan permohonan ke-10', 'berkas_permohonan_10.pdf', '1', 'Admin System', '2026-02-20 00:57:39', 'disetujui', 'Verifikator Utama', '2026-02-20 00:57:39', 'V/2024/ABC/10', 'Dokumen lengkap dan sesuai.', NULL, '2026-02-20 00:57:39', '2026-02-20 00:57:39'),
-(11, 2, 3, '1', '2026', 'Triwulan 2', 'REG-20260412-001', '2026-04-12', 4, 'Dinas Pendidikan', NULL, NULL, 'tess cube bai', 'gan asn', 'Afghan Almufqi', '199501012023011001', '0895417380105', 'Pranata Komputer', 'Seksi Teknologi Informasi dan Komunikasi', 'afghan12@gmail.com', 'oyy oyy cube kirim', '1775957930_SERTIF SEM 1.pdf', '1', '5', '2026-04-11 18:38:50', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-11 18:38:50', '2026-04-11 18:38:50'),
-(12, 1, 3, '1', '2026', 'Triwulan 2', 'REG-20260412-002', '2026-04-12', 4, 'Dinas Pendidikan', NULL, NULL, 'tess ajaa nyube', 'gan asn', 'Afghan Almufqi', '199501012023011001', '0895417380105', 'Pranata Komputer', 'Seksi Teknologi Informasi dan Komunikasi', 'afghan12@gmail.com', 'oyyy nyube bai', '1775957981_SERTIF SEM 1.pdf', '1', '5', '2026-04-11 18:39:41', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-11 18:39:41', '2026-04-11 18:39:41'),
-(13, 9, 8, '1', '2026', 'Triwulan 2', 'REG-20260412-003', '2026-04-12', 4, 'Dinas Pendidikan', NULL, NULL, 'tess ajaa nyube', 'gan asn', 'Afghan Almufqi', '199501012023011001', '0895417380105', 'Pranata Komputer', 'Seksi Teknologi Informasi dan Komunikasi', 'afghan12@gmail.com', 'cube baii oy', '1775958334_SERTIF SEM 1.pdf', '1', '5', '2026-04-11 18:45:34', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-11 18:45:34', '2026-04-11 18:45:34'),
-(14, 1, 1, '0', '2026', 'Triwulan 2', 'REG-20260412-004', '2026-04-12', 4, 'Dinas Pendidikan', NULL, NULL, 'coba bae', 'gan asn', 'Afghan Almufqi', '199501012023011001', '0895417380105', 'Pranata Komputer', 'Seksi Teknologi Informasi dan Komunikasi', 'afghan12@gmail.com', 'oy cubeee', '1775959252_SERTIF SEM 1.pdf', '1', '5', '2026-04-11 19:00:52', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-11 19:00:52', '2026-04-11 19:00:52'),
-(15, 6, 5, '0', '2026', 'Triwulan 2', 'REG-20260412-005', '2026-04-12', 4, 'Dinas Pendidikan', NULL, NULL, 'oyy ko nyube ook', 'gan asn', 'Afghan Almufqi', '199501012023011001', '0895417380105', 'Pranata Komputer', 'Seksi Teknologi Informasi dan Komunikasi', 'afghan12@gmail.com', 'ahahahhahah', '1775960059_SERTIF SEM 1.pdf', '1', '5', '2026-04-11 19:14:19', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-11 19:14:19', '2026-04-11 19:14:19'),
-(16, 3, 3, '0', '2026', 'Triwulan 2', 'REG-20260412-006', '2026-04-12', 4, 'Dinas Pendidikan', NULL, NULL, 'coba bae 1', 'gan asn', 'Afghan Almufqi', '199501012023011001', '0895417380105', 'Pranata Komputer', 'Seksi Teknologi Informasi dan Komunikasi', 'afghan12@gmail.com', 'asdasdasdasd', '1775960384_SERTIF_SEM_3.pdf', '1', '5', '2026-04-11 19:19:44', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-11 19:19:44', '2026-04-11 19:19:44'),
-(17, 10, 7, '0', '2026', 'Triwulan 2', 'REG-20260412-007', '2026-04-12', 4, 'Dinas Pendidikan', NULL, NULL, 'oyy cube tes gan', 'gan asn', 'Afghan Almufqi', '199501012023011001', '0895417380105', 'Pranata Komputer', 'Seksi Teknologi Informasi dan Komunikasi', 'afghan12@gmail.com', 'asasdads', '1775960447_SERTIF_SEM_3.pdf', '1', '5', '2026-04-11 19:20:47', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-11 19:20:47', '2026-04-11 19:20:47');
+(18, 4, '3,1,4,2', '0', '2026', 'Triwulan 2', 'REG-20260413-001', '2026-04-13', 4, 'Dinas Pendidikan', 'e-gov', 'jalan maya', 'coba aja', 'gan asn', 'royy', '198810202015032012', '0895417380190', 'kepala saja', 'informatika', 'royy@gmail.com', 'oyyy cube baii', '1776055700_SERTIF_SEM_1.pdf', '1', '5', '2026-04-12 21:48:20', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-12 21:48:20', '2026-04-12 21:48:20'),
+(19, 4, '[\"3\",\"1\",\"4\"]', '0', '2026', 'Triwulan 2', 'REG-20260413-002', '2026-04-13', 4, 'Dinas Pendidikan', 'e-gov', 'jalan maya1', 'tess ajaa nyube', 'gan asn', 'royy', '198810202015032013', '0895417380191', 'kepala bai', 'informasi', 'royy2@gmail.com', 'cubbeee oy', '1776055900_SERTIF_SEM_3.pdf', '1', '5', '2026-04-12 21:51:40', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-12 21:51:40', '2026-04-12 21:51:40');
 
 -- --------------------------------------------------------
 
@@ -378,7 +362,7 @@ CREATE TABLE `pemohon` (
 INSERT INTO `pemohon` (`id`, `tipe_user`, `nik`, `nama_lengkap`, `email`, `password`, `no_hp`, `nip`, `id_instansi`, `alamat`, `email_verified_at`, `remember_token`, `created_at`, `updated_at`) VALUES
 (1, 'eksternal', '3175092301940002', 'gan', 'gan@gmail.com', '$2y$12$g0B.p/E/cFcl54hyKlpxlOmHY2ghps.08YA2rdV9adLu333lUaFZ6', '0895417380105', NULL, NULL, 'ampui', NULL, '32exfeRQqYbnFJL9eIekNNh5btb6gtR1IVztWXsD9lHpP6tGzKIefbA43hK4', '2026-04-08 17:53:50', '2026-04-08 17:53:50'),
 (3, 'eksternal', '3175092301940007', 'gann intera', 'asn@gmail.com', '$2y$12$98kkQ1XSFNOaJiK.eo.9IeCUHstxroXtLdtZl19v8d1VDP0JD3pG6', '0895417380104', '123312312313131234', 9, NULL, NULL, NULL, '2026-04-08 21:08:37', '2026-04-08 21:08:37'),
-(5, 'internal', '3175092301940003', 'gan asn', 'ganasn@gmail.com', '$2y$12$fNvAkpiBEhZOMYo4bxvNLeZTDrKQG4LtD6lPy7PHBpJogL3BZT.fm', '0895417380106', '123312312313131235', 4, NULL, NULL, NULL, '2026-04-08 21:18:11', '2026-04-10 00:22:55');
+(5, 'internal', '3175092301940003', 'gan asn', 'ganasn@gmail.com', '$2y$12$fNvAkpiBEhZOMYo4bxvNLeZTDrKQG4LtD6lPy7PHBpJogL3BZT.fm', '0895417380106', '123312312313131235', 4, NULL, NULL, 'Al34V8nDBcOCqqBi4saUkscYCr44PXXhDipYeapBmfFjZG11YuLybjIPXZz1', '2026-04-08 21:18:11', '2026-04-10 00:22:55');
 
 -- --------------------------------------------------------
 
@@ -400,8 +384,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('ahSOT7Wb6GharzildY5QKNu7Rk3xqKzWi2YyUbzF', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiTm5JN3h5cjJqb0RrdnYwd3loMmk3bjZmY0ljdUg0OTk4RE1XQWVocSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wZW1vaG9uIjtzOjU6InJvdXRlIjtzOjEzOiJwZW1vaG9uLmluZGV4Ijt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1NDoibG9naW5fcGVtb2hvbl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjU7fQ==', 1775960385),
-('yJJrgBzrBIa7B8BI0oOKr9zyh1evL5XsNylZ2Jap', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiWk5DM2dWWW9lNmJjN0VRNDZpNExaS1lPSzh5dW42OGJjcGZuTzNndiI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6ODM6Imh0dHA6Ly9iMDBkLTI0MDQtODAwMC0xMDM2LTgyMS1kOGViLTliMDktZDE2OS1jYzQzLm5ncm9rLWZyZWUuYXBwL2Rhc2hib2FyZC1wZW1vaG9uIjtzOjU6InJvdXRlIjtzOjE2OiJkYXNoYm9hcmRQZW1vaG9uIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1NDoibG9naW5fcGVtb2hvbl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjU7fQ==', 1775960615);
+('H1StiGl4xRiL1cQjf1kf3I4SYo5IUwKmHoPoc0wG', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoielk5cEJGTWFBNE82eUJQN3A3WEJ5YzZJVDk0bnpOV0Q4aVBKNm5iSiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wZW1vaG9uIjtzOjU6InJvdXRlIjtzOjEzOiJwZW1vaG9uLmluZGV4Ijt9czo1NDoibG9naW5fcGVtb2hvbl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjU7fQ==', 1776059841);
 
 -- --------------------------------------------------------
 
@@ -585,7 +568,7 @@ ALTER TABLE `instansi`
 -- AUTO_INCREMENT untuk tabel `jenis_layanan_spbe`
 --
 ALTER TABLE `jenis_layanan_spbe`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
 -- AUTO_INCREMENT untuk tabel `jobs`
@@ -603,7 +586,7 @@ ALTER TABLE `kebutuhan_layanan_spbe`
 -- AUTO_INCREMENT untuk tabel `layanan_spbe`
 --
 ALTER TABLE `layanan_spbe`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT untuk tabel `mandates`
@@ -649,8 +632,7 @@ ALTER TABLE `kebutuhan_layanan_spbe`
 -- Ketidakleluasaan untuk tabel `layanan_spbe`
 --
 ALTER TABLE `layanan_spbe`
-  ADD CONSTRAINT `layanan_spbe_id_jenis_layanan_foreign` FOREIGN KEY (`id_jenis_layanan`) REFERENCES `jenis_layanan_spbe` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `layanan_spbe_id_kebutuhan_foreign` FOREIGN KEY (`id_kebutuhan`) REFERENCES `kebutuhan_layanan_spbe` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `layanan_spbe_id_jenis_layanan_foreign` FOREIGN KEY (`id_jenis_layanan`) REFERENCES `jenis_layanan_spbe` (`id`) ON DELETE CASCADE;
 
 --
 -- Ketidakleluasaan untuk tabel `mandates`
