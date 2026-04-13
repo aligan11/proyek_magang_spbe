@@ -9,6 +9,12 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://googleapis.com" rel="stylesheet">
+
+    <!-- Tambahkan di head atau sebelum script -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.5.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.5.2/dist/js/tom-select.complete.min.js"></script>
+
+
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -193,5 +199,68 @@
 
     @yield('content')
 </body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // 1. Inisialisasi Tom Select
+        var kebutuhanControl = new TomSelect('#kebutuhan', {
+            plugins: ['remove_button'],
+            valueField: 'id', // Sesuaikan dengan primary key di database
+            labelField: 'nama_kebutuhan', // Sesuaikan dengan kolom nama di database
+            searchField: 'nama_kebutuhan',
+            placeholder: 'Pilih satu atau lebih kebutuhan...',
+            maxItems: 10,
+            allowEmptyOption: true,
+        });
+
+        // 2. Event Listener untuk Jenis Layanan
+        const jenisLayananSelect = document.getElementById('jenis_layanan');
+
+        if (jenisLayananSelect) {
+            jenisLayananSelect.addEventListener('change', function() {
+                const idJenis = this.value;
+
+                // Reset Tom Select setiap kali ganti jenis
+                kebutuhanControl.clear();
+                kebutuhanControl.clearOptions();
+
+                if (idJenis) {
+                    // Beri feedback loading
+                    kebutuhanControl.addOption({
+                        id: '',
+                        nama_kebutuhan: 'Memuat data...'
+                    });
+                    kebutuhanControl.refreshOptions(false);
+
+                    fetch(`/get-kebutuhan/${idJenis}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Gagal memuat data');
+                            return response.json();
+                        })
+                        .then(data => {
+                            kebutuhanControl.clearOptions(); // Hapus tulisan loading
+
+                            if (data.length > 0) {
+                                kebutuhanControl.addOptions(data);
+                                kebutuhanControl.refreshOptions(false);
+                            } else {
+                                kebutuhanControl.addOption({
+                                    id: '',
+                                    nama_kebutuhan: 'Tidak ada data untuk jenis ini'
+                                });
+                                kebutuhanControl.refreshOptions(false);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert("Gagal mengambil data kebutuhan.");
+                        });
+                }
+            });
+        }
+    });
+</script>
+
+
 
 </html>

@@ -50,10 +50,16 @@ class PemohonController extends Controller
     {
         // Mengambil semua data untuk dropdown di form
         $jenis = Jenis_layanan_spbe::all();
-        $kebutuhan = Kebutuhan_layanan_spbe::all();
 
-        return view('pemohon.LayananPemohonPage', compact('jenis', 'kebutuhan'));
+        return view('pemohon.LayananPemohonPage', compact('jenis',));
     }
+
+    public function getKebutuhan($id_jenis)
+    {
+        $kebutuhan = Kebutuhan_layanan_spbe::where('id_jenis_layanan_spbe', $id_jenis)->get();
+        return response()->json($kebutuhan);
+    }
+
 
 
 
@@ -110,13 +116,23 @@ class PemohonController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. Validasi Input
+        // 1. Validasi Input (Ditambah field lokasi dan data PJ)
         $request->validate([
             'nama_kebutuhan'    => 'required|string|max:255',
             'id_jenis_layanan'  => 'required|integer',
-            'id_kebutuhan'      => 'required|integer',
+            'id_kebutuhan' => 'required|array|min:1',
+            'lokasi'            => 'required|string|max:255', // Tambahan Lokasi
+            'unit_kerja'        => 'required|string|max:255', // Tambahan Unit Kerja Pemohon
             'berkas'            => 'required|file|mimes:pdf,docx,zip|max:10240',
             'ket'               => 'nullable|string',
+
+            // Validasi Data Penanggung Jawab (Manual Input)
+            'nama_pj'           => 'required|string|max:255',
+            'nip_pj'            => 'required|string|max:50',
+            'jabatan_pj'        => 'required|string|max:255',
+            'unitkerja_pj'      => 'required|string|max:255',
+            'nohp_pj'           => 'required|string|max:20',
+            'email_pj'          => 'required|email|max:255',
         ]);
 
         // 2. Ambil data pemohon
@@ -131,20 +147,19 @@ class PemohonController extends Controller
         $fileName = null;
         if ($request->hasFile('berkas')) {
             $file = $request->file('berkas');
-            // Hilangkan spasi pada nama file agar link tidak rusak di WhatsApp
             $originalName = str_replace(' ', '_', $file->getClientOriginalName());
             $fileName = time() . '_' . $originalName;
             $file->move(public_path('storage/doc'), $fileName);
         }
 
-        // Ambil penanggung jawab (Kabid pertama untuk data tabel)
-        $penanggungJawab = User::where('role', 'kabid')->first();
-
         // 5. Simpan ke Database
         $layanan = Layanan_spbe::create([
             'id_jenis_layanan' => $request->id_jenis_layanan,
-            'id_kebutuhan'     => $request->id_kebutuhan,
+            'id_kebutuhan' => $request->id_kebutuhan,
+
             'nama_kebutuhan'   => $request->nama_kebutuhan,
+            'lokasi'           => $request->lokasi,         // Simpan Lokasi Manual
+            'unitKerja'        => $request->unit_kerja,     // Simpan Unit Kerja Manual
             'ket'              => $request->ket,
             'berkas'           => $fileName,
             'noreg'            => $noreg,
@@ -153,12 +168,15 @@ class PemohonController extends Controller
             'tgl_permohonan'   => now(),
             'status'           => 1,
             'is_eksternal'     => empty($user->id_instansi) ? 1 : 0,
-            'nama_penanggungjawab'      => $penanggungJawab->name,
-            'nip_penanggungjawab'       => $penanggungJawab->nip,
-            'nohp_penanggungjawab'      => $penanggungJawab->phone,
-            'jabatan_penanggungjawab'   => $penanggungJawab->jabatan,
-            'unitkerja_penanggungjawab' => $penanggungJawab->unitKerja,
-            'email_penanggungjawab'     => $penanggungJawab->email,
+
+            // Simpan Data Penanggung Jawab dari Input Manual Form
+            'nama_penanggungjawab'      => $request->nama_pj,
+            'nip_penanggungjawab'       => $request->nip_pj,
+            'nohp_penanggungjawab'      => $request->nohp_pj,
+            'jabatan_penanggungjawab'   => $request->jabatan_pj,
+            'unitkerja_penanggungjawab' => $request->unitkerja_pj,
+            'email_penanggungjawab'     => $request->email_pj,
+
             'inputby'          => $user->id,
             'tglinput'         => now(),
             'id_instansi'      => $user->id_instansi,
@@ -172,7 +190,6 @@ class PemohonController extends Controller
 
         if ($targetNumbers) {
             $urlDetail = route('login');
-            // MENGGUNAKAN secure_asset agar link diawali https:// (ngrok friendly)
             $urlBerkas = secure_asset('storage/doc/' . $layanan->berkas);
 
             $pesanWhatsapp = "Yth. Petugas Layanan (Kabid),\n\n" .
@@ -180,6 +197,7 @@ class PemohonController extends Controller
                 "No. Reg: *{$noreg}*\n" .
                 "Instansi: " . ($userWithInstansi->instansi->nama_instansi ?? '-') . "\n" .
                 "Perihal: {$request->nama_kebutuhan}\n" .
+                "Lokasi: {$request->lokasi}\n" . // Tambahkan lokasi di pesan WA
                 "Tgl Pengajuan: " . date('d-m-Y H:i') . "\n\n" .
                 "Silahkan cek detail pada link berikut:\n" .
                 $urlDetail . "\n\n" .
@@ -198,6 +216,7 @@ class PemohonController extends Controller
         return redirect()->route('pemohon.index')
             ->with('success', 'Permohonan berhasil dikirim. No Reg: ' . $noreg);
     }
+
 
 
 

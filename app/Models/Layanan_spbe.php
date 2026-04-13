@@ -46,7 +46,9 @@ class Layanan_spbe extends Model
 
     protected $casts = [
         'tgl_permohonan' => 'datetime',
+        'id_kebutuhan' => 'array',
     ];
+
 
     public function jenis_layanan()
     {

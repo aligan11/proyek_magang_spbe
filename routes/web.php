@@ -51,6 +51,8 @@ Route::middleware(loginCheck::class)->group(function () {
 Route::middleware(['check.pemohon'])->group(function () {
     Route::get('dashboard-pemohon', [PemohonController::class, 'dashboardPemohon'])->name('dashboardPemohon');
     Route::get('dashboard-pemohon/layanan', [PemohonController::class, 'layananPemohonPage'])->name('pemohon.layanan');
+    Route::get('/get-kebutuhan/{id_jenis}', [PemohonController::class, 'getKebutuhan']);
+
     Route::resource('pemohon', PemohonController::class);
 });
 
