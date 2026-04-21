@@ -8,8 +8,8 @@ use App\Models\Petugas;
 use App\Models\Ticket;
 use App\Models\User;
 use GuzzleHttp\Psr7\Query;
-use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http as FacadesHttp;
 use PHPUnit\Metadata\Before;
 
@@ -22,14 +22,20 @@ class MandateController extends Controller
     public function index() {}
     public function indexMandat($status)
     {
-        $idPetugas = session('id_petugas');
+        $idPetugas = Auth::guard('petugas')->user()->id;
         $dataPetugas = User::findOrFail($idPetugas); // Hapus ->first() karena FindOrFail sudah mengembalikan objek tunggal
         $firstname = str($dataPetugas->name)->before(' ')->toString();
 
         // Menggunakan Model Layanan_spbe sesuai struktur baru Anda
         // Filter status 'proses' (atau angka 2 jika Anda menggunakan sistem integer)
         $pendingTickets = Layanan_spbe::with('jenis_layanan')
-            ->where('status', $status)->latest()->get();
+            ->where('status', $status)
+            ->when(request('search'), function ($query) {
+                $query->where('noreg', 'like', '%' . request('search') . '%')
+                    ->orWhere('nama_kebutuhan', 'like', '%' . request('search') . '%');
+            })
+            ->latest()
+            ->paginate(10);
         if ($status == 1) {
             // Keadaan: Menampilkan Filter 'Belum Ditugaskan' (Aktif)
             $warna      = 'bg-emerald-600'; // Hijau Emerald Utama
@@ -86,7 +92,8 @@ class MandateController extends Controller
      */
     public function createMandate(Request $request, $noreg)
     {
-        $idPetugas = session('id_petugas');
+        $idPetugas = Auth::guard('petugas')->user()->id;
+
         $searchPetugas = $request->input('searchPetugas');
 
         // Cukup satu variabel untuk Tiket dengan filter
@@ -122,23 +129,24 @@ class MandateController extends Controller
     {
         $request->validate([
             'ticket_id' => 'required|exists:layanan_spbe,id',
-            'petugas_ids' => 'required|array|min:1',
-            'petugas_ids.*' => 'required|exists:users,id',
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'required|exists:users,id',
             'deskripsi' => 'required|string|min:10',
         ]);
 
         // 1. Ambil data ticket terlebih dahulu
         $ticket = Layanan_spbe::findOrFail($request->ticket_id);
+        $idPetugas = Auth::guard('petugas')->user()->id;
 
         $mandate = Mandate::create([
             'ticket_id' => $request->ticket_id,
-            'pimpinan_id' => session('id_petugas'),
+            'pimpinan_id' => $idPetugas,
             'deskripsi' => $request->deskripsi,
             'status' => 'selesai',
         ]);
 
-        $petugas = User::whereIn('id', $request->petugas_ids)->get();
-        $mandate->mandate_petugas()->attach($request->petugas_ids);
+        $petugas = User::whereIn('id', $request->user_ids)->get();
+        $mandate->mandate_users()->attach($request->user_ids);
         $targetNumbers = $petugas->pluck('phone')->filter()->implode(',');
 
         // 2. Susun format pesan untuk WhatsApp
@@ -184,8 +192,10 @@ class MandateController extends Controller
      */
     public function show($id)
     {
+        $idPetugas = Auth::guard('petugas')->user()->id;
+
         $mandate = Mandate::with('ticket')->where('id', $id)->firstOrFail();
-        $dataPetugas = User::where('id', session('id_petugas'))->firstOrFail();
+        $dataPetugas = User::where('id', $idPetugas)->firstOrFail();
 
 
 
@@ -197,7 +207,9 @@ class MandateController extends Controller
 
     public function showTicket($noreg)
     {
-        $dataPetugas = User::where('id', session('id_petugas'))->first();
+        $idPetugas = Auth::guard('petugas')->user()->id;
+
+        $dataPetugas = User::where('id', $idPetugas)->first();
 
         // dd($noreg);
 

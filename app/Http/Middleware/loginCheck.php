@@ -17,20 +17,24 @@ class loginCheck
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $loginStatus = session()->get('login_status');
-        $role = session()->get('role');
-        if ($loginStatus) {
-            if ($role == 'kabid') {
-                return redirect()->route('pimpinan.index');
-            }
-            if ($role == 'staff') {
-                return redirect()->route('petugas.index');
+        // Jika sudah login sebagai petugas, arahkan ke dashboard masing-masing
+        if (Auth::guard('petugas')->check()) {
+            $user = Auth::guard('petugas')->user();
+            if ($user) {
+                if ($user->role == 'kabid') {
+                    return redirect()->route('pimpinan.index');
+                }
+                if ($user->role == 'staff') {
+                    return redirect()->route('petugas.index');
+                }
             }
         }
 
+        // Jika sudah login sebagai pemohon, arahkan ke dashboard pemohon
         if (Auth::guard('pemohon')->check()) {
-            return redirect()->route('dashboardPemohon')->with('error', 'gagal');
+            return redirect()->route('dashboardPemohon');
         }
+
         return $next($request);
     }
 }

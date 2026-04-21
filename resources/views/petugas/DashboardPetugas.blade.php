@@ -1,17 +1,12 @@
 @extends('petugas.layout.AppPetugas')
 @section('dashboard')
     <!-- Header Welcome -->
-    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4" x-data="{ openFinishModal: false, selectedMandateId: null, selectedNoreg: '' }">
         <div>
             <h1 class="text-3xl font-black text-slate-800 tracking-tight">Dashboard Kerja</h1>
             <p class="text-slate-500 text-sm font-medium">Pantau dan kelola laporan tugas lapangan secara
                 real-time.</p>
         </div>
-        <button
-            class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-blue-200 transition-all active:scale-95">
-            <i data-lucide="plus-circle" class="w-5 h-5"></i>
-            Buat Laporan Baru
-        </button>
     </div>
 
     <!-- Stats Cards -->
@@ -22,7 +17,7 @@
             </div>
             <div>
                 <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Total Tugas</p>
-                <h3 class="text-2xl font-black text-slate-800">{{ $dataPetugas->laporans_count ?? 0 }}</h3>
+                <h3 class="text-2xl font-black text-slate-800">{{ $stats['total'] }}</h3>
             </div>
         </div>
 
@@ -31,8 +26,8 @@
                 <i data-lucide="clock" class="w-6 h-6"></i>
             </div>
             <div>
-                <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Menunggu</p>
-                <h3 class="text-2xl font-black text-slate-800">12</h3>
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Proses</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ $stats['proses'] }}</h3>
             </div>
         </div>
 
@@ -42,7 +37,7 @@
             </div>
             <div>
                 <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Selesai</p>
-                <h3 class="text-2xl font-black text-slate-800">128</h3>
+                <h3 class="text-2xl font-black text-slate-800">{{ $stats['selesai'] }}</h3>
             </div>
         </div>
 
@@ -58,7 +53,7 @@
     </div>
 
     <!-- Content Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" x-data="{ openFinishModal: false, selectedMandateId: null, selectedNoreg: '' }">
         <!-- Mini Profile -->
         <div class="lg:col-span-1 space-y-6">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -66,16 +61,14 @@
                 <div class="px-6 pb-6">
                     <div class="relative flex justify-center">
                         <div class="absolute -top-12 bg-white p-1 rounded-full border-4 border-slate-50 shadow-md">
-                            <div
-                                class="w-20 h-20 bg-slate-200 rounded-full flex items-center justify-center text-slate-400">
-                                <i data-lucide="user" class="w-10 h-10"></i>
+                            <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 font-black text-2xl">
+                                {{ substr($dataPetugas->name, 0, 1) }}
                             </div>
                         </div>
                     </div>
                     <div class="mt-10 text-center">
                         <h4 class="text-lg font-bold text-slate-800">{{ $dataPetugas->name }}</h4>
-                        <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium">NIP:
-                            {{ $dataPetugas->nip ?? '-' }}</span>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium">NIP: {{ $dataPetugas->nip ?? '-' }}</span>
                     </div>
                     <div class="mt-6 space-y-4 border-t border-slate-100 pt-6 text-sm">
                         <div class="flex justify-between">
@@ -95,10 +88,7 @@
         <div class="lg:col-span-2">
             <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
                 <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center">
-                    <h3 class="font-black text-slate-800 text-lg uppercase tracking-tight">Laporan Terkini</h3>
-                    <a href="#"
-                        class="text-blue-600 text-xs font-bold hover:bg-blue-50 px-4 py-2 rounded-xl transition">LIHAT
-                        SEMUA</a>
+                    <h3 class="font-black text-slate-800 text-lg uppercase tracking-tight">Tugas Mandat</h3>
                 </div>
                 <div class="overflow-x-auto px-4 pb-4">
                     <table class="w-full text-left border-separate border-spacing-y-3">
@@ -111,43 +101,78 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @forelse($mandates as $mandate)
                             <tr class="bg-slate-50/50 hover:bg-slate-100/50 transition-colors">
-                                <td class="px-4 py-4 rounded-l-2xl text-xs font-bold text-blue-600">#LP-0921
-                                </td>
+                                <td class="px-4 py-4 rounded-l-2xl text-xs font-bold text-blue-600">#{{ $mandate->ticket->noreg }}</td>
                                 <td class="px-4 py-4">
-                                    <p class="text-sm font-bold text-slate-800">Gangguan Jaringan FO</p>
-                                    <p class="text-[10px] text-slate-400 font-medium">Kantor Gubernur Babel</p>
+                                    <p class="text-sm font-bold text-slate-800">{{ $mandate->ticket->nama_kebutuhan }}</p>
+                                    <p class="text-[10px] text-slate-400 font-medium">{{ $mandate->ticket->nama_instansi }}</p>
                                 </td>
                                 <td class="px-4 py-4 text-center">
-                                    <span
-                                        class="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-black rounded-lg">PROSES</span>
+                                    @php
+                                        $statusColor = match($mandate->status) {
+                                            'proses' => 'bg-amber-100 text-amber-700',
+                                            'selesai' => 'bg-emerald-100 text-emerald-700',
+                                            default => 'bg-slate-100 text-slate-700'
+                                        };
+                                    @endphp
+                                    <span class="px-3 py-1 {{ $statusColor }} text-[10px] font-black rounded-lg uppercase">{{ $mandate->status }}</span>
                                 </td>
                                 <td class="px-4 py-4 text-right rounded-r-2xl">
-                                    <button
-                                        class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-blue-600 transition shadow-sm"><i
-                                            data-lucide="eye" class="w-4 h-4"></i></button>
+                                    <div class="flex justify-end gap-2">
+                                        @if($mandate->status == 'proses')
+                                        <button @click="openFinishModal = true; selectedMandateId = {{ $mandate->id }}; selectedNoreg = '{{ $mandate->ticket->noreg }}'"
+                                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-[10px] font-bold transition shadow-sm cursor-pointer flex items-center gap-1">
+                                            <i data-lucide="check" class="w-3 h-3"></i> SELESAIKAN
+                                        </button>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
-                            <!-- Additional Row -->
-                            <tr class="bg-slate-50/50 hover:bg-slate-100/50 transition-colors">
-                                <td class="px-4 py-4 rounded-l-2xl text-xs font-bold text-blue-600">#LP-0920
-                                </td>
-                                <td class="px-4 py-4">
-                                    <p class="text-sm font-bold text-slate-800">Instalasi Access Point</p>
-                                    <p class="text-[10px] text-slate-400 font-medium">Gedung Diskominfo</p>
-                                </td>
-                                <td class="px-4 py-4 text-center">
-                                    <span
-                                        class="px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black rounded-lg">SELESAI</span>
-                                </td>
-                                <td class="px-4 py-4 text-right rounded-r-2xl">
-                                    <button
-                                        class="p-2 hover:bg-white rounded-lg text-slate-400 hover:text-blue-600 transition shadow-sm"><i
-                                            data-lucide="eye" class="w-4 h-4"></i></button>
-                                </td>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-10 text-slate-400 italic font-medium">Belum ada tugas yang ditugaskan.</td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
+                    <div class="mt-4">
+                        {{ $mandates->links() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Selesaikan Tugas -->
+        <div x-show="openFinishModal" class="fixed inset-0 z-[100] overflow-y-auto" x-cloak>
+            <div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" @click="openFinishModal = false"></div>
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div x-show="openFinishModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                    class="relative transform overflow-hidden rounded-[2.5rem] bg-white p-8 shadow-2xl transition-all w-full max-w-md">
+                    <div class="text-center mb-6">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 mb-4">
+                            <i data-lucide="check-circle" class="w-10 h-10"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-800">Selesaikan Tugas</h3>
+                        <p class="text-slate-500 text-sm font-medium">No Registrasi: <span class="text-blue-600 font-bold" x-text="selectedNoreg"></span></p>
+                    </div>
+
+                    <form :action="'/petugas/update-status/' + selectedMandateId" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        @csrf
+                        <input type="hidden" name="status" value="selesai">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Keterangan Verifikasi</label>
+                            <textarea name="keterangan" rows="3" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-100 outline-none transition-all text-sm" placeholder="Jelaskan tindakan yang telah dilakukan..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Upload Bukti (Opsional)</label>
+                            <input type="file" name="berkas" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                        </div>
+                        <div class="pt-4 flex gap-3">
+                            <button type="button" @click="openFinishModal = false" class="flex-1 px-6 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">Batal</button>
+                            <button type="submit" class="flex-1 px-6 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition-all">Simpan</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

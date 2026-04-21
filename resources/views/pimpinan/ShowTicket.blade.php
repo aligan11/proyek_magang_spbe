@@ -14,6 +14,13 @@
             </div>
         </div>
 
+        <div class="mb-6 flex justify-end">
+            <a href="{{ route('pimpinan.download.pdf', $ticket->id) }}" class="bg-white border border-slate-200 text-slate-600 px-6 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 hover:bg-slate-50 transition shadow-sm group">
+                <i data-lucide="printer" class="w-4 h-4 text-rose-500 group-hover:scale-125 transition-transform"></i>
+                Cetak Dokumen Permohonan
+            </a>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 space-y-6">
 

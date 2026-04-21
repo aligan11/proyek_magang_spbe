@@ -9,11 +9,17 @@
                 <p class="text-slate-500 mt-1">Berikut adalah pantauan progres laporan hari ini,
                     {{ now()->translatedFormat('d F Y') }}.</p>
             </div>
-            <div class="flex gap-2">
-                <span class="bg-blue-50 text-blue-600 px-4 py-2 rounded-2xl text-xs font-bold flex items-center gap-2">
-                    <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                    Sistem Aktif
-                </span>
+            <div class="flex gap-3">
+                <a href="{{ route('pimpinan.export.pdf') }}"
+                    class="bg-white border border-slate-200 text-slate-600 px-5 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 hover:bg-slate-50 transition shadow-sm">
+                    <i data-lucide="file-text" class="w-4 h-4 text-rose-500"></i>
+                    Export PDF
+                </a>
+                <a href="{{ route('pimpinan.export.excel') }}"
+                    class="bg-white border border-slate-200 text-slate-600 px-5 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 hover:bg-slate-50 transition shadow-sm">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-500"></i>
+                    Export Excel
+                </a>
             </div>
         </div>
 
@@ -95,11 +101,16 @@
 
             <!-- List Request (Table Area) -->
             <div class="xl:col-span-2 bg-white rounded-4xl border border-slate-100 p-8 shadow-sm">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                     <div>
                         <h3 class="font-bold text-lg text-slate-900">Request OPD Terbaru</h3>
                         <p class="text-xs text-slate-400">Klik "Berikan Mandat" untuk menugaskan petugas</p>
                     </div>
+                    <form action="{{ url()->current() }}" method="GET" class="relative w-full md:w-64">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari No. Reg..."
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:ring-4 focus:ring-blue-100 outline-none transition-all">
+                        <i data-lucide="search" class="absolute left-3 top-2.5 w-4 h-4 text-slate-400"></i>
+                    </form>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -120,9 +131,9 @@
                                     </td>
                                     <td class="px-4 py-4 border-y border-slate-50 bg-slate-50/30">
                                         <div class="text-sm font-bold text-slate-900">
-                                            {{ $ticket->jenis_layanan->namajenis }}
+                                            {{ $ticket->jenis_layanan->namajenis ?? '-' }}
                                         </div>
-                                        <div class="text-[10px] text-slate-400 truncate w-32">{{ $ticket->judul_request }}
+                                        <div class="text-[10px] text-slate-400 truncate w-32">{{ $ticket->nama_kebutuhan }}
                                         </div>
                                     </td>
                                     <td
@@ -132,25 +143,11 @@
 
                                     <td class="px-4 py-4 rounded-r-2xl border-y border-r border-slate-50 bg-slate-50/30">
                                         <div class="flex items-center gap-2">
-                                            {{-- TOMBOL SHOW --}}
-                                            @if ($status == 1)
-                                                <a href="{{ route('showTicket', $ticket->noreg) }}">
-                                                    <button
-                                                        class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-xl text-[10px] font-bold transition cursor-pointer flex items-center gap-1">
-                                                        <i data-lucide="eye" class="w-3 h-3"></i>
-                                                        SHOW
-                                                    </button>
-                                                </a>
-                                            @else
-                                                <a href="{{ route('showTicket', $ticket->noreg) }}">
-                                                    <button
-                                                        class="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black tracking-wider transition-all duration-300 transform active:scale-95 shadow-sm hover:shadow-md cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:-translate-y-0.5">
-                                                        <i data-lucide="eye" class="w-3 h-3"></i>
-                                                        SHOW
-                                                    </button>
-                                                </a>
-                                            @endif
-
+                                            <a href="{{ route('showTicket', $ticket->noreg) }}"
+                                                class="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black tracking-wider transition-all duration-300 transform active:scale-95 shadow-sm hover:shadow-md cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:-translate-y-0.5">
+                                                <i data-lucide="eye" class="w-3 h-3"></i>
+                                                SHOW
+                                            </a>
 
                                             @if ($status == 1)
                                                 {{-- TOMBOL MANDAT --}}
@@ -161,16 +158,16 @@
                                                         MANDAT
                                                     </button>
                                                 </a>
-                                            @else
                                             @endif
-
                                         </div>
                                     </td>
-
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-6">
+                    {{ $pendingTickets->links() }}
                 </div>
             </div>
 

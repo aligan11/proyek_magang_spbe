@@ -27,11 +27,11 @@ Route::post('password/reset', [ForgotPasswordController::class, 'reset'])->name(
 
 
 Route::middleware(loginCheck::class)->group(function () {
-    route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
+    route::get('/login-pimpinan', [AuthController::class, 'showLoginForm'])->name('login');
     route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
     route::get('/register-pemohon', [AuthController::class, 'registerPemohonPage'])->name('registerPage');
-    route::get('/login-pemohon', [AuthController::class, 'showLoginPemohon'])->name('loginPemohon');
+    route::get('/', [AuthController::class, 'showLoginPemohon'])->name('loginPemohon');
     route::get('/forgot-password-pemohon', [ForgotPasswordPemohonController::class, 'forgotPemohon'])->name('forgotPemohon');
 
     route::post('/register-pemohon', [AuthController::class, 'registerPemohon'])->name('registerPemohon');
@@ -51,18 +51,34 @@ Route::middleware(loginCheck::class)->group(function () {
 Route::middleware(['check.pemohon'])->group(function () {
     Route::get('dashboard-pemohon', [PemohonController::class, 'dashboardPemohon'])->name('dashboardPemohon');
     Route::get('dashboard-pemohon/layanan', [PemohonController::class, 'layananPemohonPage'])->name('pemohon.layanan');
+    Route::get('profile-pemohon/', [PemohonController::class, 'profilePage'])->name('pemohon.profile');
     Route::get('/get-kebutuhan/{id_jenis}', [PemohonController::class, 'getKebutuhan']);
+    // Route untuk update data profil (Nama & Email)
+    Route::put('/profile/update', [PemohonController::class, 'updateProfile'])->name('pemohon.profile.update');
 
+    // Route untuk update password
+    Route::put('/profile/password', [PemohonController::class, 'updatePassword'])->name('pemohon.password.update');
+
+    Route::get('pemohon/download-pdf/{id}', [PemohonController::class, 'downloadPdf'])->name('pemohon.download.pdf');
     Route::resource('pemohon', PemohonController::class);
 });
 
 
 route::middleware('check.role:staff')->group(function () {
+    Route::get('petugas/profile', [PetugasController::class, 'profile'])->name('petugas.profile');
+    Route::put('petugas/profile/update', [PetugasController::class, 'updateProfile'])->name('petugas.profile.update');
+    Route::put('petugas/profile/password', [PetugasController::class, 'updatePassword'])->name('petugas.password.update');
+    Route::post('petugas/update-status/{id}', [PetugasController::class, 'updateStatus'])->name('petugas.updateStatus');
     route::resource('petugas', PetugasController::class);
 });
 
 route::middleware('check.role:kabid')->group(function () {
     Route::get('pimpinan/profile', [PimpinanController::class, 'showProfile'])->name('pimpinan.profile');
+    Route::put('pimpinan/profile/update', [PimpinanController::class, 'updateProfile'])->name('pimpinan.profile.update');
+    Route::put('pimpinan/profile/password', [PimpinanController::class, 'updatePassword'])->name('pimpinan.password.update');
+    Route::get('pimpinan/export-pdf', [PimpinanController::class, 'exportPdf'])->name('pimpinan.export.pdf');
+    Route::get('pimpinan/export-excel', [PimpinanController::class, 'exportExcel'])->name('pimpinan.export.excel');
+    Route::get('pimpinan/download-pdf/{id}', [PimpinanController::class, 'downloadSinglePdf'])->name('pimpinan.download.pdf');
     route::resource('pimpinan', PimpinanController::class);
 
     route::resource('mandate', MandateController::class);

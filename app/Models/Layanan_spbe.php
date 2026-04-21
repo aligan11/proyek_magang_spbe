@@ -44,11 +44,25 @@ class Layanan_spbe extends Model
         'berkasver',
     ];
 
+    const STATUS_PENDING = 1;
+    const STATUS_PROSES = 2;
+    const STATUS_SELESAI = 3;
+
     protected $casts = [
         'tgl_permohonan' => 'datetime',
+        'tglinput' => 'datetime',
         'id_kebutuhan' => 'array',
     ];
 
+    public function inputer()
+    {
+        return $this->belongsTo(Pemohon::class, 'inputby');
+    }
+
+    public function instansi_rel()
+    {
+        return $this->belongsTo(Instansi::class, 'id_instansi');
+    }
 
     public function jenis_layanan()
     {
@@ -60,8 +74,8 @@ class Layanan_spbe extends Model
         return $this->belongsTo(Kebutuhan_layanan_spbe::class);
     }
 
-    public function mandate()
+    public function mandates()
     {
-        return $this->hasMany(Mandate::class);
+        return $this->hasMany(Mandate::class, 'ticket_id');
     }
 }

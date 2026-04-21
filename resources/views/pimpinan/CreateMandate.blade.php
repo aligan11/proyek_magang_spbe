@@ -78,7 +78,7 @@
                                     TAMBAH
                                 </button>
                             </div>
-                            @error('petugas_ids')
+                            @error('user_ids')
                                 <p class="text-[10px] text-red-500 font-bold mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -162,7 +162,7 @@
             const nama = select.options[select.selectedIndex].getAttribute('data-nama');
 
             // Cek duplikasi
-            if (document.querySelector(`input[value="${id}"][name="petugas_ids[]"]`)) {
+            if (document.querySelector(`input[value="${id}"][name="user_ids[]"]`)) {
                 alert('Petugas ini sudah ada dalam daftar.');
                 return;
             }
@@ -175,7 +175,7 @@
             tag.innerHTML = `
                 <div class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
                 <span>${nama}</span>
-                <input type="hidden" name="petugas_ids[]" value="${id}">
+                <input type="hidden" name="user_ids[]" value="${id}">
                 <button type="button" onclick="this.parentElement.remove(); checkPlaceholder();"
                     class="ml-2 p-1.5 rounded-xl text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all">
                     <i data-lucide="x" class="w-3.5 h-3.5"></i>

@@ -60,7 +60,7 @@ class User extends Authenticatable
         return $this->hasMany(Mandate::class);
     }
 
-    public function mandate_petugas()
+    public function mandate_users()
     {
         return $this->belongsToMany(Mandate::class);
     }

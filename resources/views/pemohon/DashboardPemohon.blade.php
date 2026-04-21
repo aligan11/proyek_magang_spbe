@@ -37,16 +37,21 @@
                 <div class="text-right hidden sm:block border-r border-slate-100 pr-3 md:pr-4">
                     <p
                         class="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 italic">
-                        Tipe</p>
+                        Tipe Akun</p>
                     <span
                         class="px-2 md:px-3 py-1 rounded-full text-[8px] md:text-[9px] font-black uppercase italic {{ $user->tipe_user === 'internal' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700' }}">
                         {{ $user->tipe_user }}
                     </span>
                 </div>
-                <div
-                    class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-blue-600 shadow-lg shadow-blue-200 flex items-center justify-center text-white font-black text-sm md:text-base uppercase italic">
-                    {{ substr($user->nama_lengkap, 0, 2) }}
-                </div>
+                <a href="{{ route('pemohon.profile') }}" class="group">
+                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-blue-600 shadow-lg shadow-blue-200 flex items-center justify-center text-white font-black text-sm md:text-base overflow-hidden border-2 border-transparent group-hover:border-blue-600 transition-all">
+                        @if($user->avatar)
+                            <img src="{{ asset('storage/avatars/' . $user->avatar) }}" class="w-full h-full object-cover">
+                        @else
+                            {{ substr($user->nama_lengkap, 0, 2) }}
+                        @endif
+                    </div>
+                </a>
             </div>
         </header>
 
@@ -86,7 +91,7 @@
                 </div>
 
                 <div class="pt-2 md:pt-0">
-                    <a href="{{ route('pemohon.layanan') }}"
+                    <a href="{{ route('pemohon.create') }}"
                         class="inline-block bg-white text-blue-700 px-6 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all text-center w-full sm:w-auto">
                         Mulai Ajukan Layanan
                     </a>
@@ -142,6 +147,58 @@
                     class="w-full bg-blue-600 text-white py-4 rounded-xl md:rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100 hover:bg-blue-700 transition active:scale-95 text-center">
                     Cek Katalog Layanan
                 </a>
+            </div>
+        </div>
+
+        <!-- Latest History Section -->
+        <div class="bg-white rounded-[2.5rem] p-6 md:p-10 border border-slate-100 shadow-sm">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h3 class="text-xl font-black text-slate-800 tracking-tight uppercase">Riwayat Terakhir</h3>
+                    <p class="text-xs text-slate-400 font-bold mt-1">Status pengajuan terbaru Anda</p>
+                </div>
+                <a href="{{ route('pemohon.index') }}" class="text-blue-600 text-xs font-black uppercase tracking-widest hover:underline">Lihat Semua</a>
+            </div>
+
+            <div class="space-y-4">
+                @forelse($latestRequests as $req)
+                    <div class="flex items-center justify-between p-4 md:p-5 rounded-3xl bg-slate-50/50 hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-blue-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-black text-slate-800 tracking-tight">{{ $req->nama_kebutuhan }}</p>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">#{{ $req->noreg }} • {{ $req->tglinput->diffForHumans() }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            @php
+                                $statusLabel = match($req->status) {
+                                    1 => 'Pending',
+                                    2 => 'Proses',
+                                    3 => 'Selesai',
+                                    default => 'Pending'
+                                };
+                                $statusColor = match($req->status) {
+                                    1 => 'text-amber-600 bg-amber-50 border-amber-100',
+                                    2 => 'text-blue-600 bg-blue-50 border-blue-100',
+                                    3 => 'text-emerald-600 bg-emerald-50 border-emerald-100',
+                                    default => 'text-slate-600 bg-slate-50 border-slate-100'
+                                };
+                            @endphp
+                            <span class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border {{ $statusColor }}">
+                                {{ $statusLabel }}
+                            </span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-10">
+                        <p class="text-slate-400 font-bold italic text-sm">Belum ada riwayat pengajuan.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
 

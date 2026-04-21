@@ -79,7 +79,7 @@ class AuthController extends Controller
         // dd($request->all());
         $request->validate([
             'email' => 'required|email',
-            'password' => ['required', new loginCheck($request)],
+            'password' => 'required',
         ]);
 
         $credentials = $request->only('email', 'password');
@@ -90,7 +90,7 @@ class AuthController extends Controller
         if (FacadesAuth::guard('petugas')->attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            $user = FacadesAuth::user();
+            $user = FacadesAuth::guard('petugas')->user();
             $role = $user->role;
 
 
@@ -170,13 +170,13 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        FacadesAuth::logout();
+        FacadesAuth::guard('petugas')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('loginPemohon');
     }
 
     public function logoutPemohon(Request $request)
@@ -187,7 +187,7 @@ class AuthController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->route('loginPemohon');
+        return redirect()->route('login');
     }
     //
 }

@@ -7,6 +7,8 @@
     <title>{{ $title }} | Portal Petugas Lapangan</title>
     <link rel="stylesheet" href="{{ asset('css/output.css') }}">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com');
 
@@ -40,11 +42,22 @@
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <div class="hidden md:block text-right border-r border-slate-700 pr-4">
-                            <p class="text-slate-100 text-sm font-bold">{{ $dataPetugas->name }}</p>
-                            <p class="text-blue-400 text-[10px] font-bold uppercase tracking-tighter">
-                                {{ $dataPetugas->jabatan ?? 'Petugas Lapangan' }}</p>
-                        </div>
+                        <a href="{{ route('petugas.profile') }}" class="hidden md:flex items-center gap-3 text-right border-r border-slate-700 pr-4 group">
+                            <div>
+                                <p class="text-slate-100 text-sm font-bold group-hover:text-blue-400 transition-colors">{{ $dataPetugas->name }}</p>
+                                <p class="text-blue-400 text-[10px] font-bold uppercase tracking-tighter">
+                                    {{ $dataPetugas->jabatan ?? 'Petugas Lapangan' }}</p>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-slate-700 border-2 border-slate-600 overflow-hidden group-hover:border-blue-500 transition-all">
+                                @if($dataPetugas->avatar)
+                                    <img src="{{ asset('storage/avatars/' . $dataPetugas->avatar) }}" class="w-full h-full object-cover">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center text-slate-400">
+                                        <i data-lucide="user" class="w-5 h-5"></i>
+                                    </div>
+                                @endif
+                            </div>
+                        </a>
 
                         <button onclick="toggleLogoutModal()"
                             class="flex items-center gap-2 bg-red-500/10 hover:bg-red-600 text-red-500 hover:text-white px-4 py-2 rounded-xl text-sm font-bold transition-all border border-red-500/20">
@@ -99,6 +112,7 @@
             modal.classList.toggle('hidden');
         }
     </script>
+    @include('sweetalert::alert')
 </body>
 
 </html>

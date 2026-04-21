@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
@@ -15,13 +16,20 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, $requiredRole): Response
     {
-        $loginStatus = session()->get('login_status');
-        $role = session()->get('role');
+        // 1. Cek apakah login sebagai petugas
+        if (Auth::guard('petugas')->check()) {
+            $user = Auth::guard('petugas')->user();
 
+            // 2. Cek apakah role-nya sesuai dengan parameter middleware
+            if ($user->role === $requiredRole) {
+                return $next($request); // Berhasil, lanjut ke halaman
+            }
 
-        if (!$loginStatus || $role !== $requiredRole) {
-            return redirect()->route('login')->withErrors(['error' => 'Akses tidak diizinkan!']);
+            // Jika login tapi role salah
+            return abort(403, 'Anda tidak memiliki hak akses.');
         }
-        return $next($request);
+
+        // Jika tidak login sebagai petugas, lempar ke halaman login petugas
+        return redirect()->route('login')->with('error', 'Silakan Login Terlebih Dahulu');
     }
 }

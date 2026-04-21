@@ -1,7 +1,7 @@
 @extends('pimpinan.layout.AppPimpinan')
 
 @section('dashboard')
-    <div class="min-h-screen bg-slate-50/50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-slate-50/50 py-8 px-4 sm:px-6 lg:px-8" x-data="{ tab: 'profile' }">
         <div class="max-w-5xl mx-auto">
 
             <!-- Header / Navigation -->
@@ -20,14 +20,6 @@
                         </p>
                     </div>
                 </div>
-
-                <!-- Badge Status -->
-                <div class="hidden sm:block">
-                    <span
-                        class="bg-emerald-50 text-emerald-600 text-xs font-bold px-4 py-2 rounded-full border border-emerald-100 uppercase tracking-widest">
-                        Akun Terverifikasi
-                    </span>
-                </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -36,134 +28,190 @@
                 <div class="lg:col-span-4 space-y-6">
                     <div
                         class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/60 border border-slate-100 p-8 text-center relative overflow-hidden">
-                        <!-- Decorative Background -->
                         <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-blue-600 to-indigo-700"></div>
 
                         <div class="relative z-10">
-                            <div class="relative inline-block mb-5">
-                                <div class="w-32 h-32 bg-white p-1 rounded-full shadow-lg">
-                                    <div
-                                        class="w-full h-full bg-slate-100 rounded-full flex items-center justify-center border border-slate-100 overflow-hidden">
-                                        <i data-lucide="user" class="text-slate-400 w-16 h-16"></i>
+                            <form action="{{ route('pimpinan.profile.update') }}" method="POST"
+                                enctype="multipart/form-data" id="avatarForm">
+                                @csrf
+                                @method('PUT')
+                                <div class="relative inline-block mb-5 group">
+                                    <div class="w-32 h-32 bg-white p-1 rounded-full shadow-lg overflow-hidden">
+                                        <div
+                                            class="w-full h-full bg-slate-100 rounded-full flex items-center justify-center border border-slate-100 overflow-hidden relative">
+                                            @if ($dataPetugas->avatar)
+                                                <img src="{{ asset('storage/avatars/' . $dataPetugas->avatar) }}"
+                                                    class="w-full h-full object-cover">
+                                            @else
+                                                <i data-lucide="user" class="text-slate-400 w-16 h-16"></i>
+                                            @endif
+                                            <label
+                                                class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                                                <i data-lucide="camera" class="text-white w-6 h-6"></i>
+                                                <input type="file" name="avatar" class="hidden"
+                                                    onchange="document.getElementById('avatarForm').submit()">
+                                            </label>
+                                        </div>
                                     </div>
+                                    <div class="absolute bottom-2 right-2 w-6 h-6 bg-emerald-500 rounded-full border-4 border-white"
+                                        title="Online"></div>
                                 </div>
-                                <div class="absolute bottom-2 right-2 w-6 h-6 bg-emerald-500 rounded-full border-4 border-white"
-                                    title="Online"></div>
-                            </div>
+                                <input type="hidden" name="name" value="{{ $dataPetugas->name }}">
+                                <input type="hidden" name="email" value="{{ $dataPetugas->email }}">
+                                <input type="hidden" name="phone" value="{{ $dataPetugas->phone }}">
+                            </form>
 
-                            <h2 class="text-2xl font-black text-slate-900 tracking-tight">{{ $data->name }}</h2>
+                            <h2 class="text-2xl font-black text-slate-900 tracking-tight">{{ $dataPetugas->name }}</h2>
                             <div class="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-blue-50 rounded-lg">
                                 <i data-lucide="shield-check" class="w-3.5 h-3.5 text-blue-600"></i>
-                                <span class="text-blue-700 font-bold text-[10px] uppercase tracking-wider">Kepala
-                                    Bidang</span>
-                            </div>
-
-                            <div class="mt-8 space-y-3">
-                                <div
-                                    class="flex items-center gap-4 p-3 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-blue-200 transition-colors">
-                                    <div class="p-2 bg-white rounded-xl shadow-sm text-blue-600">
-                                        <i data-lucide="mail" class="w-4 h-4"></i>
-                                    </div>
-                                    <span
-                                        class="text-slate-600 text-sm font-medium truncate">{{ $data->email ?? '-' }}</span>
-                                </div>
-                                <div
-                                    class="flex items-center gap-4 p-3 rounded-2xl bg-slate-50 border border-slate-100 group hover:border-blue-200 transition-colors">
-                                    <div class="p-2 bg-white rounded-xl shadow-sm text-blue-600">
-                                        <i data-lucide="phone" class="w-4 h-4"></i>
-                                    </div>
-                                    <span
-                                        class="text-slate-600 text-sm font-medium">{{ $data->phone ?? '+62 812-3456-7890' }}</span>
-                                </div>
+                                <span
+                                    class="text-blue-700 font-bold text-[10px] uppercase tracking-wider">{{ $dataPetugas->role }}</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Stats Brief -->
-                    <div class="bg-[#0f172a] rounded-[2rem] p-6 text-white shadow-xl shadow-slate-300">
-                        <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mb-4 text-center">Performa
-                            Verifikasi</p>
-                        <div class="flex items-center justify-around">
-                            <div class="text-center">
-                                <p class="text-3xl font-black">{{ $data->laporans_count ?? '0' }}</p>
-                                <p class="text-[10px] text-slate-400 font-medium">Laporan</p>
-                            </div>
-                            <div class="w-px h-8 bg-slate-700"></div>
-                            <div class="text-center">
-                                <p class="text-3xl font-black text-blue-400">100%</p>
-                                <p class="text-[10px] text-slate-400 font-medium">Akurasi</p>
-                            </div>
-                        </div>
+                    <!-- Navigation Menu -->
+                    <div class="bg-white rounded-[2rem] p-3 shadow-sm border border-slate-100 space-y-1">
+                        <button @click="tab = 'profile'"
+                            :class="tab === 'profile' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' :
+                                'text-slate-600 hover:bg-slate-50'"
+                            class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all duration-300">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            Data Personalia
+                        </button>
+                        <button @click="tab = 'security'"
+                            :class="tab === 'password' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' :
+                                'text-slate-600 hover:bg-slate-50'"
+                            class="w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-bold transition-all duration-300">
+                            <i data-lucide="lock" class="w-5 h-5"></i>
+                            Keamanan Akun
+                        </button>
                     </div>
                 </div>
 
-                <!-- Right Column: Details & Settings -->
-                <div class="lg:col-span-8 space-y-6">
-                    <!-- Personal Info Card -->
-                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-8 sm:p-10">
+                <!-- Right Column: Forms -->
+                <div class="lg:col-span-8">
+                    <!-- Profile Tab -->
+                    <div x-show="tab === 'profile'" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-4"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-8 sm:p-10">
                         <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
                             <h3 class="text-xl font-bold text-slate-900 flex items-center gap-3">
                                 <span class="w-1.5 h-6 bg-blue-600 rounded-full"></span>
                                 Detail Personalia
                             </h3>
-                            <button class="text-blue-600 hover:text-blue-700 text-sm font-bold flex items-center gap-2">
-                                <i data-lucide="edit-3" class="w-4 h-4"></i> Edit
-                            </button>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">NIP / ID
-                                    Sistem</label>
-                                <p class="text-lg font-bold text-slate-800">{{ $data->id }}</p>
+                        <form action="{{ route('pimpinan.profile.update') }}" method="POST" class="space-y-6">
+                            @csrf
+                            @method('PUT')
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Nama
+                                        Lengkap</label>
+                                    <input type="text" name="name" value="{{ old('name', $dataPetugas->name) }}"
+                                        class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none transition-all font-bold text-slate-700">
+                                </div>
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Email
+                                        Official</label>
+                                    <input type="email" name="email" value="{{ old('email', $dataPetugas->email) }}"
+                                        class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none transition-all font-bold text-slate-700">
+                                </div>
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Nomor
+                                        WhatsApp</label>
+                                    <input type="text" name="phone" value="{{ old('phone', $dataPetugas->phone) }}"
+                                        class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none transition-all font-bold text-slate-700">
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Unit
+                                        Kerja</label>
+                                    <input type="text" disabled
+                                        value="{{ $dataPetugas->unitKerja ?? 'Dinas Komunikasi dan Informatika' }}"
+                                        class="w-full px-6 py-4 bg-slate-100 border border-slate-100 rounded-2xl font-bold text-slate-400 cursor-not-allowed">
+                                </div>
                             </div>
-                            <div class="space-y-1">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Waktu
-                                    Bergabung</label>
-                                <p class="text-lg font-bold text-slate-800">
-                                    {{ $data->created_at->translatedFormat('d F Y') }}</p>
+                            <div class="pt-4">
+                                <button type="submit"
+                                    class="px-10 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-200 transition-all active:scale-95">
+                                    Simpan Perubahan
+                                </button>
                             </div>
-                            <div class="sm:col-span-2">
-                                <label
-                                    class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Hak
-                                    Akses & Role</label>
-                                <div class="flex flex-wrap gap-3">
-                                    <div
-                                        class="px-4 py-2 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center gap-2">
-                                        <div class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></div>
-                                        <span class="text-indigo-700 text-xs font-bold uppercase">Executive
-                                            Management</span>
+                        </form>
+                    </div>
+
+                    <!-- Security Tab -->
+                    <div x-show="tab === 'security'" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-y-4"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 p-8 sm:p-10">
+                        <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+                            <h3 class="text-xl font-bold text-slate-900 flex items-center gap-3">
+                                <span class="w-1.5 h-6 bg-rose-600 rounded-full"></span>
+                                Ganti Kata Sandi
+                            </h3>
+                        </div>
+
+                        <form action="{{ route('pimpinan.password.update') }}" method="POST" class="space-y-6"
+                            x-data="{ showOld: false, showNew: false, showConfirm: false }">
+                            @csrf
+                            @method('PUT')
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Kata
+                                    Sandi Saat Ini</label>
+                                <div class="relative">
+                                    <input :type="showOld ? 'text' : 'password'" name="current_password" required
+                                        class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-rose-100 focus:border-rose-600 outline-none transition-all font-bold">
+                                    <button type="button" @click="showOld = !showOld"
+                                        class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                                        <i :data-lucide="showOld ? 'eye-off' : 'eye'" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Kata
+                                        Sandi Baru</label>
+                                    <div class="relative">
+                                        <input :type="showNew ? 'text' : 'password'" name="new_password" required
+                                            class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none transition-all font-bold">
+                                        <button type="button" @click="showNew = !showNew"
+                                            class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                                            <i :data-lucide="showNew ? 'eye-off' : 'eye'" class="w-5 h-5"></i>
+                                        </button>
                                     </div>
-                                    <div
-                                        class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl flex items-center gap-2">
-                                        <i data-lucide="check-circle-2" class="w-4 h-4 text-slate-400"></i>
-                                        <span class="text-slate-600 text-xs font-bold uppercase">Report Verifier</span>
+                                </div>
+                                <div class="space-y-2">
+                                    <label
+                                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Konfirmasi
+                                        Kata Sandi Baru</label>
+                                    <div class="relative">
+                                        <input :type="showConfirm ? 'text' : 'password'" name="new_password_confirmation"
+                                            required
+                                            class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none transition-all font-bold">
+                                        <button type="button" @click="showConfirm = !showConfirm"
+                                            class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
+                                            <i :data-lucide="showConfirm ? 'eye-off' : 'eye'" class="w-5 h-5"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Security/Quick Action Card -->
-                    <div
-                        class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-[2.5rem] p-8 text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-lg shadow-blue-200">
-                        <div class="text-center sm:text-left">
-                            <h4 class="text-xl font-bold italic">Keamanan Akun</h4>
-                            <p class="text-blue-100 text-sm mt-1">Pastikan password Anda diperbarui secara berkala demi
-                                keamanan data.</p>
-                        </div>
-                        <a href="#"
-                            class="px-6 py-3 bg-white text-blue-600 rounded-2xl font-bold text-sm shadow-xl shadow-black/10 hover:scale-105 transition-transform">
-                            Ganti Password
-                        </a>
+                            <div class="pt-4">
+                                <button type="submit"
+                                    class="px-10 py-4 bg-slate-900 hover:bg-black text-white font-bold rounded-2xl shadow-xl shadow-slate-200 transition-all active:scale-95">
+                                    Perbarui Kata Sandi
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
             </div>
         </div>
     </div>
-
-    <script>
-        lucide.createIcons();
-    </script>
 @endsection

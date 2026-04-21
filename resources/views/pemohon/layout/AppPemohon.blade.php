@@ -9,6 +9,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://googleapis.com" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Tambahkan di head atau sebelum script -->
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.5.2/dist/css/tom-select.css" rel="stylesheet">
@@ -127,7 +128,7 @@
                     x-show="sidebarOpen">Akun SAYA</p>
 
                 <!-- Menu Profil -->
-                <a
+                <a href="{{ route('pemohon.profile') }}"
                     class="flex items-center space-x-3 p-4 rounded-2xl transition-all duration-300 group
             {{ request()->routeIs('pemohon.profile')
                 ? 'bg-white/10 text-white active-nav'
@@ -198,6 +199,7 @@
     </aside>
 
     @yield('content')
+    @include('sweetalert::alert')
 </body>
 
 <script>
