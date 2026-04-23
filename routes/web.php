@@ -65,11 +65,13 @@ Route::middleware(['check.pemohon'])->group(function () {
 
 
 route::middleware('check.role:staff')->group(function () {
+    Route::get('petugas/dashboard', [PetugasController::class, 'index'])->name('petugas.index');
+    Route::get('petugas/tugas', [PetugasController::class, 'tugas'])->name('petugas.tugas');
+    Route::get('petugas/tugas/{id}', [PetugasController::class, 'show'])->name('petugas.show');
     Route::get('petugas/profile', [PetugasController::class, 'profile'])->name('petugas.profile');
-    Route::put('petugas/profile/update', [PetugasController::class, 'updateProfile'])->name('petugas.profile.update');
+    Route::put('petugas/profile/update', [PimpinanController::class, 'updateProfile'])->name('petugas.profile.update');
     Route::put('petugas/profile/password', [PetugasController::class, 'updatePassword'])->name('petugas.password.update');
-    Route::post('petugas/update-status/{id}', [PetugasController::class, 'updateStatus'])->name('petugas.updateStatus');
-    route::resource('petugas', PetugasController::class);
+    Route::post('petugas/tugas/{id}/selesai', [PetugasController::class, 'updateStatus'])->name('petugas.updateStatus');
 });
 
 route::middleware('check.role:kabid')->group(function () {

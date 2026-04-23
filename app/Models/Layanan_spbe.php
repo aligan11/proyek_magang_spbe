@@ -34,6 +34,7 @@ class Layanan_spbe extends Model
         'tgl_permohonan',
         'berkas',
         'status',
+        'petugas_id',
         'inputby',
         'tglinput',
         'status_ver',
@@ -44,9 +45,9 @@ class Layanan_spbe extends Model
         'berkasver',
     ];
 
+    const STATUS_PROSES = 3;
+    const STATUS_SELESAI = 2;
     const STATUS_PENDING = 1;
-    const STATUS_PROSES = 2;
-    const STATUS_SELESAI = 3;
 
     protected $casts = [
         'tgl_permohonan' => 'datetime',
@@ -77,5 +78,10 @@ class Layanan_spbe extends Model
     public function mandates()
     {
         return $this->hasMany(Mandate::class, 'ticket_id');
+    }
+
+    public function petugas()
+    {
+        return $this->belongsTo(User::class, 'petugas_id');
     }
 }

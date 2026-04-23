@@ -25,6 +25,13 @@ class Mandate extends Model
         return $this->belongsTo(Layanan_spbe::class);
     }
 
+    public function kebutuhan()
+    {
+        return $this->belongsTo(Kebutuhan_layanan_spbe::class);
+    }
+
+
+
     public function pimpinan()
     {
         return $this->belongsTo(User::class);
@@ -32,6 +39,6 @@ class Mandate extends Model
 
     public function mandate_users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, 'mandate_petugas', 'mandate_id', 'petugas_id');
     }
 }

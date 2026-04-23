@@ -22,6 +22,7 @@ class User extends Authenticatable
         'jabatan',
         'pangkat',
         'gol',
+        'avatar',
         'phone',
         'last_seen',
     ];

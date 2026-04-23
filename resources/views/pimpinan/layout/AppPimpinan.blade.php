@@ -182,11 +182,21 @@
                         </div>
 
                         <div
-                            class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center border border-blue-200">
-                            <i data-lucide="user" class="text-blue-600 w-5 h-5"></i>
+                            class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center border border-blue-200 overflow-hidden">
+                            @if ($dataPetugas->avatar)
+                                {{-- Menambahkan slash (/) setelah folder avatars --}}
+                                <img src="{{ asset('storage/avatars/' . $dataPetugas->avatar) }}"
+                                    alt="{{ $dataPetugas->name }}" class="w-full h-full object-cover">
+                            @else
+                                {{-- Fallback inisial nama --}}
+                                <span class="text-blue-600 font-bold text-sm">
+                                    {{ strtoupper(substr($dataPetugas->name, 0, 1)) }}
+                                </span>
+                            @endif
                         </div>
                     </a>
                 </div>
+
 
             </nav>
 

@@ -211,7 +211,7 @@
                         class="bg-white rounded-[2.5rem] p-6 sm:p-8 shadow-xl shadow-slate-200/40 border border-slate-100 text-left">
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Lampiran Berkas</p>
                         @if ($detail->berkas)
-                            <a href="{{ asset('storage/' . $detail->berkas) }}" target="_blank"
+                            <a href="{{ asset('storage/doc/' . $detail->berkas) }}" target="_blank"
                                 class="group flex items-center p-4 bg-slate-50 border border-slate-200 rounded-3xl hover:border-blue-600 hover:bg-blue-50 transition-all duration-300">
                                 <div
                                     class="w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-xl group-hover:scale-105 transition-transform">

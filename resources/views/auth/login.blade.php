@@ -113,6 +113,26 @@
                 </div>
             </div>
 
+            <!-- Error Session Alert -->
+            @if (session('login_error') || $errors->any())
+                <div class="mb-6 animate-float">
+                    <div class="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-start space-x-3 shadow-sm">
+                        <div class="bg-red-100 p-1.5 rounded-lg flex-shrink-0">
+                            <svg class="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xs font-bold text-red-800 uppercase tracking-wider">Akses Ditolak</h3>
+                            <p class="text-sm text-red-600 mt-0.5 font-medium">
+                                {{ session('login_error') ?? 'Kredensial yang Anda masukkan tidak cocok.' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
             <!-- Form -->
             <form method="POST" action="{{ route('login.post') }}" class="space-y-6">
                 @csrf

@@ -89,12 +89,13 @@
                     <a href="{{ route('pimpinan.profile') }}"
                         class="block w-full py-3 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-700 text-xs font-bold transition">Pengaturan
                         Profil</a>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit"
-                            class="w-full py-3 text-rose-500 text-xs font-bold hover:bg-rose-50 rounded-xl transition">Keluar
-                            Sistem</button>
-                    </form>
+
+
+                    <!-- Sidebar Footer with Logout Trigger -->
+                    <button type="submit" onclick="toggleLogoutModal()"
+                        class="w-full py-3 text-rose-500 text-xs font-bold hover:bg-rose-50 rounded-xl transition">Keluar
+                        Sistem</button>
+
                 </div>
             </div>
         </div>

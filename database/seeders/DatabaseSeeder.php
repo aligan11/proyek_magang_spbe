@@ -29,8 +29,8 @@ class DatabaseSeeder extends Seeder
         $this->call(
             [
                 adminSeeder::class,
-                ServiceSeeder::class,
-                TicketSeeder::class,
+                // ServiceSeeder::class,
+                // TicketSeeder::class,
                 jenisLayananSeeder::class,
                 kebutuhan_layanan_seeder::class,
                 layanan_spbe_seeder::class,

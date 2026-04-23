@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('mandate_petugas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('mandate_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('petugas_id')->constrained('petugas')->cascadeOnDelete();
+            $table->foreignId('petugas_id')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });
 
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('mandate_petugas');
     }
 };

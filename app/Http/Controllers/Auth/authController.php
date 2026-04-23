@@ -91,16 +91,18 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             $user = FacadesAuth::guard('petugas')->user();
-            $role = $user->role;
 
-
-            if ($role == 'kabid') {
-                return redirect()->route('pimpinan.index');
-            } elseif ($role == 'staff') {
-                return redirect()->route('petugas.index');
-            } else {
-            }
+            // Gunakan switch atau match jika role bertambah di kemudian hari
+            return match ($user->role) {
+                'kabid' => redirect()->route('pimpinan.index'),
+                'staff' => redirect()->route('petugas.index'),
+                default => FacadesAuth::guard('petugas')->logout()
+                    && abort(403, 'Role tidak terdaftar.'),
+            };
         }
+
+        // Tambahkan pesan error jika login gagal
+        return back()->with(['login_error' => 'Email atau password salah.']);
     }
 
 
@@ -176,7 +178,7 @@ class AuthController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('loginPemohon');
+        return redirect()->route('login');
     }
 
     public function logoutPemohon(Request $request)
@@ -187,7 +189,7 @@ class AuthController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route('loginPemohon');
     }
     //
 }

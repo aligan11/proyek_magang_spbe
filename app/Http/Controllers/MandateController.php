@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kebutuhan_layanan_spbe;
 use App\Models\Layanan_spbe;
 use App\Models\Mandate;
 use App\Models\Petugas;
@@ -197,34 +198,50 @@ class MandateController extends Controller
         $mandate = Mandate::with('ticket')->where('id', $id)->firstOrFail();
         $dataPetugas = User::where('id', $idPetugas)->firstOrFail();
 
+        // Karena varchar, kita pastikan di-decode menjadi array
+        $ids = json_decode($mandate->ticket->id_kebutuhan, true) ?? [];
 
+        // Ambil nama kebutuhan dari tabel referensi
+        $listKebutuhan = Kebutuhan_layanan_spbe::whereIn('id', $ids)->get();
 
-        return view('pimpinan.showMandate', compact('mandate', 'dataPetugas'), [
+        return view('pimpinan.showMandate', compact('mandate', 'dataPetugas', 'listKebutuhan'), [
             'title' => 'show mandate',
         ]);
         //
     }
-
     public function showTicket($noreg)
     {
         $idPetugas = Auth::guard('petugas')->user()->id;
-
-        $dataPetugas = User::where('id', $idPetugas)->first();
-
-        // dd($noreg);
-
+        $dataPetugas = User::find($idPetugas);
         $ticket = Layanan_spbe::where('noreg', $noreg)->firstOrFail();
-        $status = $ticket->status;
+
+        // 1. Ambil data (asumsikan sudah array karena cast, atau masih string)
+        $ids = $ticket->id_kebutuhan;
+
+        // 2. Jika masih string JSON, decode dulu
+        if (is_string($ids)) {
+            $ids = json_decode($ids, true) ?? [];
+        }
+
+        // 3. MEMBERSIHKAN DATA (Paling Penting)
+        // Pastikan tidak ada karakter kutip, spasi, atau simbol lain, lalu ubah ke integer
+        $cleanIds = collect($ids)->map(function ($value) {
+            return (int) str_replace(['"', '[', ']', ' '], '', $value);
+        })->filter()->toArray();
+
+        // 4. Query menggunakan array yang sudah bersih
+        $listKebutuhan = Kebutuhan_layanan_spbe::whereIn('id', $cleanIds)->get();
+
         return view('pimpinan.ShowTicket', [
             'ticket' => $ticket,
             'title' => "Informasi detail untuk tiket",
             'dataPetugas' => $dataPetugas,
-            'status' => $status,
+            'status' => $ticket->status,
+            'listKebutuhan' => $listKebutuhan,
         ]);
-
-
-        // return redirect()->route('showTicket');
     }
+
+
 
 
     /**

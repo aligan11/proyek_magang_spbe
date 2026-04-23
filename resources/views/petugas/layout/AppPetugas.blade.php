@@ -5,10 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title }} | Portal Petugas Lapangan</title>
-    <link rel="stylesheet" href="{{ asset('css/output.css') }}">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <!-- Tambahkan di head atau sebelum script -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.5.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.5.2/dist/js/tom-select.complete.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com');
 
@@ -42,15 +47,19 @@
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <a href="{{ route('petugas.profile') }}" class="hidden md:flex items-center gap-3 text-right border-r border-slate-700 pr-4 group">
+                        <a href="{{ route('petugas.profile') }}"
+                            class="hidden md:flex items-center gap-3 text-right border-r border-slate-700 pr-4 group">
                             <div>
-                                <p class="text-slate-100 text-sm font-bold group-hover:text-blue-400 transition-colors">{{ $dataPetugas->name }}</p>
+                                <p class="text-slate-100 text-sm font-bold group-hover:text-blue-400 transition-colors">
+                                    {{ $dataPetugas->name }}</p>
                                 <p class="text-blue-400 text-[10px] font-bold uppercase tracking-tighter">
                                     {{ $dataPetugas->jabatan ?? 'Petugas Lapangan' }}</p>
                             </div>
-                            <div class="w-10 h-10 rounded-full bg-slate-700 border-2 border-slate-600 overflow-hidden group-hover:border-blue-500 transition-all">
-                                @if($dataPetugas->avatar)
-                                    <img src="{{ asset('storage/avatars/' . $dataPetugas->avatar) }}" class="w-full h-full object-cover">
+                            <div
+                                class="w-10 h-10 rounded-full bg-slate-700 border-2 border-slate-600 overflow-hidden group-hover:border-blue-500 transition-all">
+                                @if ($dataPetugas->avatar)
+                                    <img src="{{ asset('storage/avatars/' . $dataPetugas->avatar) }}"
+                                        class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-slate-400">
                                         <i data-lucide="user" class="w-5 h-5"></i>

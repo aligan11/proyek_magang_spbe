@@ -75,7 +75,7 @@
                         <i data-lucide="users" class="w-4 h-4 text-blue-500"></i> Petugas Pelaksana
                     </h4>
                     <div class="space-y-3">
-                        @foreach ($mandate->mandate_petugas as $petugas)
+                        @foreach ($mandate->mandate_users as $petugas)
                             <div class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-2xl transition-colors group">
                                 <div
                                     class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white text-xs font-black group-hover:scale-110 transition-transform">

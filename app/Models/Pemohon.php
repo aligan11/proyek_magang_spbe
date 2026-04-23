@@ -23,6 +23,7 @@ class Pemohon extends Authenticatable
         'no_hp',
         'nip',
         'id_instansi',
+        'avatar',
         'alamat',
     ];
 
