@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Pimpinan;
 
 use App\Http\Controllers\Controller;
+use App\Models\Jenis_layanan_spbe;
+use App\Models\Kebutuhan_layanan_spbe;
 use App\Models\Layanan_spbe;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use RealRashid\SweetAlert\Facades\Alert;
 use Symfony\Component\Mime\Email;
 
 class PimpinanController extends Controller
@@ -131,22 +134,38 @@ class PimpinanController extends Controller
         return \Maatwebsite\Excel\Facades\Excel::download(new \App\Exports\LayananExport, 'Laporan-Layanan-SPBE-' . now()->format('Y-m-d') . '.xlsx');
     }
 
+
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        $permohonan = Layanan_spbe::findOrFail($id);
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        $dataPetugas = User::findOrFail($idPetugas);
+        $title = "Edit Deskripsi";
+
+        return view('pimpinan.editRequest', compact('permohonan', 'title', 'dataPetugas'));
     }
-
-
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
+        $permohonan = Layanan_spbe::findOrFail($id);
+
+        $request->validate([
+            'ket' => 'nullable|string',
+        ]);
+
+        $permohonan->update([
+            'ket' => $request->ket,
+        ]);
+
+        Alert::success('Berhasil', 'Deskripsi berhasil diperbarui!');
+        return redirect()->route('indexMandat', 1);
     }
 
     /**
@@ -154,6 +173,15 @@ class PimpinanController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $permohonan = Layanan_spbe::findOrFail($id);
+
+        if ($permohonan->berkas && file_exists(public_path('storage/doc/' . $permohonan->berkas))) {
+            unlink(public_path('storage/doc/' . $permohonan->berkas));
+        }
+
+        $permohonan->delete();
+
+        Alert::success('Berhasil', 'Permohonan berhasil dihapus!');
+        return redirect()->back();
     }
 }

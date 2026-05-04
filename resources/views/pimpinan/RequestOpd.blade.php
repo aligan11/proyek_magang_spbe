@@ -143,10 +143,11 @@
 
                                     <td class="px-4 py-4 rounded-r-2xl border-y border-r border-slate-50 bg-slate-50/30">
                                         <div class="flex items-center gap-2">
+                                            {{-- Button Show --}}
                                             <a href="{{ route('showTicket', $ticket->noreg) }}"
-                                                class="flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black tracking-wider transition-all duration-300 transform active:scale-95 shadow-sm hover:shadow-md cursor-pointer bg-slate-100 text-slate-600 hover:bg-slate-200 hover:-translate-y-0.5">
-                                                <i data-lucide="eye" class="w-3 h-3"></i>
-                                                SHOW
+                                                class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white hover:bg-blue-600 transition-all shadow-lg shadow-slate-200 hover:shadow-blue-500/30 active:scale-95">
+                                                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                                Detail
                                             </a>
 
                                             @if ($status == 1)
@@ -159,6 +160,26 @@
                                                     </button>
                                                 </a>
                                             @endif
+                                            <div class="flex items-center gap-2 ml-2 pl-2 border-l border-slate-200">
+                                                {{-- Edit --}}
+                                                <a href="{{ route('pimpinan.edit', $ticket->id) }}"
+                                                    class="p-2.5 bg-white text-amber-500 border border-slate-200 rounded-xl hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all shadow-sm active:scale-90">
+                                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                                </a>
+
+                                                {{-- Delete --}}
+                                                <button type="button" onclick="confirmDelete({{ $ticket->id }})"
+                                                    class="p-2.5 bg-white text-rose-500 border border-slate-200 rounded-xl hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all shadow-sm active:scale-90 cursor-pointer">
+                                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                </button>
+                                                <form id="delete-form-{{ $ticket->id }}"
+                                                    action="{{ route('pimpinan.destroy', $ticket->id) }}" method="POST"
+                                                    class="hidden">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+                                            </div>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -199,7 +220,8 @@
                                 </div>
 
                                 <div>
-                                    <p class="text-xs font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
+                                    <p
+                                        class="text-xs font-bold text-slate-800 group-hover:text-blue-700 transition-colors">
                                         {{ $petugas->name }}</p>
                                     <p class="text-[10px] text-slate-400 font-medium">
                                         {{ $petugas->jabatan ?? 'Petugas Lapangan' }}
@@ -240,6 +262,23 @@
 
         function closeMandateModal() {
             document.getElementById('mandateModal').classList.add('hidden');
+        }
+
+        function confirmDelete(ticketId) {
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: 'Yakin ingin menghapus tiket ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + ticketId).submit();
+                }
+            });
         }
     </script>
 @endsection

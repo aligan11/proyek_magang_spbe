@@ -100,24 +100,33 @@
                                         {{ $item->tglinput->format('d/m/Y') }}</td>
                                     <td class="px-8 py-6 text-center">
                                         @php
-                                            $stLabel = match ($item->status) {
-                                                \App\Models\Layanan_spbe::STATUS_PENDING => 'pending',
-                                                \App\Models\Layanan_spbe::STATUS_PROSES => 'proses',
-                                                \App\Models\Layanan_spbe::STATUS_SELESAI => 'selesai',
-                                                default => 'pending',
-                                            };
-                                            $stColor = match ($stLabel) {
-                                                'pending' => 'amber',
-                                                'proses' => 'blue',
-                                                'selesai' => 'emerald',
-                                                default => 'slate',
+                                            // Gunakan status_ver (sesuai diskusi sebelumnya) atau tetap status jika kolomnya berbeda
+                                            // Paksa ke integer agar cocok dengan match strict comparison
+                                            $statusValue = (int) ($item->status_ver ?? $item->status);
+
+                                            $stConfig = match ($statusValue) {
+                                                \App\Models\Layanan_spbe::STATUS_SELESAI => [
+                                                    'label' => 'selesai',
+                                                    'color' => 'emerald',
+                                                ],
+                                                \App\Models\Layanan_spbe::STATUS_PROSES => [
+                                                    'label' => 'proses',
+                                                    'color' => 'blue',
+                                                ],
+                                                \App\Models\Layanan_spbe::STATUS_PENDING => [
+                                                    'label' => 'pending',
+                                                    'color' => 'amber',
+                                                ],
+                                                default => ['label' => 'pending', 'color' => 'amber'],
                                             };
                                         @endphp
+
                                         <span
-                                            class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-{{ $stColor }}-100 text-{{ $stColor }}-600 border border-{{ $stColor }}-200">
-                                            {{ $stLabel }}
+                                            class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-{{ $stConfig['color'] }}-100 text-{{ $stConfig['color'] }}-600 border border-{{ $stConfig['color'] }}-200">
+                                            {{ $stConfig['label'] }}
                                         </span>
                                     </td>
+
                                     <td class="px-8 py-6 text-right">
                                         <div class="flex justify-end space-x-2">
                                             <a href="{{ route('pemohon.show', $item->id) }}"

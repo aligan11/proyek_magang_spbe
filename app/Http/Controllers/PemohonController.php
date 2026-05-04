@@ -177,8 +177,24 @@ class PemohonController extends Controller
             ->where('inputby', $idPemohon)
             ->firstOrFail();
 
+        // Tambahkan logika label status
+        $statusValue = (int) ($detail->status_ver ?? $detail->status);
+
+        $detail->status_label = match ($statusValue) {
+            Layanan_spbe::STATUS_SELESAI => 'Selesai',
+            Layanan_spbe::STATUS_PROSES  => 'Proses',
+            default                      => 'Pending',
+        };
+
+        $detail->status_color = match ($statusValue) {
+            Layanan_spbe::STATUS_SELESAI => 'emerald',
+            Layanan_spbe::STATUS_PROSES  => 'blue',
+            default                      => 'amber',
+        };
+
         return view('pemohon.ShowPermohonan', compact('detail'));
     }
+
 
     public function downloadPdf($id)
     {

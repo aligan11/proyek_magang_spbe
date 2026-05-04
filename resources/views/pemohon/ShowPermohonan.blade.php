@@ -49,22 +49,37 @@
                 <!-- Status & Print (Responsive grid/flex) -->
                 <div class="flex items-center space-x-3 w-full md:w-auto">
                     @php
+                        // Pastikan status dipaksa menjadi integer untuk mencocokkan konstanta
+                        $statusValue = (int) ($detail->status_ver ?? $detail->status);
+
                         $statusStyles =
                             [
-                                'pending' => 'bg-amber-500 shadow-amber-200',
-                                'proses' => 'bg-blue-500 shadow-blue-200',
-                                'selesai' => 'bg-emerald-500 shadow-emerald-200',
-                            ][$detail->status] ?? 'bg-slate-500 shadow-slate-200';
+                                1 => 'bg-amber-500 shadow-amber-200', // PENDING
+                                3 => 'bg-blue-500 shadow-blue-200', // PROSES
+                                2 => 'bg-emerald-500 shadow-emerald-200', // SELESAI
+                            ][$statusValue] ?? 'bg-slate-500 shadow-slate-200';
+
+                        // Label fallback jika status_label dari controller kosong
+                        $displayLabel =
+                            $detail->status_label ??
+                            match ($statusValue) {
+                                2 => 'Selesai',
+                                3 => 'Proses',
+                                default => 'Pending',
+                            };
                     @endphp
+
                     <div
                         class="{{ $statusStyles }} flex-1 md:flex-none text-white px-6 py-3 rounded-2xl shadow-xl flex items-center justify-center space-x-2">
                         <span class="relative flex h-2 w-2">
-                            <span
-                                class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                            {{-- Efek ping hanya untuk status yang belum selesai (Pending/Proses) --}}
+                            @if ($statusValue != 2)
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                            @endif
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                         </span>
-                        <span
-                            class="font-bold text-sm uppercase tracking-wider">{{ $detail->status_label ?? 'Menunggu' }}</span>
+                        <span class="font-bold text-sm uppercase tracking-wider">{{ $displayLabel }}</span>
                     </div>
 
                     <a href="{{ route('pemohon.download.pdf', $detail->id) }}"
@@ -73,6 +88,7 @@
                         <span class="hidden sm:inline font-bold text-xs uppercase tracking-widest">Cetak PDF</span>
                     </a>
                 </div>
+
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -214,6 +214,9 @@ class MandateController extends Controller
         $idPetugas = Auth::guard('petugas')->user()->id;
         $dataPetugas = User::find($idPetugas);
         $ticket = Layanan_spbe::where('noreg', $noreg)->firstOrFail();
+        $mandat = Mandate::where('pimpinan_id', $idPetugas)->latest()->first();
+        $deskripsiMandat = $mandat ? $mandat->deskripsi : 'Tidak ada deskripsi';
+
 
         // 1. Ambil data (asumsikan sudah array karena cast, atau masih string)
         $ids = $ticket->id_kebutuhan;
@@ -222,6 +225,7 @@ class MandateController extends Controller
         if (is_string($ids)) {
             $ids = json_decode($ids, true) ?? [];
         }
+
 
         // 3. MEMBERSIHKAN DATA (Paling Penting)
         // Pastikan tidak ada karakter kutip, spasi, atau simbol lain, lalu ubah ke integer
@@ -238,6 +242,7 @@ class MandateController extends Controller
             'dataPetugas' => $dataPetugas,
             'status' => $ticket->status,
             'listKebutuhan' => $listKebutuhan,
+            'deskripsiMandat' => $deskripsiMandat,
         ]);
     }
 

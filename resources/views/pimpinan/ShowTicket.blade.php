@@ -79,6 +79,80 @@
                         </div>
                     </div>
 
+                    <!-- Bagian Informasi Mandat dari Pimpinan -->
+                    <div class="mt-10 pt-8 border-t border-slate-100">
+                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                            <i data-lucide="shield-check" class="w-4 h-4 text-indigo-500"></i> Instruksi Mandat Pimpinan
+                        </h4>
+
+                        <div class="space-y-4">
+                            @forelse ($ticket->mandates as $mandate)
+                                <div
+                                    class="relative overflow-hidden bg-gradient-to-br from-indigo-50/50 to-white border border-indigo-100 rounded-[2.5rem] p-6 shadow-sm">
+                                    <!-- Dekorasi Background -->
+                                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl">
+                                    </div>
+
+                                    <div class="relative z-10">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="w-10 h-10 bg-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                                                    <i data-lucide="message-square" class="w-5 h-5 text-white"></i>
+                                                </div>
+                                                <div>
+                                                    <p
+                                                        class="text-[10px] text-slate-400 font-black uppercase tracking-tighter">
+                                                        Instruksi Tugas</p>
+                                                    <p class="text-xs font-bold text-indigo-600">Diterbitkan pada
+                                                        {{ $mandate->created_at->format('d/m/Y') }}</p>
+                                                </div>
+                                            </div>
+                                            <!-- Status Verifikasi dari Mandat -->
+                                            <span
+                                                class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border {{ $mandate->status_ver == 2 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100' }}">
+                                                {{ $mandate->status_ver == 2 ? 'Selesai' : 'Dalam Proses' }}
+                                            </span>
+                                        </div>
+
+                                        <!-- Deskripsi Mandat -->
+                                        <div
+                                            class="bg-white/60 border border-white p-5 rounded-3xl text-slate-700 leading-relaxed text-sm italic shadow-inner">
+                                            "{{ $mandate->deskripsi }}"
+                                        </div>
+
+                                        <!-- List Petugas yang ditunjuk -->
+                                        <div class="mt-5 flex flex-wrap items-center gap-2">
+                                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">
+                                                Petugas Pelaksana:</p>
+                                            @foreach ($mandate->mandate_users as $petugas)
+                                                <div
+                                                    class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-100 rounded-xl shadow-sm">
+                                                    <div
+                                                        class="w-5 h-5 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                                        <i data-lucide="user" class="w-3 h-3 text-indigo-600"></i>
+                                                    </div>
+                                                    <span
+                                                        class="text-[11px] font-bold text-slate-600">{{ $petugas->name }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="p-8 border-2 border-dashed border-slate-100 rounded-[2.5rem] text-center">
+                                    <div
+                                        class="w-16 h-16 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-4">
+                                        <i data-lucide="clipboard-x" class="w-8 h-8 text-slate-300"></i>
+                                    </div>
+                                    <p class="text-sm font-bold text-slate-400">Belum ada mandat pimpinan yang diterbitkan
+                                        untuk tiket ini.</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+
                     <!-- CARD BARU: Rincian Kebutuhan SPBE (Berdasarkan json_decode di Controller) -->
                     <div class="mt-10">
                         <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -147,81 +221,83 @@
             <!-- Kolom Kanan: Status & Kontrol -->
             <div class="space-y-6">
                 <div class="bg-white rounded-4xl border border-slate-100 p-8 shadow-sm">
-                    <h3 class="font-bold text-lg text-slate-900 mb-6">Status Tiket</h3>
+                    <h3 class="font-black text-xs text-slate-400 uppercase tracking-[0.2em] mb-8">Status Verifikasi</h3>
 
-                    <div class="flex items-center gap-4 mb-8">
+                    <div class="flex flex-col items-center text-center">
                         @if ($status == 1)
-                            {{-- Status: Menunggu (Pending) --}}
-                            <div
-                                class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center animate-pulse shadow-sm shadow-amber-100">
-                                <i data-lucide="clock" class="w-6 h-6 text-amber-600"></i>
+                            {{-- Tampilan untuk Status PENDING --}}
+                            <div class="relative mb-6">
+                                <div
+                                    class="w-24 h-24 bg-amber-50 rounded-[2.5rem] flex items-center justify-center border border-amber-100">
+                                    <i data-lucide="clock" class="w-10 h-10 text-amber-500 animate-pulse"></i>
+                                </div>
+                                <div
+                                    class="absolute -bottom-2 -right-2 w-8 h-8 bg-amber-500 rounded-xl border-4 border-white flex items-center justify-center">
+                                    <span class="w-1.5 h-1.5 bg-white rounded-full animate-ping"></span>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-sm font-black text-amber-600 uppercase tracking-tight">Menunggu</p>
-                                <p class="text-[10px] text-slate-400 font-medium">BUTUH MANDAT SEGERA</p>
-                            </div>
-                        @else
-                            {{-- Status: Selesai (Success) --}}
-                            <div
-                                class="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center shadow-sm shadow-emerald-100">
-                                <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-600"></i>
-                            </div>
-                            <div>
-                                <p class="text-sm font-black text-emerald-600 uppercase tracking-tight">Selesai</p>
-                                <p class="text-[10px] text-slate-400 font-medium">TERVERIFIKASI SISTEM</p>
-                            </div>
-                        @endif
-                    </div>
+                            <h4 class="text-xl font-black text-slate-900 tracking-tight">Menunggu Mandat</h4>
+                            <p class="text-xs text-slate-400 font-medium mt-2 mb-8 leading-relaxed px-4">
+                                Tiket ini belum didelegasikan ke petugas verifikasi lapangan.
+                            </p>
 
-                    @if ($status == 1)
-                        <div class="space-y-3">
                             <a href="{{ route('pimpinan.mandat', $ticket->noreg) }}"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-bold text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-blue-100">
-                                <i data-lucide="send" class="w-4 h-4"></i>
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-200 hover:scale-[1.02] active:scale-95 group">
+                                <i data-lucide="send" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
                                 Berikan Mandat
                             </a>
-                            <button
-                                class="w-full bg-slate-50 hover:bg-slate-100 text-slate-600 p-4 rounded-2xl font-bold text-sm transition">
-                                Cetak Detail
-                            </button>
-                        </div>
-                    @else
-                        <div class="space-y-3">
-                            <a href="{{ route('mandate.show', $ticket->id) }}"
-                                class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-bold text-sm transition flex items-center justify-center gap-2 shadow-lg shadow-blue-100">
-                                <i data-lucide="send" class="w-4 h-4"></i>
-                                Cek Mandat
-                            </a>
-                            <button
-                                class="w-full bg-slate-50 hover:bg-slate-100 text-slate-600 p-4 rounded-2xl font-bold text-sm transition">
-                                Cetak Detail
-                            </button>
-                        </div>
-                    @endif
-
+                        @else
+                            {{-- Tampilan untuk Status SELESAI --}}
+                            <div class="relative mb-6">
+                                <div
+                                    class="w-24 h-24 bg-emerald-50 rounded-[2.5rem] flex items-center justify-center border border-emerald-100">
+                                    <i data-lucide="shield-check" class="w-10 h-10 text-emerald-500"></i>
+                                </div>
+                                <div
+                                    class="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 rounded-xl border-4 border-white flex items-center justify-center">
+                                    <i data-lucide="check" class="w-4 h-4 text-white"></i>
+                                </div>
+                            </div>
+                            <h4 class="text-xl font-black text-slate-900 tracking-tight">Tugas Selesai</h4>
+                            <p class="text-xs text-emerald-600 font-bold mt-2 mb-8 bg-emerald-50 px-4 py-2 rounded-xl">
+                                TERVERIFIKASI SISTEM
+                            </p>
+                        @endif
+                    </div>
                 </div>
-                @if ($status == 1)
-                    <div class="bg-slate-900 rounded-4xl p-8 text-white relative overflow-hidden">
-                        <div class="relative z-10">
-                            <h4 class="text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Quick Log
+
+                <!-- Quick Log / Activity Stream -->
+                <div class="bg-slate-900 rounded-4xl p-8 text-white relative overflow-hidden">
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-2 mb-6">
+                            <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                            <h4 class="text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em]">Sistem Activity
                             </h4>
-                            <div class="space-y-4">
-                                <div class="flex gap-3">
-                                    <div class="w-1 h-10 bg-emerald-500 rounded-full"></div>
-                                    <div>
-                                        <p class="text-xs font-bold italic">"Tiket telah diverifikasi sistem dan siap
-                                            ditugaskan."</p>
-                                        <p class="text-[9px] text-slate-400 mt-1">Sistem Otomatis • 12:40</p>
-                                    </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                                    <div class="w-0.5 h-12 bg-slate-700 mt-1"></div>
+                                </div>
+                                <div>
+                                    <p class="text-[11px] font-bold text-slate-200 italic leading-relaxed">
+                                        "Menunggu instruksi pimpinan untuk proses verifikasi."
+                                    </p>
+                                    <p class="text-[9px] text-slate-500 mt-2 uppercase tracking-widest font-black">
+                                        {{ \Carbon\Carbon::parse($ticket->created_at)->diffForHumans() }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
-                        <i data-lucide="activity" class="absolute -bottom-4 -right-4 w-24 h-24 text-white opacity-5"></i>
                     </div>
-                @else
-                @endif
-
+                    <!-- Watermark Icon -->
+                    <i data-lucide="activity"
+                        class="absolute -bottom-6 -right-6 w-32 h-32 text-white opacity-[0.03] rotate-12"></i>
+                </div>
             </div>
+
         </div>
     </div>
 @endsection
