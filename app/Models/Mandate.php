@@ -37,6 +37,11 @@ class Mandate extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function petugas()
+    {
+        return $this->belongsToMany(User::class, 'mandate_petugas', 'mandate_id', 'petugas_id');
+    }
+
     public function mandate_users()
     {
         return $this->belongsToMany(User::class, 'mandate_petugas', 'mandate_id', 'petugas_id');

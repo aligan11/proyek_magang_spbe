@@ -9,87 +9,97 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class PetugasController extends Controller
 {
-    /**
-     * index(): Menampilkan ringkasan statistik dan 5 mandat terbaru.
-     */
+    // Konstanta Status (berdasarkan status_ver di table layanan_spbe)
+    const STATUS_PENDING = 1; // Jika NULL juga dianggap 1
+    const STATUS_SELESAI = 2;
+    const STATUS_PROSES  = 3;
+
     public function index()
     {
-        // Ambil user dari guard petugas
-        $user = Auth::guard('petugas')->user();
+        /** @var \App\Models\User $user */
+        $user = auth()->guard('petugas')->user();
 
-        // Pastikan user ditemukan
         if (!$user) {
             return redirect()->route('login');
         }
 
-        // Ambil data lewat relasi yang didefinisikan di Model User
-        $latestTasks = $user->mandate_users()
-            ->with(['ticket.jenis_layanan'])
+        // Statistik mengecek status_ver di tabel ticket (layanan_spbe)
+        $stats = [
+            'total'   => $user->mandates()->count(),
+            'pending' => $user->mandates()->whereHas('ticket', function ($q) {
+                $q->where('status_ver', self::STATUS_PENDING)
+                    ->orWhereNull('status_ver');
+            })->count(),
+            'selesai' => $user->mandates()->whereHas('ticket', function ($q) {
+                $q->where('status_ver', self::STATUS_SELESAI);
+            })->count(),
+        ];
+
+        $latestTasks = $user->mandates()
+            ->with(['ticket', 'ticket.jenis_layanan'])
             ->latest()
             ->take(5)
             ->get();
 
-        $stats = [
-            'total'   => $user->mandate_users()->count(),
-            'pending' => $user->mandate_users()->where('status', 'pending')->count(),
-            'selesai' => $user->mandate_users()->where('status', 'selesai')->count(),
-        ];
+        $title = 'Dashboard';
 
-        return view('petugas.index', compact('stats', 'latestTasks', 'user'));
+        return view('petugas.index', compact('stats', 'latestTasks', 'user', 'title'));
     }
 
-
-
-    /**
-     * tugas(): Menampilkan seluruh daftar mandat dengan pagination.
-     */
     public function tugas()
     {
-        $user = Auth::guard('petugas')->user();
-        $mandateIds = DB::table('mandate_users')
-            ->where('petugas_id', $user->id)
-            ->pluck('mandate_id');
+        /** @var \App\Models\User $user */
+        $user = auth()->guard('petugas')->user();
 
-        $tasks = Mandate::whereIn('id', $mandateIds)
-            ->with(['ticket', 'ticket.jenis_layanan', 'ticket.inputer'])
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $stats = [
+            'total'   => $user->mandates()->count(),
+            'pending' => $user->mandates()->whereHas('ticket', function ($q) {
+                $q->where('status_ver', self::STATUS_PENDING)
+                    ->orWhereNull('status_ver');
+            })->count(),
+            'selesai' => $user->mandates()->whereHas('ticket', function ($q) {
+                $q->where('status_ver', self::STATUS_SELESAI);
+            })->count(),
+        ];
+
+        $tasks = $user->mandates()
+            ->with(['ticket', 'ticket.jenis_layanan'])
             ->latest()
             ->paginate(10);
 
-        return view('petugas.tugas', compact('tasks', 'user'));
+        $title = 'Tugas Saya';
+
+        return view('petugas.tugas', compact('tasks', 'stats', 'user', 'title'));
     }
 
-    /**
-     * show($id): Menampilkan detail lengkap satu permohonan dari mandat.
-     */
     public function show($id)
     {
-        $user = Auth::guard('petugas')->user();
+        /** @var \App\Models\User $user */
+        $user = auth()->guard('petugas')->user();
 
-        // Pastikan mandat ini milik petugas yang sedang login
-        $mandate = Mandate::whereHas('mandate_users', function ($q) use ($user) {
-            $q->where('petugas_id', $user->id);
-        })->with(['ticket', 'ticket.jenis_layanan', 'ticket.inputer', 'ticket.instansi_rel'])->findOrFail($id);
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        // Cari mandat milik user yang login
+        $mandate = $user->mandates()
+            ->with(['ticket', 'ticket.jenis_layanan', 'ticket.instansi_rel'])
+            ->findOrFail($id);
 
         $task = $mandate->ticket;
+        $title = 'Detail Mandat';
 
-        return view('petugas.show', compact('task', 'mandate', 'user'));
+        return view('petugas.show', compact('task', 'mandate', 'user', 'title'));
     }
 
-    /**
-     * profile(): Menampilkan informasi profil petugas.
-     */
-    public function profile()
-    {
-        $user = Auth::guard('petugas')->user();
-        return view('petugas.profile', compact('user'));
-    }
-
-    /**
-     * Update status permohonan menjadi selesai.
-     */
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
@@ -98,84 +108,75 @@ class PetugasController extends Controller
             'berkasver' => 'nullable|file|mimes:pdf,jpg,png,zip|max:5120',
         ]);
 
-        $user = Auth::guard('petugas')->user();
-        $mandate = Mandate::whereHas('mandate_users', function ($q) use ($user) {
-            $q->where('petugas_id', $user->id);
-        })->findOrFail($id);
+        /** @var \App\Models\User $user */
+        $user = auth()->guard('petugas')->user();
 
-        $task = $mandate->ticket;
+        if (!$user) {
+            return redirect()->route('login');
+        }
 
-        $data = [
-            'status' => Layanan_spbe::STATUS_SELESAI,
-            'status_ver' => 'Selesai',
-            'verby' => $user->name,
-            'tglver' => now(),
-            'ketver' => $request->ketver,
+        // 1. Ambil Mandate & Ticket terkait
+        $mandate = $user->mandates()->findOrFail($id);
+        $task = $mandate->ticket; // Model Layanan_spbe
+
+        // 2. Siapkan data update untuk tabel layanan_spbe
+        $dataTicket = [
+            'status_ver' => self::STATUS_SELESAI, // Angka 2
+            'ketver'     => $request->ketver,
+            'verby'      => $user->name,
+            'tglver'     => now(),
         ];
 
+        // 3. Proses File jika ada
         if ($request->hasFile('berkasver')) {
             $file = $request->file('berkasver');
             $fileName = 'ver_' . time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
             $file->move(public_path('storage/doc'), $fileName);
-            $data['berkasver'] = $fileName;
+            $dataTicket['berkasver'] = $fileName;
         }
 
-        // Update Ticket
-        $task->update($data);
+        // 4. Update tabel Layanan_spbe
+        $task->update($dataTicket);
 
-        // Update Mandate Status
-        $mandate->update(['status' => 'selesai']);
+        // 5. Update kolom deskripsi/status di pivot jika memang diperlukan 
+        // (Namun karena status_ver ada di table layanan_spbe, update di atas sudah cukup)
 
-        \RealRashid\SweetAlert\Facades\Alert::success('Berhasil', 'Mandat telah diselesaikan!');
-        return redirect()->route('petugas.tugas');
+        return redirect()->route('petugas.tugas')->with('success', 'Mandat telah diselesaikan!');
     }
 
-    /**
-     * Update profile information.
-     */
-    public function updateProfile(Request $request)
+    public function profile()
     {
-        $user = Auth::guard('petugas')->user();
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'required|string|max:20',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+        /** @var \App\Models\User $user */
+        $user = auth()->guard('petugas')->user();
 
-        $data = $request->only(['name', 'email', 'phone']);
-
-        if ($request->hasFile('avatar')) {
-            if ($user->avatar && file_exists(public_path('storage/avatars/' . $user->avatar))) {
-                unlink(public_path('storage/avatars/' . $user->avatar));
-            }
-            $file = $request->file('avatar');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('storage/avatars'), $fileName);
-            $data['avatar'] = $fileName;
+        if (!$user) {
+            return redirect()->route('login');
         }
 
-        User::where('id', $user->id)->update($data);
-
-        \RealRashid\SweetAlert\Facades\Alert::success('Berhasil', 'Profil berhasil diperbarui!');
-        return redirect()->back();
+        $title = 'Profil';
+        return view('petugas.profile', compact('user', 'title'));
     }
 
-    /**
-     * Update user password.
-     */
     public function updatePassword(Request $request)
     {
         $request->validate([
-            'current_password' => 'required|current_password',
-            'new_password' => 'required|string|min:8|confirmed',
+            'current_password' => 'required',
+            'password' => 'required|confirmed|min:8',
         ]);
 
-        User::where('id', Auth::guard('petugas')->id())->update([
-            'password' => \Illuminate\Support\Facades\Hash::make($request->new_password)
-        ]);
+        /** @var \App\Models\User $user */
+        $user = auth()->guard('petugas')->user();
 
-        \RealRashid\SweetAlert\Facades\Alert::success('Berhasil', 'Kata sandi berhasil diubah!');
-        return redirect()->back();
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai']);
+        }
+
+        $user->update(['password' => Hash::make($request->password)]);
+
+        return back()->with('success', 'Password berhasil diperbarui!');
     }
 }

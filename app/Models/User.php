@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use App\Models\Mandate;
 
 class User extends Authenticatable
 {
@@ -61,10 +62,12 @@ class User extends Authenticatable
         return $this->hasMany(Mandate::class);
     }
 
-    public function mandate_users()
+    public function mandates()
     {
-        return $this->belongsToMany(Mandate::class);
+        return $this->belongsToMany(Mandate::class, 'mandate_petugas', 'petugas_id', 'mandate_id');
     }
+
+
 
     public function isOnline()
     {

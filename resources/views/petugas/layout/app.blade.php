@@ -1,253 +1,309 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" x-data="{ sidebarOpen: false, collapsed: false }">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'Portal Petugas' }} | DISKOMINFO</title>
-
-    <!-- Fonts: Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>{{ $title ?? 'Portal Petugas' }} | SPBE</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-
-    <!-- Integrasi Laravel Vite -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <!-- Alpine.js & Lucide Icons -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        body {
+        * {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            overflow-x: hidden;
-        }
-
-        [x-cloak] {
-            display: none !important;
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
         }
 
         .glass-dark {
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
-        .sidebar-transition {
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .sidebar-glass {
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.98) 0%, rgba(15, 23, 42, 0.98) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .nav-link {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-link:hover {
+            transform: translateX(4px);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(99, 102, 241, 0.2) 100%);
+            border-left: 3px solid #3b82f6;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #b45309;
+            border: 1px solid #fcd34d;
+        }
+
+        .status-selesai {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #047857;
+            border: 1px solid #6ee7b7;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Fix scrollbar for webkit */
-        ::-webkit-scrollbar {
-            width: 6px;
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
         }
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
+        .glow-blue {
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
+        .glow-amber {
+            box-shadow: 0 0 40px rgba(245, 158, 11, 0.3);
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #cbd5e1;
+        .glow-emerald {
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
     </style>
 </head>
 
-<body class="bg-[#f8fafc] text-slate-900 selection:bg-blue-100 selection:text-blue-700" x-data="{ sidebarOpen: true, mobileMenu: false }">
-    <!-- Animated Background Pattern -->
-    <div class="fixed inset-0 z-0 pointer-events-none opacity-40">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-200/50 blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-200/50 blur-[120px]">
-        </div>
-    </div>
+<body class="bg-gradient-to-br from-slate-100 via-slate-50 to-blue-50 min-h-screen">
 
-    <!-- Mobile Header -->
-    <header
-        class="lg:hidden glass fixed top-0 left-0 w-full h-16 z-[60] px-6 flex items-center justify-between border-b border-slate-200">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-blue-600 rounded-xl">
-                <i data-lucide="shield-check" class="text-white w-5 h-5"></i>
-            </div>
-            <span class="font-extrabold text-slate-800 tracking-tight uppercase text-sm">Petugas Portal</span>
-        </div>
-        <button @click="mobileMenu = !mobileMenu" class="p-2 text-slate-600">
-            <i data-lucide="menu" x-show="!mobileMenu"></i>
-            <i data-lucide="x" x-show="mobileMenu"></i>
-        </button>
-    </header>
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <aside x-show="sidebarOpen || window.innerWidth >= 1024" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="-translate-x-full opacity-0" x-transition:enter-end="translate-x-0 opacity-100"
+            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-x-0 opacity-100"
+            x-transition:leave-end="-translate-x-full opacity-0"
+            :class="sidebarOpen ? 'fixed inset-0 z-50 lg:relative lg:inset-auto' : 'hidden lg:block'"
+            class="sidebar-glass w-80 min-h-screen flex flex-col border-r border-slate-700/50">
 
-    <!-- Sidebar -->
-    <aside :class="sidebarOpen ? 'w-72' : 'w-24'"
-        class="fixed left-0 top-0 h-screen glass-dark z-[70] hidden lg:flex flex-col sidebar-transition overflow-hidden">
-
-        <!-- Logo Area -->
-        <div class="p-8 mb-4 flex items-center gap-4 overflow-hidden whitespace-nowrap">
-            <div class="p-3 bg-blue-600 rounded-2xl shadow-lg shadow-blue-500/30 flex-shrink-0">
-                <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
-            </div>
-            <div :class="sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'" class="sidebar-transition">
-                <span class="text-white font-extrabold tracking-tighter uppercase text-lg">DISKOMINFO</span>
-                <p class="text-slate-400 text-[10px] font-bold tracking-widest uppercase">Petugas SPBE</p>
-            </div>
-        </div>
-
-        <!-- Navigation -->
-        <nav class="flex-1 px-4 space-y-2">
-            <a href="{{ route('petugas.index') }}"
-                class="flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 {{ request()->routeIs('petugas.index') ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
-                <i data-lucide="layout-grid" class="w-6 h-6 flex-shrink-0"></i>
-                <span :class="sidebarOpen ? 'opacity-100' : 'opacity-0'"
-                    class="font-bold text-sm sidebar-transition">Dashboard</span>
-            </a>
-
-            <a href="{{ route('petugas.tugas') }}"
-                class="flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 {{ request()->routeIs('petugas.tugas') ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
-                <i data-lucide="clipboard-list" class="w-6 h-6 flex-shrink-0"></i>
-                <span :class="sidebarOpen ? 'opacity-100' : 'opacity-0'"
-                    class="font-bold text-sm sidebar-transition">Mandat Saya</span>
-            </a>
-
-            <a href="{{ route('petugas.profile') }}"
-                class="flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 {{ request()->routeIs('petugas.profile') ? 'bg-blue-600 text-white shadow-xl shadow-blue-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5' }}">
-                <i data-lucide="user-circle" class="w-6 h-6 flex-shrink-0"></i>
-                <span :class="sidebarOpen ? 'opacity-100' : 'opacity-0'"
-                    class="font-bold text-sm sidebar-transition">Profil Saya</span>
-            </a>
-        </nav>
-
-        <!-- Sidebar Footer -->
-        <div class="p-4">
-            <button @click="sidebarOpen = !sidebarOpen"
-                class="w-full flex items-center justify-center p-4 bg-white/5 rounded-2xl text-slate-400 hover:text-white transition-all">
-                <i data-lucide="chevron-left" :class="!sidebarOpen ? 'rotate-180' : ''" class="sidebar-transition"></i>
-            </button>
-        </div>
-    </aside>
-
-    <div :class="sidebarOpen ? 'lg:ml-72' : 'lg:ml-24'"
-        class="min-h-screen sidebar-transition flex flex-col pt-16 lg:pt-0 bg-transparent relative z-10">
-
-        <!-- Topbar -->
-        <header class="hidden lg:flex items-center justify-between px-10 py-6 glass sticky top-0 z-50">
-            <div>
-                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">{{ $title ?? 'Dashboard' }}</h2>
-                <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">
-                    {{ now()->translatedFormat('l, d F Y') }}</p>
-            </div>
-
-            <div class="flex items-center gap-6">
-                <div class="text-right border-r border-slate-200 pr-6">
-                    <p class="text-sm font-extrabold text-slate-800 leading-none">{{ $user->name }}</p>
-                    <span class="text-[10px] font-black text-blue-600 uppercase tracking-tighter">Staff Petugas</span>
-                </div>
-
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-12 h-12 rounded-2xl bg-blue-50 border-2 border-white shadow-lg overflow-hidden transition-transform active:scale-95">
-                        @if ($user->avatar)
-                            <img src="{{ asset('storage/avatars/' . $user->avatar) }}"
-                                class="w-full h-full object-cover">
-                        @else
-                            <div
-                                class="w-full h-full flex items-center justify-center text-blue-600 font-black uppercase italic">
-                                {{ substr($user->name, 0, 2) }}
-                            </div>
-                        @endif
-                    </button>
-
-                    <div x-show="open" @click.outside="open = false" x-cloak
-                        class="absolute right-0 mt-4 w-56 glass rounded-3xl shadow-2xl p-2 z-[100]">
-                        <a href="{{ route('petugas.profile') }}"
-                            class="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-slate-50 text-slate-600 text-sm font-bold">
-                            <i data-lucide="settings" class="w-4 h-4"></i> Pengaturan
-                        </a>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-rose-50 text-rose-500 text-sm font-bold">
-                                <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
-                            </button>
-                        </form>
+            <!-- Logo Area -->
+            <div class="p-8 border-b border-slate-700/50">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30 float-animation">
+                        <i data-lucide="shield-check" class="text-white w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-white font-extrabold text-lg tracking-tight">Portal Petugas</h1>
+                        <p class="text-slate-400 text-xs font-medium uppercase tracking-widest">SPBE Diskominfo</p>
                     </div>
                 </div>
             </div>
-        </header>
+
+            <!-- Navigation -->
+            <nav class="flex-1 p-6 space-y-2">
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6 px-4">Menu Utama</p>
+
+                <a href="{{ route('petugas.index') }}"
+                    class="nav-link flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.index') ? 'active text-white bg-white/10' : '' }}">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span class="font-semibold">Dashboard</span>
+                </a>
+
+                <a href="{{ route('petugas.tugas') }}"
+                    class="nav-link flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.tugas') || request()->routeIs('petugas.show') ? 'active text-white bg-white/10' : '' }}">
+                    <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                    <span class="font-semibold">Tugas Saya</span>
+                </a>
+
+                <a href="{{ route('petugas.profile') }}"
+                    class="nav-link flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.profile') ? 'active text-white bg-white/10' : '' }}">
+                    <i data-lucide="user-circle" class="w-5 h-5"></i>
+                    <span class="font-semibold">Profil</span>
+                </a>
+            </nav>
+
+            <!-- User Info -->
+            <div class="p-6 border-t border-slate-700/50">
+                <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                        {{ substr($user->name, 0, 1) }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-white font-bold text-sm truncate">{{ $user->name }}</p>
+                        <p class="text-slate-400 text-xs truncate">{{ $user->jabatan ?? 'Petugas Lapangan' }}</p>
+                    </div>
+                    <button onclick="toggleLogoutModal()"
+                        class="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Overlay for mobile -->
+        <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            @click="sidebarOpen = false"></div>
 
         <!-- Main Content -->
-        <main class="flex-1 px-6 lg:px-10 py-8">
-            @yield('content')
-        </main>
+        <div class="flex-1 flex flex-col min-h-screen">
+            <!-- Top Navbar -->
+            <header class="sticky top-0 z-30 glass border-b border-slate-200/50">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex items-center gap-4">
+                        <button @click="sidebarOpen = !sidebarOpen"
+                            class="lg:hidden p-3 rounded-xl hover:bg-slate-100 transition-colors">
+                            <i data-lucide="menu" class="w-6 h-6 text-slate-600"></i>
+                        </button>
+                        <div>
+                            <h2 class="text-slate-800 font-bold text-lg">{{ $title ?? 'Dashboard' }}</h2>
+                            <p class="text-slate-400 text-xs font-medium">
+                                {{ now()->translatedFormat('l, d M Y') }}
+                        </div>
+                    </div>
 
-        <!-- Footer -->
-        <footer class="px-10 py-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-            &copy; {{ date('Y') }} DISKOMINFO - Sistem Informasi Layanan SPBE
-        </footer>
+                    <div class="flex items-center gap-4">
+                        <!-- Notifications -->
+                        <button class="relative p-3 rounded-xl hover:bg-slate-100 transition-colors">
+                            <i data-lucide="bell" class="w-5 h-5 text-slate-500"></i>
+                            <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+
+                        <!-- Profile Dropdown -->
+                        <div class="hidden sm:flex items-center gap-3 pl-4 border-l border-slate-200">
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-slate-800">{{ $user->name }}</p>
+                                <p class="text-xs text-slate-400">{{ $user->role ?? 'Petugas' }}</p>
+                            </div>
+                            <div
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg">
+                                {{ substr($user->name, 0, 1) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="flex-1 p-6 lg:p-8">
+                @yield('content')
+            </main>
+
+            <!-- Footer -->
+            <footer class="glass border-t border-slate-200/50 px-8 py-6">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p class="text-slate-400 text-sm font-medium">© {{ date('Y') }} SPBE Diskominfo Bangka Belitung
+                    </p>
+                    <div class="flex items-center gap-2 text-slate-400 text-sm">
+                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                        <span>Sistem Normal</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
     </div>
 
-    <!-- Mobile Nav Overlay -->
-    <div x-show="mobileMenu" x-cloak class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[80] lg:hidden"
-        @click="mobileMenu = false"></div>
-    <div x-show="mobileMenu" x-transition:enter="transition ease-out duration-300 transform"
-        x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
-        x-transition:leave="transition ease-in duration-300 transform" x-transition:leave-start="translate-x-0"
-        x-transition:leave-end="-translate-x-full" x-cloak
-        class="fixed left-0 top-0 h-screen w-80 glass-dark z-[90] lg:hidden p-8 flex flex-col">
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="fixed inset-0 z-[100] hidden">
+        <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-md" onclick="toggleLogoutModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative bg-white rounded-[2rem] p-10 max-w-md w-full shadow-2xl border border-slate-100"
+                onclick="event.stopPropagation()">
+                <div class="absolute -top-12 left-1/2 -translate-x-1/2">
+                    <div
+                        class="w-20 h-20 bg-gradient-to-br from-red-500 to-rose-600 rounded-full flex items-center justify-center shadow-xl">
+                        <i data-lucide="log-out" class="text-white w-10 h-10"></i>
+                    </div>
+                </div>
 
-        <div class="flex items-center gap-4 mb-12">
-            <div class="p-3 bg-blue-600 rounded-2xl">
-                <i data-lucide="shield-check" class="text-white w-6 h-6"></i>
-            </div>
-            <div>
-                <span class="text-white font-extrabold tracking-tighter uppercase text-lg">DISKOMINFO</span>
-                <p class="text-slate-400 text-[10px] font-bold tracking-widest uppercase">Petugas Portal</p>
+                <div class="text-center mt-8">
+                    <h3 class="text-2xl font-black text-slate-800 tracking-tight">Keluar dari Sistem?</h3>
+                    <p class="text-slate-500 text-sm mt-3 font-medium">Pastikan semua data pekerjaan Anda sudah
+                        tersimpan
+                        sebelum logout.</p>
+                </div>
+
+                <div class="mt-10 flex gap-4">
+                    <button onclick="toggleLogoutModal()"
+                        class="flex-1 px-6 py-4 rounded-2xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition-all">
+                        Batal
+                    </button>
+                    <form action="{{ route('logout') }}" method="POST" class="flex-1">
+                        @csrf
+                        <button type="submit"
+                            class="w-full px-6 py-4 rounded-2xl bg-gradient-to-r from-red-500 to-rose-600 text-white font-bold text-sm shadow-lg hover:shadow-xl transition-all">
+                            Ya, Keluar
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
-
-        <nav class="flex-1 space-y-4">
-            <a href="{{ route('petugas.index') }}"
-                class="flex items-center gap-4 px-6 py-4 rounded-2xl text-white bg-blue-600 shadow-xl shadow-blue-600/20 font-bold text-sm">
-                <i data-lucide="layout-grid" class="w-6 h-6"></i> Dashboard
-            </a>
-            <a href="{{ route('petugas.tugas') }}"
-                class="flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 font-bold text-sm">
-                <i data-lucide="clipboard-list" class="w-6 h-6"></i> Mandat Saya
-            </a>
-            <a href="{{ route('petugas.profile') }}"
-                class="flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-400 font-bold text-sm">
-                <i data-lucide="user-circle" class="w-6 h-6"></i> Profil Saya
-            </a>
-        </nav>
-
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit"
-                class="w-full flex items-center justify-center gap-3 py-4 rounded-2xl bg-rose-500 text-white font-bold text-sm shadow-xl shadow-rose-500/20">
-                <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
-            </button>
-        </form>
     </div>
 
+    @if (session('success'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)"
+            class="fixed bottom-6 right-6 z-50 glass-card rounded-2xl p-5 flex items-center gap-4 shadow-xl border-l-4 border-emerald-500">
+            <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i>
+            </div>
+            <div>
+                <p class="font-bold text-slate-800">Berhasil!</p>
+                <p class="text-sm text-slate-500">{{ session('success') }}</p>
+            </div>
+            <button @click="show = false" class="ml-4 text-slate-400 hover:text-slate-600">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+    @endif
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
-        });
+        lucide.createIcons();
+
+        function toggleLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.toggle('hidden');
+        }
     </script>
-    @include('sweetalert::alert')
 </body>
 
 </html>
