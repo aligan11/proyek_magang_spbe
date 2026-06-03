@@ -7,8 +7,9 @@
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 class="text-3xl font-extrabold text-slate-900">Edit Deskripsi</h1>
+                        <!-- Menggunakan optional() atau relasi aman bawaan laravel -->
                         <p class="text-slate-500 mt-1">No. Registrasi: <span
-                                class="font-bold text-blue-600">#{{ $permohonan->noreg }}</span></p>
+                                class="font-bold text-blue-600">#{{ $permohonan->layanan->noreg ?? '-' }}</span></p>
                     </div>
                 </div>
             </div>
@@ -20,11 +21,16 @@
 
                     <div class="mb-6">
                         <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">
-                            <i data-lucide="file-text" class="inline w-4 h-4 mr-2"></i>
-                            Keterangan / Deskripsi
+                            <i data-lucide="file-text" class="inline w-4 h-4 mr-2"></i> Keterangan / Deskripsi
                         </label>
-                        <textarea name="ket" rows="6"
-                            class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none transition-all">{{ old('ket', $permohonan->ket) }}</textarea>
+
+                        <!-- PERBAIKAN 2: Mengubah $permohonan->ket menjadi $permohonan->keterangan sesuai tabel database -->
+                        <textarea name="ket" rows="6" required
+                            class="w-full px-5 py-4 bg-slate-50 border @error('ket') border-rose-300 bg-rose-50/10 @else border-slate-200 @enderror rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none transition-all shadow-inner">{{ old('ket', $permohonan->keterangan) }}</textarea>
+
+                        @error('ket')
+                            <p class="text-xs text-rose-500 font-bold mt-2">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="flex flex-col sm:flex-row gap-4 pt-4">
@@ -44,9 +50,8 @@
                             </template>
                         </button>
                         <a href="{{ route('indexMandat', 1) }}"
-                            class="px-8 py-4 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-all text-center">
-                            <i data-lucide="x" class="inline w-4 h-4 mr-2"></i>
-                            Batal
+                            class="px-8 py-4 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-all text-center flex items-center justify-center">
+                            <i data-lucide="x" class="inline w-4 h-4 mr-2"></i> Batal
                         </a>
                     </div>
                 </form>

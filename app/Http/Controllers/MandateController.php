@@ -95,34 +95,35 @@ class MandateController extends Controller
      */
     public function createMandate(Request $request, $noreg)
     {
-        $idPetugas = Auth::guard('petugas')->user()->id;
-
-        $searchPetugas = $request->input('searchPetugas');
-
-        // Cukup satu variabel untuk Tiket dengan filter
+        // Ambil data tiket tunggal berdasarkan nomor registrasi
         $pendingTickets = Layanan_spbe::with('jenis_layanan')
             ->where('noreg', $noreg)
             ->firstOrFail();
 
-        $statusMandat = $pendingTickets->first()->status_tl;
+        // PERBAIKAN: Langsung ambil kolom status_tl dari objek $pendingTickets tanpa ->first()
+        $statusMandat = $pendingTickets->status_tl;
 
-        // Cukup satu variabel untuk Petugas dengan filter
+        // Ambil data petugas pelaksana
+        $searchPetugas = $request->input('searchPetugas');
         $availablePetugas = User::where('role', 'staff')
             ->when($searchPetugas, function ($query, $searchPetugas) {
                 return $query->where('name', 'LIKE', "%{$searchPetugas}%");
             })
-            ->latest()->get();
+            ->latest()
+            ->get();
 
-        $dataPetugas = User::findOrFail($idPetugas);
+        // Ambil data pimpinan yang sedang login (Gunakan Auth standar jika guard utama)
+        $dataPetugas = Auth::user();
 
         return view('pimpinan.CreateMandate', [
-            'pendingTickets'   => $pendingTickets, // Variabel ini sekarang sudah terfilter
+            'pendingTickets' => $pendingTickets,
             'availablePetugas' => $availablePetugas,
-            'dataPetugas'      => $dataPetugas,
-            'title'            => 'Layanan Tambah Mandat',
+            'dataPetugas' => $dataPetugas,
+            'title' => 'Layanan Tambah Mandat',
             'statusMandat' => $statusMandat,
         ]);
     }
+
 
 
     /**
@@ -130,6 +131,7 @@ class MandateController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'ticket_id' => 'required|exists:layanan_spbe,id',
             'user_ids' => 'required|array|min:1',

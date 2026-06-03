@@ -213,6 +213,16 @@ class PetugasController extends Controller
         // Eksekusi update pada table layanan_spbe
         $task->update($dataTicket);
 
+        // Create notification for pemohon
+        Notification::create([
+            'pemohon_id' => $task->id_pemohon,
+            'type' => 'status_completed',
+            'message' => "Permohonan Anda dengan nomor registrasi {$task->noreg} telah selesai ditindaklanjuti.",
+            'related_id' => $task->id,
+            'related_type' => 'layanan_spbe',
+            'is_read' => false,
+        ]);
+
         return redirect()->route('petugas.tugas')->with('success', 'Mandat telah diselesaikan!');
     }
 

@@ -23,9 +23,10 @@ class Tindak_lanjut_layanan extends Model
         return $this->belongsTo(Layanan_spbe::class, 'id_layanan');
     }
 
+    // Relasi ke Layanan SPBE
     public function layanan()
     {
-        return $this->belongsTo(Layanan_spbe::class, 'id_layanan');
+        return $this->belongsTo(Layanan_spbe::class, 'id_layanan', 'id');
     }
 
 

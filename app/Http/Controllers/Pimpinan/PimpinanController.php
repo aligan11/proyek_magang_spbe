@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Jenis_layanan_spbe;
 use App\Models\Kebutuhan_layanan_spbe;
 use App\Models\Layanan_spbe;
+use App\Models\Tindak_lanjut_layanan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -141,7 +142,11 @@ class PimpinanController extends Controller
      */
     public function edit(string $id)
     {
-        $permohonan = Layanan_spbe::findOrFail($id);
+        // FIX: Remove 'petugas_tindak' to stop the internal JSON array relation crash
+        $permohonan = Tindak_lanjut_layanan::where('id_layanan', $id)
+            ->with(['layanan'])
+            ->firstOrFail();
+
         $idPetugas = Auth::guard('petugas')->user()->id;
         $dataPetugas = User::findOrFail($idPetugas);
         $title = "Edit Deskripsi";
@@ -149,24 +154,33 @@ class PimpinanController extends Controller
         return view('pimpinan.editRequest', compact('permohonan', 'title', 'dataPetugas'));
     }
 
+
+
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        $permohonan = Layanan_spbe::findOrFail($id);
-
         $request->validate([
-            'ket' => 'nullable|string',
+            'ket' => 'required|string|min:5',
         ]);
 
-        $permohonan->update([
-            'ket' => $request->ket,
+        // KARENA URL ADALAH /pimpinan/23 (ID Asli), MAKA GUNAKAN findOrFail SECARA LANGSUNG
+        $tindakLanjut = Tindak_lanjut_layanan::findOrFail($id);
+
+        // Proses update data ke kolom keterangan
+        $tindakLanjut->update([
+            'keterangan' => $request->ket,
         ]);
 
-        Alert::success('Berhasil', 'Deskripsi berhasil diperbarui!');
-        return redirect()->route('indexMandat', 1);
+        // Alihkan halaman kembali ke index mandat status 1
+        return redirect()->route('indexMandat', ['status' => 1])
+            ->with('success', 'Deskripsi penugasan berhasil diperbarui.');
     }
+
+
+
+
 
     /**
      * Remove the specified resource from storage.

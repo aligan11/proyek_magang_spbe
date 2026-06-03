@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Jenis_layanan_spbe;
 use App\Models\Kebutuhan_layanan_spbe;
 use App\Models\Layanan_spbe;
+use App\Models\Notification;
 use App\Models\Pemohon;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,11 +19,25 @@ use RealRashid\SweetAlert\Facades\Alert;
 class PemohonController extends Controller
 {
     /**
+     * Helper function to get notifications for authenticated pemohon
+     */
+    private function getPemohonNotifications($pemohonId)
+    {
+        $notifications = Notification::where('pemohon_id', $pemohonId)
+            ->where('is_read', false)
+            ->latest()
+            ->get();
+        $unreadCount = $notifications->count();
+        return compact('notifications', 'unreadCount');
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
         $idPemohon = Auth::guard('pemohon')->user()->id;
+        $notificationData = $this->getPemohonNotifications($idPemohon);
 
         $permohonan = Layanan_spbe::with('jenis_layanan')
             ->where('id_pemohon', $idPemohon)
@@ -35,7 +50,7 @@ class PemohonController extends Controller
             ->orderBy('tgl_permohonan', 'desc')
             ->paginate(10);
 
-        return view('pemohon.IndexPemohonan', compact('permohonan'));
+        return view('pemohon.IndexPemohonan', compact('permohonan') + $notificationData);
     }
 
     /**
@@ -46,6 +61,7 @@ class PemohonController extends Controller
         $userId = Auth::guard('pemohon')->id();
         $user = Auth::guard('pemohon')->user();
         $userInstansi = Pemohon::with('instansi')->findOrFail($userId);
+        $notificationData = $this->getPemohonNotifications($userId);
 
         $nama = $user->nama_lengkap;
 
@@ -62,7 +78,7 @@ class PemohonController extends Controller
             ->take(3)
             ->get();
 
-        return view('pemohon.DashboardPemohon', compact('user', 'userInstansi', 'countAktif', 'countSelesai', 'latestRequests'));
+        return view('pemohon.DashboardPemohon', compact('user', 'userInstansi', 'countAktif', 'countSelesai', 'latestRequests') + $notificationData);
     }
 
     /**
@@ -71,7 +87,9 @@ class PemohonController extends Controller
     public function create()
     {
         $jenis = Jenis_layanan_spbe::all();
-        return view('pemohon.LayananPemohonPage', compact('jenis'));
+        $idPemohon = Auth::guard('pemohon')->user()->id;
+        $notificationData = $this->getPemohonNotifications($idPemohon);
+        return view('pemohon.LayananPemohonPage', compact('jenis') + $notificationData);
     }
 
     /**
@@ -178,6 +196,7 @@ class PemohonController extends Controller
     public function show($id)
     {
         $idPemohon = Auth::guard('pemohon')->user()->id;
+        $notificationData = $this->getPemohonNotifications($idPemohon);
         $detail = Layanan_spbe::where('id', $id)
             ->where('id_pemohon', $idPemohon)
             ->firstOrFail();
@@ -197,7 +216,7 @@ class PemohonController extends Controller
             default                      => 'amber',
         };
 
-        return view('pemohon.ShowPermohonan', compact('detail'));
+        return view('pemohon.ShowPermohonan', compact('detail') + $notificationData);
     }
 
 
@@ -218,6 +237,7 @@ class PemohonController extends Controller
     public function edit($id)
     {
         $idPemohon = Auth::guard('pemohon')->user()->id;
+        $notificationData = $this->getPemohonNotifications($idPemohon);
         $permohonan = Layanan_spbe::where('id', $id)
             ->where('id_pemohon', $idPemohon)
             ->firstOrFail();
@@ -230,7 +250,7 @@ class PemohonController extends Controller
         $jenis = Jenis_layanan_spbe::all();
         $kebutuhan = Kebutuhan_layanan_spbe::where('id_jenis_layanan_spbe', $permohonan->id_jenis_layanan)->get();
 
-        return view('pemohon.EditPermohonan', compact('permohonan', 'jenis', 'kebutuhan'));
+        return view('pemohon.EditPermohonan', compact('permohonan', 'jenis', 'kebutuhan') + $notificationData);
     }
 
     /**
@@ -328,7 +348,8 @@ class PemohonController extends Controller
     public function profilePage()
     {
         $user = Auth::guard('pemohon')->user();
-        return view('pemohon.PengaturanProfile', compact('user'));
+        $notificationData = $this->getPemohonNotifications($user->id);
+        return view('pemohon.PengaturanProfile', compact('user') + $notificationData);
     }
 
     /**
@@ -385,6 +406,28 @@ class PemohonController extends Controller
 
         Alert::success('Berhasil', 'Kata sandi berhasil diubah!');
         return redirect()->back();
+    }
+
+    /**
+     * Mark a single notification as read.
+     */
+    public function markNotificationRead($id)
+    {
+        $notification = Notification::where('id', $id)
+            ->where('pemohon_id', Auth::guard('pemohon')->id())
+            ->firstOrFail();
+        $notification->update(['is_read' => true]);
+        return back();
+    }
+
+    /**
+     * Mark all notifications as read for pemohon.
+     */
+    public function markAllNotificationsRead()
+    {
+        Notification::where('pemohon_id', Auth::guard('pemohon')->id())
+            ->update(['is_read' => true]);
+        return back();
     }
 
     /**

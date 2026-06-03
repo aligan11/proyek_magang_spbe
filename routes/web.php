@@ -62,6 +62,10 @@ Route::middleware(['check.pemohon'])->group(function () {
 
     Route::get('pemohon/download-pdf/{id}', [PemohonController::class, 'downloadPdf'])->name('pemohon.download.pdf');
     Route::resource('pemohon', PemohonController::class);
+    
+    // Notification routes for pemohon
+    Route::post('pemohon/notifications/{id}/read', [PemohonController::class, 'markNotificationRead'])->name('pemohon.notification.read');
+    Route::post('pemohon/notifications/read-all', [PemohonController::class, 'markAllNotificationsRead'])->name('pemohon.notification.read-all');
 });
 
 

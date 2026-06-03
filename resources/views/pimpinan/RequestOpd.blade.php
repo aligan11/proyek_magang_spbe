@@ -23,6 +23,13 @@
             </div>
         </div>
 
+        @if (session('success'))
+            <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl text-xs font-bold">
+                {{ session('success') }}
+            </div>
+        @endif
+
+
         <!-- Strategic Stats (Tetap Sesuai Desain Kamu) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
             <!-- Card 1: Total Masuk (Static) -->
