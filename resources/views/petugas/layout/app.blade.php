@@ -242,10 +242,61 @@
 
                     <div class="flex items-center gap-2 sm:gap-4 shrink-0">
                         <!-- Notifications -->
-                        <button class="relative p-3 rounded-2xl hover:bg-slate-100 transition-colors">
-                            <i data-lucide="bell" class="w-5 h-5 text-slate-500"></i>
-                            <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-                        </button>
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open" class="relative p-3 rounded-2xl hover:bg-slate-100 transition-colors">
+                                <i data-lucide="bell" class="w-5 h-5 text-slate-500"></i>
+                                @if(isset($unreadCount) && $unreadCount > 0)
+                                    <span class="absolute top-2 right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                        {{ $unreadCount }}
+                                    </span>
+                                @endif
+                            </button>
+
+                            <!-- Notification Dropdown -->
+                            <div x-show="open" @click.outside="open = false" x-transition class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 z-50">
+                                <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+                                    <h3 class="font-bold text-slate-800">Notifikasi</h3>
+                                    @if(isset($unreadCount) && $unreadCount > 0)
+                                        <form action="{{ route('petugas.notification.read-all') }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="text-xs font-bold text-blue-600 hover:text-blue-700">
+                                                Tandai semua dibaca
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                                <div class="max-h-80 overflow-y-auto">
+                                    @if(isset($notifications) && $notifications->count() > 0)
+                                        @foreach($notifications as $notification)
+                                            <form action="{{ route('petugas.notification.read', $notification->id) }}" method="POST" class="block">
+                                                @csrf
+                                                <button type="submit" class="w-full p-4 hover:bg-slate-50 text-left border-b border-slate-100 last:border-0">
+                                                    <div class="flex items-start gap-3">
+                                                        <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                                            <i data-lucide="briefcase" class="w-5 h-5 text-blue-600"></i>
+                                                        </div>
+                                                        <div class="flex-1">
+                                                            <p class="text-sm font-semibold text-slate-800">{{ $notification->message }}</p>
+                                                            <p class="text-xs text-slate-400 mt-1">
+                                                                {{ $notification->created_at->diffForHumans() }}
+                                                            </p>
+                                                        </div>
+                                                        @if(!$notification->is_read)
+                                                            <span class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                                                        @endif
+                                                    </div>
+                                                </button>
+                                            </form>
+                                        @endforeach
+                                    @else
+                                        <div class="p-8 text-center">
+                                            <i data-lucide="inbox" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+                                            <p class="text-sm text-slate-500">Tidak ada notifikasi baru</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Profile Dropdown -->
                         <div class="hidden sm:flex items-center gap-3 pl-4 border-l border-slate-200">

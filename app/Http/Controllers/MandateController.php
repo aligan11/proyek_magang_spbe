@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kebutuhan_layanan_spbe;
 use App\Models\Layanan_spbe;
 use App\Models\Mandate;
+use App\Models\Notification;
 use App\Models\Petugas;
 use App\Models\Ticket;
 use App\Models\Tindak_lanjut_layanan;
@@ -151,13 +152,25 @@ class MandateController extends Controller
         ]);
 
         // Insert ke tindak_lanjut_layanan untuk setiap petugas
-        Tindak_lanjut_layanan::create([
+        $tindakLanjut = Tindak_lanjut_layanan::create([
             'id_layanan' => $ticket->id,
             'id_petugas' => $request->user_ids,
             'keterangan' => $request->ket,
         ]);
 
         $petugas = User::whereIn('id', $request->user_ids)->get();
+
+        // Create notifications for each petugas
+        foreach ($petugas as $p) {
+            Notification::create([
+                'user_id' => $p->id,
+                'type' => 'new_mandate',
+                'message' => "Anda mendapat tugas baru untuk permohonan No. {$ticket->noreg} - {$ticket->nama_kebutuhan}",
+                'related_id' => $tindakLanjut->id,
+                'related_type' => 'tindak_lanjut',
+                'is_read' => false,
+            ]);
+        }
         $targetNumbers = $petugas->pluck('no_hp')->filter()->implode(',');
 
         // 2. Susun format pesan untuk WhatsApp

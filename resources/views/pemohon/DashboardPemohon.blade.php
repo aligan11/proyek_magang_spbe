@@ -183,18 +183,21 @@
                         </div>
                         <div class="text-right">
                             @php
-                                $statusLabel = match ($req->status) {
+                                // PERBAIKAN: Mengubah acuan data dari 'status' ke 'status_ver'
+                                $statusLabel = match ((int) $req->status_ver) {
                                     1 => 'Proses',
-                                    3 => 'Selesai',
-                                    default => 'proses',
+                                    2 => 'Selesai',
+                                    default => 'Selesai', // Menyamakan kondisi jika status_ver berupa string "selesai"
                                 };
-                                $statusColor = match ($req->status) {
+
+                                // PERBAIKAN: Menyesuaikan warna agar status Selesai (2) berwarna hijau/emerald estetik
+                                $statusColor = match ((int) $req->status_ver) {
                                     1 => 'text-amber-600 bg-amber-50 border-amber-100',
-                                    2 => 'text-blue-600 bg-blue-50 border-blue-100',
-                                    3 => 'text-emerald-600 bg-emerald-50 border-emerald-100',
-                                    default => 'text-slate-600 bg-slate-50 border-slate-100',
+                                    2 => 'text-emerald-600 bg-emerald-50 border-emerald-100',
+                                    default => 'text-emerald-600 bg-emerald-50 border-emerald-100',
                                 };
                             @endphp
+
                             <span
                                 class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider border {{ $statusColor }}">
                                 {{ $statusLabel }}

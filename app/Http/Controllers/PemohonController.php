@@ -47,15 +47,17 @@ class PemohonController extends Controller
         $user = Auth::guard('pemohon')->user();
         $userInstansi = Pemohon::with('instansi')->findOrFail($userId);
 
-        $countAktif = Layanan_spbe::where('inputby', $userId)
+        $nama = $user->nama_lengkap;
+
+        $countAktif = Layanan_spbe::where('inputby', $nama)
             ->whereIn('status', [Layanan_spbe::STATUS_PENDING, Layanan_spbe::STATUS_PROSES])
             ->count();
 
-        $countSelesai = Layanan_spbe::where('inputby', $userId)
+        $countSelesai = Layanan_spbe::where('inputby', $nama)
             ->where('status', Layanan_spbe::STATUS_SELESAI)
             ->count();
 
-        $latestRequests = Layanan_spbe::where('inputby', $userId)
+        $latestRequests = Layanan_spbe::where('inputby', $nama)
             ->latest()
             ->take(3)
             ->get();

@@ -73,6 +73,8 @@ route::middleware('check.role:staff')->group(function () {
     Route::put('petugas/profile/update', [PimpinanController::class, 'updateProfile'])->name('petugas.profile.update');
     Route::put('petugas/profile/password', [PetugasController::class, 'updatePassword'])->name('petugas.password.update');
     Route::post('petugas/tugas/{id}/selesai', [PetugasController::class, 'updateStatus'])->name('petugas.updateStatus');
+    Route::post('petugas/notifications/{id}/read', [PetugasController::class, 'markNotificationRead'])->name('petugas.notification.read');
+    Route::post('petugas/notifications/read-all', [PetugasController::class, 'markAllNotificationsRead'])->name('petugas.notification.read-all');
 });
 
 route::middleware('check.role:kabid')->group(function () {

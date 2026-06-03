@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Petugas;
 
 use App\Http\Controllers\Controller;
 use App\Models\Layanan_spbe;
+use App\Models\Notification;
 use App\Models\Tindak_lanjut_layanan;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,6 +19,17 @@ class PetugasController extends Controller
     const STATUS_SELESAI = 2;
     const STATUS_PROSES  = 3;
 
+    // Helper to get notifications data
+    private function getNotificationsData($userId)
+    {
+        $notifications = Notification::where('user_id', $userId)
+            ->where('is_read', false)
+            ->latest()
+            ->get();
+        $unreadCount = $notifications->count();
+        return compact('notifications', 'unreadCount');
+    }
+
     public function index()
     {
         $idPetugas = Auth::guard('petugas')->user()->id;
@@ -26,6 +38,8 @@ class PetugasController extends Controller
         if (!$user) {
             return redirect()->route('login');
         }
+
+        $notificationData = $this->getNotificationsData($idPetugas);
 
         // 1. Ambil semua data tindak lanjut layanan
         $allMandat = Tindak_lanjut_layanan::with(['ticket', 'ticket.jenis_layanan'])->latest()->get();
@@ -58,7 +72,7 @@ class PetugasController extends Controller
         $latestTasks = $filteredMandates->take(5);
         $title = 'Dashboard';
 
-        return view('petugas.index', compact('stats', 'latestTasks', 'user', 'title'));
+        return view('petugas.index', compact('stats', 'latestTasks', 'user', 'title') + $notificationData);
     }
 
     public function tugas()
@@ -69,6 +83,8 @@ class PetugasController extends Controller
         if (!$user) {
             return redirect()->route('login');
         }
+
+        $notificationData = $this->getNotificationsData($idPetugas);
 
         // 1. Fetch all transactional data with eager loaded relations
         $allMandat = Tindak_lanjut_layanan::with(['ticket', 'ticket.jenis_layanan'])->latest()->get();
@@ -110,7 +126,23 @@ class PetugasController extends Controller
 
         $title = 'Tugas Saya';
 
-        return view('petugas.tugas', compact('tasks', 'stats', 'user', 'title'));
+        return view('petugas.tugas', compact('tasks', 'stats', 'user', 'title') + $notificationData);
+    }
+
+    // Mark notification as read
+    public function markNotificationRead($id)
+    {
+        $notification = Notification::findOrFail($id);
+        $notification->update(['is_read' => true]);
+        return back();
+    }
+
+    // Mark all notifications as read
+    public function markAllNotificationsRead()
+    {
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        Notification::where('user_id', $idPetugas)->update(['is_read' => true]);
+        return back();
     }
 
 
@@ -122,6 +154,8 @@ class PetugasController extends Controller
         if (!$user) {
             return redirect()->route('login');
         }
+
+        $notificationData = $this->getNotificationsData($idPetugas);
 
         // Cari data berdasarkan ID utama
         $mandate = Tindak_lanjut_layanan::with(['ticket', 'ticket.jenis_layanan', 'ticket.instansi_rel'])->findOrFail($id);
@@ -137,7 +171,7 @@ class PetugasController extends Controller
         $task = $mandate->ticket;
         $title = 'Detail Mandat';
 
-        return view('petugas.show', compact('task', 'mandate', 'user', 'title'));
+        return view('petugas.show', compact('task', 'mandate', 'user', 'title') + $notificationData);
     }
 
     public function updateStatus(Request $request, $id)
@@ -191,8 +225,9 @@ class PetugasController extends Controller
             return redirect()->route('login');
         }
 
+        $notificationData = $this->getNotificationsData($idPetugas);
         $title = 'Profil';
-        return view('petugas.profile', compact('user', 'title'));
+        return view('petugas.profile', compact('user', 'title') + $notificationData);
     }
 
     public function updatePassword(Request $request)
