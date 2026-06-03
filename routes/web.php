@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Petugas\PetugasController;
 use App\Http\Controllers\Pimpinan\PimpinanController;
+use App\Http\Controllers\TindakLanjutLayananController;
 use App\Http\Middleware\loginCheck;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ForgotPasswordController;

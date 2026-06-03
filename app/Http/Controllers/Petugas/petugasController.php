@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Petugas;
 
 use App\Http\Controllers\Controller;
 use App\Models\Layanan_spbe;
-use App\Models\Mandate;
+use App\Models\Tindak_lanjut_layanan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,31 +20,42 @@ class PetugasController extends Controller
 
     public function index()
     {
-        /** @var \App\Models\User $user */
-        $user = auth()->guard('petugas')->user();
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        $user = User::find($idPetugas);
 
         if (!$user) {
             return redirect()->route('login');
         }
 
-        // Statistik mengecek status_ver di tabel ticket (layanan_spbe)
+        // 1. Ambil semua data tindak lanjut layanan
+        $allMandat = Tindak_lanjut_layanan::with(['ticket', 'ticket.jenis_layanan'])->latest()->get();
+
+        // 2. Filter data mandats yang di dalamnya mengandung ID petugas ini
+        $filteredMandates = $allMandat->filter(function ($mandat) use ($idPetugas) {
+            $ids = is_string($mandat->id_petugas) ? json_decode($mandat->id_petugas, true) : $mandat->id_petugas;
+            $cleanIds = collect($ids)->map(fn($v) => (int) str_replace(['"', '[', ']', ' '], '', $v))->filter()->toArray();
+            return in_array((int)$idPetugas, $cleanIds);
+        });
+
+        // 3. Hitung Statistik berdasarkan data yang sudah difilter
+        $totalCount = $filteredMandates->count();
+
+        $pendingCount = $filteredMandates->filter(function ($mandat) {
+            return optional($mandat->ticket)->status_ver == self::STATUS_PENDING || is_null(optional($mandat->ticket)->status_ver);
+        })->count();
+
+        $selesaiCount = $filteredMandates->filter(function ($mandat) {
+            return optional($mandat->ticket)->status_ver == self::STATUS_SELESAI;
+        })->count();
+
         $stats = [
-            'total'   => $user->mandates()->count(),
-            'pending' => $user->mandates()->whereHas('ticket', function ($q) {
-                $q->where('status_ver', self::STATUS_PENDING)
-                    ->orWhereNull('status_ver');
-            })->count(),
-            'selesai' => $user->mandates()->whereHas('ticket', function ($q) {
-                $q->where('status_ver', self::STATUS_SELESAI);
-            })->count(),
+            'total'   => $totalCount,
+            'pending' => $pendingCount,
+            'selesai' => $selesaiCount,
         ];
 
-        $latestTasks = $user->mandates()
-            ->with(['ticket', 'ticket.jenis_layanan'])
-            ->latest()
-            ->take(5)
-            ->get();
-
+        // Ambil 5 tugas terbaru untuk dashboard
+        $latestTasks = $filteredMandates->take(5);
         $title = 'Dashboard';
 
         return view('petugas.index', compact('stats', 'latestTasks', 'user', 'title'));
@@ -52,47 +63,76 @@ class PetugasController extends Controller
 
     public function tugas()
     {
-        /** @var \App\Models\User $user */
-        $user = auth()->guard('petugas')->user();
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        $user = User::find($idPetugas);
 
         if (!$user) {
             return redirect()->route('login');
         }
 
+        // 1. Fetch all transactional data with eager loaded relations
+        $allMandat = Tindak_lanjut_layanan::with(['ticket', 'ticket.jenis_layanan'])->latest()->get();
+
+        // 2. Filter collection and drop broken parent records to prevent null crashes
+        $filteredMandates = $allMandat->filter(function ($mandat) use ($idPetugas) {
+
+            // SAFETY POINT: If the ticket parent relation does not exist, drop the row immediately!
+            if (is_null($mandat->ticket)) {
+                return false;
+            }
+
+            $ids = is_string($mandat->id_petugas) ? json_decode($mandat->id_petugas, true) : $mandat->id_petugas;
+            $cleanIds = collect($ids)->map(fn($v) => (int) str_replace(['"', '[', ']', ' '], '', $v))->filter()->toArray();
+            return in_array((int)$idPetugas, $cleanIds);
+        });
+
+        // 3. Compute dashboard counter metric statistics using the clean dataset
         $stats = [
-            'total'   => $user->mandates()->count(),
-            'pending' => $user->mandates()->whereHas('ticket', function ($q) {
-                $q->where('status_ver', self::STATUS_PENDING)
-                    ->orWhereNull('status_ver');
+            'total'   => $filteredMandates->count(),
+            'pending' => $filteredMandates->filter(function ($mandat) {
+                return optional($mandat->ticket)->status_ver == self::STATUS_PENDING || is_null(optional($mandat->ticket)->status_ver);
             })->count(),
-            'selesai' => $user->mandates()->whereHas('ticket', function ($q) {
-                $q->where('status_ver', self::STATUS_SELESAI);
+            'selesai' => $filteredMandates->filter(function ($mandat) {
+                return optional($mandat->ticket)->status_ver == self::STATUS_SELESAI;
             })->count(),
         ];
 
-        $tasks = $user->mandates()
-            ->with(['ticket', 'ticket.jenis_layanan'])
-            ->latest()
-            ->paginate(10);
+        // 4. Construct pagination segments from the sanitized list
+        $perPage = 10;
+        $currentPage = request()->get('page', 1);
+        $tasks = new \Illuminate\Pagination\LengthAwarePaginator(
+            $filteredMandates->forPage($currentPage, $perPage)->values(),
+            $filteredMandates->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
 
         $title = 'Tugas Saya';
 
         return view('petugas.tugas', compact('tasks', 'stats', 'user', 'title'));
     }
 
+
     public function show($id)
     {
-        /** @var \App\Models\User $user */
-        $user = auth()->guard('petugas')->user();
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        $user = User::find($idPetugas);
 
         if (!$user) {
             return redirect()->route('login');
         }
 
-        // Cari mandat milik user yang login
-        $mandate = $user->mandates()
-            ->with(['ticket', 'ticket.jenis_layanan', 'ticket.instansi_rel'])
-            ->findOrFail($id);
+        // Cari data berdasarkan ID utama
+        $mandate = Tindak_lanjut_layanan::with(['ticket', 'ticket.jenis_layanan', 'ticket.instansi_rel'])->findOrFail($id);
+
+        // Validasi akses keamanan manual agar petugas lain tidak bisa melihat tiket ini
+        $ids = is_string($mandate->id_petugas) ? json_decode($mandate->id_petugas, true) : $mandate->id_petugas;
+        $cleanIds = collect($ids)->map(fn($v) => (int) str_replace(['"', '[', ']', ' '], '', $v))->filter()->toArray();
+
+        if (!in_array((int)$idPetugas, $cleanIds)) {
+            abort(403, 'Anda tidak memiliki akses ke tugas ini.');
+        }
 
         $task = $mandate->ticket;
         $title = 'Detail Mandat';
@@ -102,32 +142,33 @@ class PetugasController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
+
         $request->validate([
             'status' => 'required|in:selesai',
             'ketver' => 'required|string',
             'berkasver' => 'nullable|file|mimes:pdf,jpg,png,zip|max:5120',
         ]);
 
-        /** @var \App\Models\User $user */
-        $user = auth()->guard('petugas')->user();
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        $user = User::find($idPetugas);
 
         if (!$user) {
             return redirect()->route('login');
         }
 
-        // 1. Ambil Mandate & Ticket terkait
-        $mandate = $user->mandates()->findOrFail($id);
-        $task = $mandate->ticket; // Model Layanan_spbe
+        // Ambil data mandat berdasarkan ID utama
+        $mandate = Tindak_lanjut_layanan::findOrFail($id);
+        $task = $mandate->ticket;
 
-        // 2. Siapkan data update untuk tabel layanan_spbe
+        // Siapkan data update tiket
         $dataTicket = [
-            'status_ver' => self::STATUS_SELESAI, // Angka 2
+            'status_ver' => self::STATUS_SELESAI,
             'ketver'     => $request->ketver,
             'verby'      => $user->name,
             'tglver'     => now(),
         ];
 
-        // 3. Proses File jika ada
+        // Proses penyimpanan berkas
         if ($request->hasFile('berkasver')) {
             $file = $request->file('berkasver');
             $fileName = 'ver_' . time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
@@ -135,19 +176,16 @@ class PetugasController extends Controller
             $dataTicket['berkasver'] = $fileName;
         }
 
-        // 4. Update tabel Layanan_spbe
+        // Eksekusi update pada table layanan_spbe
         $task->update($dataTicket);
-
-        // 5. Update kolom deskripsi/status di pivot jika memang diperlukan 
-        // (Namun karena status_ver ada di table layanan_spbe, update di atas sudah cukup)
 
         return redirect()->route('petugas.tugas')->with('success', 'Mandat telah diselesaikan!');
     }
 
     public function profile()
     {
-        /** @var \App\Models\User $user */
-        $user = auth()->guard('petugas')->user();
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        $user = User::find($idPetugas);
 
         if (!$user) {
             return redirect()->route('login');
@@ -164,8 +202,8 @@ class PetugasController extends Controller
             'password' => 'required|confirmed|min:8',
         ]);
 
-        /** @var \App\Models\User $user */
-        $user = auth()->guard('petugas')->user();
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        $user = User::find($idPetugas);
 
         if (!$user) {
             return redirect()->route('login');
@@ -175,6 +213,7 @@ class PetugasController extends Controller
             return back()->withErrors(['current_password' => 'Password saat ini tidak sesuai']);
         }
 
+        // Menggunakan instance object hasil User::find($idPetugas) agar terhindar dari error undefined method update()
         $user->update(['password' => Hash::make($request->password)]);
 
         return back()->with('success', 'Password berhasil diperbarui!');

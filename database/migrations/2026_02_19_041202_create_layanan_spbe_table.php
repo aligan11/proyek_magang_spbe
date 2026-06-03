@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string('nip_penanggungjawab')->nullable();
             $table->string('nohp_penanggungjawab')->nullable();
             $table->string('jabatan_penanggungjawab')->nullable();
-            $table->string('unitkerja_penanggungjawab')->nullable();
+            $table->string('unitKerja_penanggungjawab')->nullable();
             $table->string('email_penanggungjawab')->nullable();
 
             // Data Tambahan & Berkas

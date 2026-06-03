@@ -111,6 +111,16 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
+        [x-cloak] {
+            display: none !important;
+        }
+
+        @media (max-width: 1023px) {
+            .mobile-safe-padding {
+                padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+            }
+        }
     </style>
 </head>
 
@@ -118,62 +128,84 @@
 
     <div class="min-h-screen flex">
         <!-- Sidebar -->
-        <aside x-show="sidebarOpen || window.innerWidth >= 1024" x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="-translate-x-full opacity-0" x-transition:enter-end="translate-x-0 opacity-100"
-            x-transition:leave="transition ease-in duration-200" x-transition:leave-start="translate-x-0 opacity-100"
-            x-transition:leave-end="-translate-x-full opacity-0"
-            :class="sidebarOpen ? 'fixed inset-0 z-50 lg:relative lg:inset-auto' : 'hidden lg:block'"
-            class="sidebar-glass w-80 min-h-screen flex flex-col border-r border-slate-700/50">
+        <aside x-cloak
+            :class="[
+                collapsed ? 'lg:w-24' : 'lg:w-80',
+                sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+            ]"
+            class="sidebar-glass fixed inset-y-0 left-0 z-50 flex min-h-screen w-[86vw] max-w-[320px] flex-col border-r border-slate-700/50 shadow-2xl transition-all duration-300 lg:sticky lg:top-0 lg:max-w-none">
 
             <!-- Logo Area -->
-            <div class="p-8 border-b border-slate-700/50">
-                <div class="flex items-center gap-4">
-                    <div
-                        class="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30 float-animation">
-                        <i data-lucide="shield-check" class="text-white w-7 h-7"></i>
+            <div class="border-b border-slate-700/50 p-5 lg:p-8">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-4 min-w-0">
+                        <div
+                            class="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg shadow-blue-500/30 float-animation shrink-0">
+                            <i data-lucide="shield-check" class="text-white w-7 h-7"></i>
+                        </div>
+                        <div x-show="!collapsed" x-transition.opacity class="min-w-0">
+                            <h1 class="text-white font-extrabold text-lg tracking-tight truncate">Portal Petugas</h1>
+                            <p class="text-slate-400 text-xs font-medium uppercase tracking-widest">SPBE Diskominfo</p>
+                        </div>
                     </div>
-                    <div>
-                        <h1 class="text-white font-extrabold text-lg tracking-tight">Portal Petugas</h1>
-                        <p class="text-slate-400 text-xs font-medium uppercase tracking-widest">SPBE Diskominfo</p>
+                    <div
+                        class="flex items-center gap-2">
+                        <button @click="collapsed = !collapsed"
+                            class="hidden lg:inline-flex p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                            :title="collapsed ? 'Buka sidebar' : 'Ciutkan sidebar'">
+                            <i data-lucide="panel-left-close" class="w-5 h-5" x-show="!collapsed"></i>
+                            <i data-lucide="panel-left-open" class="w-5 h-5" x-show="collapsed" x-cloak></i>
+                        </button>
+                        <button @click="sidebarOpen = false"
+                            class="inline-flex lg:hidden p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                            title="Tutup sidebar">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 p-6 space-y-2">
-                <p class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6 px-4">Menu Utama</p>
+            <nav class="flex-1 p-4 lg:p-6 space-y-2 overflow-y-auto mobile-safe-padding">
+                <p x-show="!collapsed" x-transition.opacity
+                    class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6 px-4">Menu Utama</p>
 
                 <a href="{{ route('petugas.index') }}"
-                    class="nav-link flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.index') ? 'active text-white bg-white/10' : '' }}">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-                    <span class="font-semibold">Dashboard</span>
+                    :class="collapsed ? 'justify-center px-4' : 'px-6'"
+                    class="nav-link flex items-center gap-4 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.index') ? 'active text-white bg-white/10' : '' }}">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i>
+                    <span x-show="!collapsed" x-transition.opacity class="font-semibold">Dashboard</span>
                 </a>
 
                 <a href="{{ route('petugas.tugas') }}"
-                    class="nav-link flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.tugas') || request()->routeIs('petugas.show') ? 'active text-white bg-white/10' : '' }}">
-                    <i data-lucide="clipboard-list" class="w-5 h-5"></i>
-                    <span class="font-semibold">Tugas Saya</span>
+                    :class="collapsed ? 'justify-center px-4' : 'px-6'"
+                    class="nav-link flex items-center gap-4 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.tugas') || request()->routeIs('petugas.show') ? 'active text-white bg-white/10' : '' }}">
+                    <i data-lucide="clipboard-list" class="w-5 h-5 shrink-0"></i>
+                    <span x-show="!collapsed" x-transition.opacity class="font-semibold">Tugas Saya</span>
                 </a>
 
                 <a href="{{ route('petugas.profile') }}"
-                    class="nav-link flex items-center gap-4 px-6 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.profile') ? 'active text-white bg-white/10' : '' }}">
-                    <i data-lucide="user-circle" class="w-5 h-5"></i>
-                    <span class="font-semibold">Profil</span>
+                    :class="collapsed ? 'justify-center px-4' : 'px-6'"
+                    class="nav-link flex items-center gap-4 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.profile') ? 'active text-white bg-white/10' : '' }}">
+                    <i data-lucide="user-circle" class="w-5 h-5 shrink-0"></i>
+                    <span x-show="!collapsed" x-transition.opacity class="font-semibold">Profil</span>
                 </a>
             </nav>
 
             <!-- User Info -->
-            <div class="p-6 border-t border-slate-700/50">
-                <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5">
+            <div class="p-4 lg:p-6 border-t border-slate-700/50">
+                <div :class="collapsed ? 'justify-center px-3' : 'p-4'"
+                    class="flex items-center gap-4 rounded-2xl bg-white/5">
                     <div
-                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                        class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shrink-0">
                         {{ substr($user->name, 0, 1) }}
                     </div>
-                    <div class="flex-1 min-w-0">
+                    <div x-show="!collapsed" x-transition.opacity class="flex-1 min-w-0">
                         <p class="text-white font-bold text-sm truncate">{{ $user->name }}</p>
                         <p class="text-slate-400 text-xs truncate">{{ $user->jabatan ?? 'Petugas Lapangan' }}</p>
                     </div>
                     <button onclick="toggleLogoutModal()"
+                        x-show="!collapsed" x-transition.opacity
                         class="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
                         <i data-lucide="log-out" class="w-5 h-5"></i>
                     </button>
@@ -182,29 +214,35 @@
         </aside>
 
         <!-- Overlay for mobile -->
-        <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-black/50 z-40 lg:hidden"
+        <div x-cloak x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden"
             @click="sidebarOpen = false"></div>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col min-h-screen">
+        <div class="flex-1 flex flex-col min-h-screen min-w-0">
             <!-- Top Navbar -->
             <header class="sticky top-0 z-30 glass border-b border-slate-200/50">
-                <div class="flex items-center justify-between px-6 py-4">
-                    <div class="flex items-center gap-4">
+                <div class="flex items-center justify-between gap-4 px-4 py-4 sm:px-6">
+                    <div class="flex items-center gap-3 sm:gap-4 min-w-0">
                         <button @click="sidebarOpen = !sidebarOpen"
-                            class="lg:hidden p-3 rounded-xl hover:bg-slate-100 transition-colors">
+                            class="lg:hidden inline-flex p-3 rounded-2xl bg-white/70 border border-slate-200 text-slate-600 hover:bg-slate-100 transition-all shadow-sm shrink-0">
                             <i data-lucide="menu" class="w-6 h-6 text-slate-600"></i>
                         </button>
-                        <div>
-                            <h2 class="text-slate-800 font-bold text-lg">{{ $title ?? 'Dashboard' }}</h2>
-                            <p class="text-slate-400 text-xs font-medium">
+                        <button @click="collapsed = !collapsed"
+                            class="hidden lg:inline-flex p-3 rounded-2xl bg-white/70 border border-slate-200 text-slate-600 hover:bg-slate-100 transition-all shadow-sm shrink-0"
+                            :title="collapsed ? 'Buka sidebar' : 'Ciutkan sidebar'">
+                            <i data-lucide="menu" class="w-5 h-5"></i>
+                        </button>
+                        <div class="min-w-0">
+                            <h2 class="text-slate-800 font-bold text-base sm:text-lg truncate">{{ $title ?? 'Dashboard' }}</h2>
+                            <p class="text-slate-400 text-xs font-medium truncate">
                                 {{ now()->translatedFormat('l, d M Y') }}
+                            </p>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 sm:gap-4 shrink-0">
                         <!-- Notifications -->
-                        <button class="relative p-3 rounded-xl hover:bg-slate-100 transition-colors">
+                        <button class="relative p-3 rounded-2xl hover:bg-slate-100 transition-colors">
                             <i data-lucide="bell" class="w-5 h-5 text-slate-500"></i>
                             <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                         </button>
@@ -225,12 +263,12 @@
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1 p-6 lg:p-8">
+            <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden">
                 @yield('content')
             </main>
 
             <!-- Footer -->
-            <footer class="glass border-t border-slate-200/50 px-8 py-6">
+            <footer class="glass border-t border-slate-200/50 px-4 py-6 sm:px-8">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p class="text-slate-400 text-sm font-medium">© {{ date('Y') }} SPBE Diskominfo Bangka Belitung
                     </p>
@@ -282,7 +320,7 @@
 
     @if (session('success'))
         <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)"
-            class="fixed bottom-6 right-6 z-50 glass-card rounded-2xl p-5 flex items-center gap-4 shadow-xl border-l-4 border-emerald-500">
+            class="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 z-50 glass-card rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-xl border-l-4 border-emerald-500">
             <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
                 <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i>
             </div>

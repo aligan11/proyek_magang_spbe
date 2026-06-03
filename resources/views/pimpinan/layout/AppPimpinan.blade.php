@@ -13,6 +13,7 @@
 
 
 
+
     <script src="https://unpkg.com/lucide@latest"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -33,43 +34,47 @@
     </style>
 </head>
 
-<body x-data="{ sidebarOpen: false }" class="bg-[#f8fafc] text-slate-900 overflow-x-hidden">
+<body x-data="{ sidebarOpen: true }" class="bg-[#f8fafc] text-slate-900 overflow-x-hidden">
 
 
     <div class="h-screen flex">
 
+        <!-- Overlay for mobile -->
         <div x-cloak x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false"
             class="fixed inset-0 bg-black/40 z-40 lg:hidden">
         </div>
 
 
 
+
+
         <!-- Sidebar -->
-        <aside class="hidden lg:flex w-72 bg-[#0f172a] flex-col shrink-0">
-
-
+        <aside class="bg-[#0f172a] flex-col shrink-0 transition-all duration-300 overflow-hidden"
+            :class="sidebarOpen ? 'w-72 fixed lg:static z-50 h-screen' : 'w-0 lg:w-20 lg:static'">
 
 
 
 
 
             <!-- logo -->
-            <div class="p-6 flex items-center gap-3">
-                <div class="p-2 bg-blue-500 rounded-lg">
+            <div class="p-6 flex items-center gap-3 overflow-hidden">
+                <div class="p-2 bg-blue-500 rounded-lg shrink-0">
                     <i data-lucide="layout-dashboard" class="text-white w-6 h-6"></i>
                 </div>
-                <span class="text-white font-bold text-xl tracking-tight">E-PIMPINAN</span>
+                <span x-show="sidebarOpen" x-transition
+                    class="text-white font-bold text-xl tracking-tight">E-PIMPINAN</span>
             </div>
 
             <!-- nav -->
-            <nav class="flex-1 px-4 space-y-2 mt-4">
+            <nav class="flex-1 px-4 space-y-2 mt-4 overflow-hidden">
                 <!-- Dashboard -->
                 <a href="{{ route('pimpinan.index') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300
         {{ request()->routeIs('pimpinan.index')
             ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
             : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
-                    <i data-lucide="home" class="w-5 h-5"></i> Dashboard
+                    <i data-lucide="home" class="w-5 h-5 shrink-0"></i>
+                    <span x-show="sidebarOpen" x-transition>Dashboard</span>
                 </a>
 
                 <!-- Request OPD (Aktif jika route-nya indexMandat) -->
@@ -78,8 +83,8 @@
         {{ request()->routeIs('indexMandat')
             ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20 shadow-sm shadow-blue-500/10'
             : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
-                    <i data-lucide="landmark" class="w-5 h-5"></i>
-                    Request OPD
+                    <i data-lucide="landmark" class="w-5 h-5 shrink-0"></i>
+                    <span x-show="sidebarOpen" x-transition>Request OPD</span>
                 </a>
 
                 <!-- Manajemen Petugas -->
@@ -88,65 +93,42 @@
         {{ request()->is('petugas*')
             ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20'
             : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
-                    <i data-lucide="users" class="w-5 h-5"></i> Manajemen Petugas
+                    <i data-lucide="users" class="w-5 h-5 shrink-0"></i>
+                    <span x-show="sidebarOpen" x-transition>Manajemen Petugas</span>
                 </a>
             </nav>
 
             <!-- Sidebar Footer with Logout -->
-            <div class="p-4 border-t border-slate-800 space-y-2">
-                <div class="bg-slate-800/50 rounded-2xl p-4 mb-2">
+            <div class="p-4 border-t border-slate-800 space-y-2 overflow-hidden">
+                <div x-show="sidebarOpen" x-transition class="bg-slate-800/50 rounded-2xl p-4 mb-2">
                     <p class="text-slate-500 text-[10px] uppercase font-bold mb-1">Status Sesi</p>
-                    <p class="text-emerald-400 text-xs font-medium flex items-center gap-1"> <span
-                            class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> Terhubung Aman </p>
+                    <p class="text-emerald-400 text-xs font-medium flex items-center gap-1">
+                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                        Terhubung Aman
+                    </p>
                 </div>
-                <form action="{{ route('logout') }}" method="POST"> @csrf <!-- Sidebar Footer with Logout Trigger -->
-                    <div class="p-4 border-t border-slate-800 space-y-2"> <!-- ... Status Sesi ... --> <button
-                            type="button" onclick="toggleLogoutModal()"
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <div class="space-y-2">
+                        <button type="button" onclick="toggleLogoutModal()"
                             class="cursor-pointer w-full flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white py-3 rounded-xl text-sm font-bold transition-all border border-red-500/20 group">
-                            <i data-lucide="log-out" class="w-4 h-4 group-hover:scale-110 transition"></i> Logout
-                        </button> </div>
+                            <i data-lucide="log-out" class="w-4 h-4 shrink-0 group-hover:scale-110 transition"></i>
+                            <span x-show="sidebarOpen" x-transition>Logout</span>
+                        </button>
+                    </div>
                 </form>
             </div>
-            <div class="p-4 border-t border-slate-800">
+            <div x-show="sidebarOpen" x-transition class="p-4 border-t border-slate-800 overflow-hidden">
                 <div class="bg-slate-800/50 rounded-2xl p-4">
-                    <p class="text-slate-500 text-[10px] uppercase font-bold mb-2">Pusat Bantuan</p> <button
-                        class="w-full bg-slate-700 text-white text-xs py-2 rounded-lg hover:bg-slate-600 transition">Hubungi
-                        IT</button>
+                    <p class="text-slate-500 text-[10px] uppercase font-bold mb-2">Pusat Bantuan</p>
+                    <button
+                        class="w-full bg-slate-700 text-white text-xs py-2 rounded-lg hover:bg-slate-600 transition">
+                        Hubungi IT
+                    </button>
                 </div>
         </aside>
 
 
-        <!-- Sidebar Mobile -->
-        <aside x-cloak
-            class="fixed lg:hidden z-50 top-0 left-0 w-72 h-screen bg-[#0f172a] flex flex-col transform transition-transform duration-300"
-            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
-
-
-
-            <!-- logo -->
-            <div class="p-6 flex items-center gap-3">
-                <div class="p-2 bg-blue-500 rounded-lg">
-                    <i data-lucide="layout-dashboard" class="text-white w-6 h-6"></i>
-                </div>
-                <span class="text-white font-bold text-xl tracking-tight">E-PIMPINAN</span>
-            </div>
-
-            <!-- nav -->
-            <nav class="flex-1 px-4 space-y-2 mt-4">
-                <a href="#"
-                    class="flex items-center gap-3 bg-blue-600/10 text-blue-400 px-4 py-3 rounded-xl font-medium border border-blue-600/20">
-                    <i data-lucide="home" class="w-5 h-5"></i> Dashboard
-                </a>
-                <a href="#"
-                    class="flex items-center gap-3 text-slate-400 hover:bg-slate-800 hover:text-white px-4 py-3 rounded-xl">
-                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Statistik Wilayah
-                </a>
-                <a href="#"
-                    class="flex items-center gap-3 text-slate-400 hover:bg-slate-800 hover:text-white px-4 py-3 rounded-xl">
-                    <i data-lucide="users" class="w-5 h-5"></i> Manajemen Petugas
-                </a>
-            </nav>
-        </aside>
 
         <!-- Main -->
 
@@ -156,10 +138,9 @@
                 class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 px-4 lg:px-8 py-4 flex justify-between items-center">
 
                 <div class="flex items-center gap-3">
-                    <!-- Toggle button mobile -->
-                    <button @click="sidebarOpen = true" class="lg:hidden p-2 rounded-lg hover:bg-slate-100">
-
-                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    <!-- Toggle button (always visible) -->
+                    <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-lg hover:bg-slate-100 transition">
+                        <i data-lucide="menu" class="w-6 h-6 text-slate-700"></i>
                     </button>
 
                     <h2 class="font-bold text-slate-800 hidden lg:block">
@@ -247,6 +228,11 @@
 <script>
     // Initialize Lucide icons
     lucide.createIcons();
+
+    function toggleLogoutModal() {
+        const modal = document.getElementById('logoutModal');
+        modal.classList.toggle('hidden');
+    }
 </script>
 @include('sweetalert::alert')
 

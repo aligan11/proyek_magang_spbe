@@ -17,7 +17,7 @@ class Admin extends Model
         'jabatan',
         'pangkat',
         'gol',
-        'phone',
+        'no_hp',
     ];
 
 

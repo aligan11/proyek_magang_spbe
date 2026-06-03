@@ -15,7 +15,7 @@ class Pemohon extends Authenticatable
     protected $table = 'pemohon';
     protected $fillable = [
         'nik',
-        'tipe_user',
+        'jenis_pemohon',
 
         'nama_lengkap',
         'email',

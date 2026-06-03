@@ -25,7 +25,7 @@ class PemohonController extends Controller
         $idPemohon = Auth::guard('pemohon')->user()->id;
 
         $permohonan = Layanan_spbe::with('jenis_layanan')
-            ->where('inputby', $idPemohon)
+            ->where('id_pemohon', $idPemohon)
             ->when($request->search, function ($query) use ($request) {
                 $query->where(function ($q) use ($request) {
                     $q->where('noreg', 'like', '%' . $request->search . '%')
@@ -77,12 +77,14 @@ class PemohonController extends Controller
      */
     public function store(Request $request)
     {
+
+        // dd($request->all()); 
         $request->validate([
             'nama_kebutuhan'    => 'required|string|max:255',
             'id_jenis_layanan'  => 'required|integer',
             'id_kebutuhan'      => 'required|array|min:1',
             'lokasi'            => 'required|string|max:255',
-            'unit_kerja'        => 'required|string|max:255',
+            'unitKerja'        => 'required|string|max:255',
             'berkas'            => 'required|file|mimes:pdf,docx,zip|max:10240',
             'ket'               => 'nullable|string',
             'nama_pj'           => 'required|string|max:255',
@@ -112,31 +114,32 @@ class PemohonController extends Controller
             'id_kebutuhan' => $request->id_kebutuhan,
             'nama_kebutuhan'   => $request->nama_kebutuhan,
             'lokasi'           => $request->lokasi,
-            'unitKerja'        => $request->unit_kerja,
+            'unitKerja'        => $request->unitKerja,
             'ket'              => $request->ket,
             'berkas'           => $fileName,
             'noreg'            => $noreg,
             'tahunanggaran'    => date('Y'),
             'periode'          => 'Triwulan ' . ceil(date('n') / 3),
             'tgl_permohonan'   => now(),
-            'status'           => Layanan_spbe::STATUS_PENDING,
-            'is_eksternal'     => empty($user->id_instansi) ? 1 : 0,
+            'status'           => 1, // Sesuai default database
+            'is_eksternal'     => empty($user->id_instansi) ? "ya" : "tidak",
             'nama_penanggungjawab'      => $request->nama_pj,
             'nip_penanggungjawab'       => $request->nip_pj,
             'nohp_penanggungjawab'      => $request->nohp_pj,
             'jabatan_penanggungjawab'   => $request->jabatan_pj,
-            'unitkerja_penanggungjawab' => $request->unitkerja_pj,
+            'unitKerja_penanggungjawab' => $request->unitKerja_pj, // Sesuaikan dengan DB (huruf kecil)
             'email_penanggungjawab'     => $request->email_pj,
-            'inputby'          => $user->id,
+            'inputby'          => $user->nama_lengkap,
             'tglinput'         => now(),
             'id_instansi'      => $user->id_instansi,
+            'id_pemohon'     => $user->id,
             'nama_instansi'    => $userWithInstansi->instansi->nama_instansi ?? '-',
-            'nama_pemohon'     => $user->nama_lengkap,
         ]);
+
 
         // Notifikasi Fonnte
         $semuaKabid = User::where('role', 'kabid')->get();
-        $targetNumbers = $semuaKabid->pluck('phone')->filter()->implode(',');
+        $targetNumbers = $semuaKabid->pluck('no_hp')->filter()->implode(',');
 
         if ($targetNumbers) {
             $urlDetail = route('login');
@@ -174,7 +177,7 @@ class PemohonController extends Controller
     {
         $idPemohon = Auth::guard('pemohon')->user()->id;
         $detail = Layanan_spbe::where('id', $id)
-            ->where('inputby', $idPemohon)
+            ->where('id_pemohon', $idPemohon)
             ->firstOrFail();
 
         // Tambahkan logika label status
@@ -200,7 +203,7 @@ class PemohonController extends Controller
     {
         $idPemohon = Auth::guard('pemohon')->user()->id;
         $detail = Layanan_spbe::with('jenis_layanan')->where('id', $id)
-            ->where('inputby', $idPemohon)
+            ->where('id_pemohon', $idPemohon)
             ->firstOrFail();
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pemohon.reports.permohonan_single_pdf', compact('detail'));
@@ -214,7 +217,7 @@ class PemohonController extends Controller
     {
         $idPemohon = Auth::guard('pemohon')->user()->id;
         $permohonan = Layanan_spbe::where('id', $id)
-            ->where('inputby', $idPemohon)
+            ->where('id_pemohon', $idPemohon)
             ->firstOrFail();
 
         if ($permohonan->status != Layanan_spbe::STATUS_PENDING) {
@@ -235,7 +238,7 @@ class PemohonController extends Controller
     {
         $idPemohon = Auth::guard('pemohon')->user()->id;
         $permohonan = Layanan_spbe::where('id', $id)
-            ->where('inputby', $idPemohon)
+            ->where('id_pemohon', $idPemohon)
             ->firstOrFail();
 
         if ($permohonan->status != Layanan_spbe::STATUS_PENDING) {
@@ -248,13 +251,13 @@ class PemohonController extends Controller
             'id_jenis_layanan'  => 'required|integer',
             'id_kebutuhan'      => 'required|array|min:1',
             'lokasi'            => 'required|string|max:255',
-            'unit_kerja'        => 'required|string|max:255',
+            'unitKerja'        => 'required|string|max:255',
             'berkas'            => 'nullable|file|mimes:pdf,docx,zip|max:10240',
             'ket'               => 'nullable|string',
             'nama_pj'           => 'required|string|max:255',
             'nip_pj'            => 'required|string|max:50',
             'jabatan_pj'        => 'required|string|max:255',
-            'unitkerja_pj'      => 'required|string|max:255',
+            'unitKerja_pj'      => 'required|string|max:255',
             'nohp_pj'           => 'required|string|max:20',
             'email_pj'          => 'required|email|max:255',
         ]);
@@ -264,13 +267,13 @@ class PemohonController extends Controller
             'id_kebutuhan' => $request->id_kebutuhan,
             'nama_kebutuhan'   => $request->nama_kebutuhan,
             'lokasi'           => $request->lokasi,
-            'unitKerja'        => $request->unit_kerja,
+            'unitKerja'        => $request->unitKerja,
             'ket'              => $request->ket,
             'nama_penanggungjawab'      => $request->nama_pj,
             'nip_penanggungjawab'       => $request->nip_pj,
             'nohp_penanggungjawab'      => $request->nohp_pj,
             'jabatan_penanggungjawab'   => $request->jabatan_pj,
-            'unitkerja_penanggungjawab' => $request->unitkerja_pj,
+            'unitKerja_penanggungjawab' => $request->unitKerja_pj,
             'email_penanggungjawab'     => $request->email_pj,
         ];
 
@@ -299,7 +302,7 @@ class PemohonController extends Controller
     {
         $idPemohon = Auth::guard('pemohon')->user()->id;
         $permohonan = Layanan_spbe::where('id', $id)
-            ->where('inputby', $idPemohon)
+            ->where('id_pemohon', $idPemohon)
             ->firstOrFail();
 
         if ($permohonan->status != Layanan_spbe::STATUS_PENDING) {

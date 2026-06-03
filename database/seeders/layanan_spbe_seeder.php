@@ -34,7 +34,7 @@ class layanan_spbe_seeder extends Seeder
                 'nip_penanggungjawab' => '198501012010011' . str_pad($i, 3, '0', STR_PAD_LEFT),
                 'nohp_penanggungjawab' => '0812345678' . $i,
                 'jabatan_penanggungjawab' => 'Kepala Bidang',
-                'unitkerja_penanggungjawab' => $namaInstansi,
+                'unitKerja_penanggungjawab' => $namaInstansi,
                 'email_penanggungjawab' => 'pj' . $i . '@instansi.go.id',
                 'ket' => 'Keterangan permohonan ke-' . $i,
                 'tgl_permohonan' => $tglMohon,

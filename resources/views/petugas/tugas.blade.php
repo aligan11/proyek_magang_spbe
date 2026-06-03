@@ -83,11 +83,11 @@
                                 <div class="flex items-center gap-4">
                                     <div
                                         class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold uppercase text-sm shadow-lg">
-                                        {{ substr($mandate->ticket->nama_pemohon ?? 'U', 0, 1) }}
+                                        {{ substr($mandate->ticket->inputby ?? 'U', 0, 1) }}
                                     </div>
                                     <div>
                                         <p class="text-sm font-extrabold text-slate-800 leading-none">
-                                            {{ $mandate->ticket->nama_pemohon ?? '-' }}
+                                            {{ $mandate->ticket->inputby ?? '-' }}
                                         </p>
                                         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">
                                             {{ $mandate->ticket->nama_instansi ?? '-' }}
@@ -102,13 +102,13 @@
                                 <div class="flex items-center gap-2">
                                     <i data-lucide="calendar" class="w-3 h-3 text-slate-300"></i>
                                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-                                        {{ $mandate->ticket->tgl_permohonan ? $mandate->ticket->tgl_permohonan->format('d M Y') : '-' }}
+                                        {{ $mandate->ticket?->tglinput ? $mandate->ticket->tglinput->format('d M Y') : '-' }}
                                     </span>
                                 </div>
                             </td>
                             <td class="px-6 py-8 bg-white/60 group-hover:bg-white border-y border-slate-100/50 text-center">
                                 @php
-                                    // Mengambil status_ver dari tabel layanan_spbe melalui relasi ticket
+                                    // Mengambil status_ver dari tabel layanan_spbe melalui relasi layanan
                                     $statusVer = $mandate->ticket->status_ver;
                                 @endphp
 

@@ -10,8 +10,8 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 class LayananExport implements FromCollection, WithHeadings, WithMapping
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
     public function collection()
     {
         return Layanan_spbe::with(['jenis_layanan', 'inputer'])->get();
@@ -34,7 +34,7 @@ class LayananExport implements FromCollection, WithHeadings, WithMapping
 
     public function map($layanan): array
     {
-        $status = match($layanan->status) {
+        $status = match ($layanan->status) {
             1 => 'Pending',
             2 => 'Proses',
             3 => 'Selesai',

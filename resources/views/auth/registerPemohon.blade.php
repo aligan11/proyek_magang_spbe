@@ -73,7 +73,7 @@
             <form method="POST" class="space-y-5 custom-scroll overflow-y-auto max-h-[60vh] px-2"
                 action="{{ route('registerPemohon') }}">
                 @csrf
-                <input type="hidden" name="tipe_user" :value="tipe">
+                <input type="hidden" name="jenis_pemohon" :value="tipe">
 
                 <!-- Baris 1: Email & Password -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

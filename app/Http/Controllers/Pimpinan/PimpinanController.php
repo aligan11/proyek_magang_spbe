@@ -78,11 +78,11 @@ class PimpinanController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'phone' => 'required|string|max:20',
+            'no_hp' => 'required|string|max:20',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = $request->only(['name', 'email', 'phone']);
+        $data = $request->only(['name', 'email', 'no_hp']);
 
         if ($request->hasFile('avatar')) {
             if ($user->avatar && file_exists(public_path('storage/avatars/' . $user->avatar))) {

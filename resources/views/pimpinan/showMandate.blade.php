@@ -84,7 +84,7 @@
                                 <div>
                                     <p class="text-xs font-bold text-slate-800">{{ $petugas->name }}</p>
                                     <p class="text-[9px] text-slate-400 font-medium uppercase tracking-tighter">
-                                        {{ $petugas->phone ?? 'No Phone' }}</p>
+                                        {{ $petugas->no_hp ?? 'No no_hp' }}</p>
                                 </div>
                             </div>
                         @endforeach

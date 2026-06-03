@@ -86,7 +86,7 @@
                         </h4>
 
                         <div class="space-y-4">
-                            @forelse ($ticket->mandates as $mandate)
+                            @forelse ($mandat as $mandate)
                                 <div
                                     class="relative overflow-hidden bg-gradient-to-br from-indigo-50/50 to-white border border-indigo-100 rounded-[2.5rem] p-6 shadow-sm">
                                     <!-- Dekorasi Background -->
@@ -110,33 +110,44 @@
                                             </div>
                                             <!-- Status Verifikasi dari Mandat -->
                                             <span
-                                                class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border {{ $mandate->status_ver == 2 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100' }}">
-                                                {{ $mandate->status_ver == 2 ? 'Selesai' : 'Dalam Proses' }}
+                                                class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border {{ $mandate->ticket?->status_ver == 2 ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-amber-50 text-amber-600 border-amber-100' }}">
+                                                {{ $mandate->ticket?->status_ver == 2 ? 'Selesai' : 'Dalam Proses' }}
                                             </span>
                                         </div>
 
                                         <!-- Deskripsi Mandat -->
                                         <div
                                             class="bg-white/60 border border-white p-5 rounded-3xl text-slate-700 leading-relaxed text-sm italic shadow-inner">
-                                            "{{ $mandate->deskripsi }}"
+                                            "{{ $mandate->keterangan }}"
                                         </div>
 
                                         <!-- List Petugas yang ditunjuk -->
                                         <div class="mt-5 flex flex-wrap items-center gap-2">
                                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2">
-                                                Petugas Pelaksana:</p>
-                                            @foreach ($mandate->mandate_users as $petugas)
+                                                Petugas Pelaksana:
+                                            </p>
+
+
+
+                                            @foreach ($daftarPetugas as $petugas)
                                                 <div
-                                                    class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-100 rounded-xl shadow-sm">
+                                                    class="flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-100 rounded-xl shadow-sm animate-in fade-in zoom-in duration-300">
                                                     <div
                                                         class="w-5 h-5 bg-indigo-100 rounded-lg flex items-center justify-center">
                                                         <i data-lucide="user" class="w-3 h-3 text-indigo-600"></i>
                                                     </div>
-                                                    <span
-                                                        class="text-[11px] font-bold text-slate-600">{{ $petugas->name }}</span>
+                                                    <span class="text-[11px] font-bold text-slate-600">
+                                                        {{ $petugas->name }}
+                                                    </span>
                                                 </div>
                                             @endforeach
+
+                                            @if ($daftarPetugas->isEmpty())
+                                                <span class="text-[10px] italic text-slate-400 font-medium">Belum ada
+                                                    petugas ditunjuk</span>
+                                            @endif
                                         </div>
+
                                     </div>
                                 </div>
                             @empty

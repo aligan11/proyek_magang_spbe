@@ -7,6 +7,7 @@ use App\Models\Layanan_spbe;
 use App\Models\Mandate;
 use App\Models\Petugas;
 use App\Models\Ticket;
+use App\Models\Tindak_lanjut_layanan;
 use App\Models\User;
 use GuzzleHttp\Psr7\Query;
 use Illuminate\Http\Request;
@@ -102,7 +103,7 @@ class MandateController extends Controller
             ->where('noreg', $noreg)
             ->firstOrFail();
 
-        $statusMandat = Mandate::where('ticket_id', $pendingTickets->id)->value('status');
+        $statusMandat = $pendingTickets->first()->status_tl;
 
         // Cukup satu variabel untuk Petugas dengan filter
         $availablePetugas = User::where('role', 'staff')
@@ -132,23 +133,32 @@ class MandateController extends Controller
             'ticket_id' => 'required|exists:layanan_spbe,id',
             'user_ids' => 'required|array|min:1',
             'user_ids.*' => 'required|exists:users,id',
-            'deskripsi' => 'required|string|min:10',
+            'ket' => 'required|string|min:10',
         ]);
 
         // 1. Ambil data ticket terlebih dahulu
         $ticket = Layanan_spbe::findOrFail($request->ticket_id);
         $idPetugas = Auth::guard('petugas')->user()->id;
+        $user = Auth::guard('petugas')->user();
 
-        $mandate = Mandate::create([
-            'ticket_id' => $request->ticket_id,
-            'pimpinan_id' => $idPetugas,
-            'deskripsi' => $request->deskripsi,
-            'status' => 'selesai',
+        // Update layanan_spbe table
+        $ticket->update([
+            'tl_by' => $user->id,
+            'status_tl' => 'selesai',
+            'tgl_tl' => now(),
+            'status' => 2,
+            'status_ver' => 1,
+        ]);
+
+        // Insert ke tindak_lanjut_layanan untuk setiap petugas
+        Tindak_lanjut_layanan::create([
+            'id_layanan' => $ticket->id,
+            'id_petugas' => $request->user_ids,
+            'keterangan' => $request->ket,
         ]);
 
         $petugas = User::whereIn('id', $request->user_ids)->get();
-        $mandate->mandate_users()->attach($request->user_ids);
-        $targetNumbers = $petugas->pluck('phone')->filter()->implode(',');
+        $targetNumbers = $petugas->pluck('no_hp')->filter()->implode(',');
 
         // 2. Susun format pesan untuk WhatsApp
         // Gunakan *text* untuk menebalkan teks di WhatsApp
@@ -160,16 +170,12 @@ class MandateController extends Controller
         $pesanWhatsapp = "Yth. Petugas Layanan,\n\n" .
             "Terdapat permohonan baru dengan No. Registrasi: *{$ticket->noreg}*\n" .
             "Perihal: {$ticket->nama_kebutuhan}\n\n" .
-            "Deskripsi Pimpinan: {$request->deskripsi}\n\n" .
+            "Deskripsi Pimpinan: {$request->ket}\n\n" .
             "Silahkan akses detail permohonan pada link berikut:\n" .
             $urlDetail . "\n\n" .
             "Lihat/Unduh Berkas Lampiran:\n" .
             $urlBerkas . "\n\n" . // Menampilkan link berkas di sini
             "Terima kasih.";
-
-        $ticket->update([
-            'status' => 2,
-        ]);
 
         if ($targetNumbers) {
             $response = FacadesHttp::withHeaders([
@@ -195,7 +201,7 @@ class MandateController extends Controller
     {
         $idPetugas = Auth::guard('petugas')->user()->id;
 
-        $mandate = Mandate::with('ticket')->where('id', $id)->firstOrFail();
+        $mandate = tindak_lanjut_layanan::with('layanan')->where('id', $id)->firstOrFail();
         $dataPetugas = User::where('id', $idPetugas)->firstOrFail();
 
         // Karena varchar, kita pastikan di-decode menjadi array
@@ -214,37 +220,39 @@ class MandateController extends Controller
         $idPetugas = Auth::guard('petugas')->user()->id;
         $dataPetugas = User::find($idPetugas);
         $ticket = Layanan_spbe::where('noreg', $noreg)->firstOrFail();
-        $mandat = Mandate::where('pimpinan_id', $idPetugas)->latest()->first();
-        $deskripsiMandat = $mandat ? $mandat->deskripsi : 'Tidak ada deskripsi';
 
+        // 1. Ambil semua baris mandat untuk tiket ini (atau yang terkait petugas ini)
+        $mandat = Tindak_lanjut_layanan::with('layanan')
+            ->where('id_layanan', $ticket->id) // Sebaiknya berdasarkan ID layanan agar semua mandat tampil
+            ->latest()
+            ->get();
 
-        // 1. Ambil data (asumsikan sudah array karena cast, atau masih string)
-        $ids = $ticket->id_kebutuhan;
-
-        // 2. Jika masih string JSON, decode dulu
-        if (is_string($ids)) {
-            $ids = json_decode($ids, true) ?? [];
-        }
-
-
-        // 3. MEMBERSIHKAN DATA (Paling Penting)
-        // Pastikan tidak ada karakter kutip, spasi, atau simbol lain, lalu ubah ke integer
-        $cleanIds = collect($ids)->map(function ($value) {
-            return (int) str_replace(['"', '[', ']', ' '], '', $value);
-        })->filter()->toArray();
-
-        // 4. Query menggunakan array yang sudah bersih
+        // 2. PROSES DAFTAR KEBUTUHAN (Sama seperti kodemu)
+        $ids = is_string($ticket->id_kebutuhan) ? json_decode($ticket->id_kebutuhan, true) : $ticket->id_kebutuhan;
+        $cleanIds = collect($ids)->map(fn($v) => (int) str_replace(['"', '[', ']', ' '], '', $v))->filter()->toArray();
         $listKebutuhan = Kebutuhan_layanan_spbe::whereIn('id', $cleanIds)->get();
+
+        // 3. PROSES DAFTAR PETUGAS (Dibuat Seragam)
+        // Pluck mengambil semua kolom 'id_petugas', flatten menyatukan array di dalamnya
+        $allPetugasIds = $mandat->pluck('id_petugas')->flatten()->map(function ($value) {
+            return (int) str_replace(['"', '[', ']', ' '], '', $value);
+        })->unique()->filter()->toArray();
+
+        // Query ke tabel Users
+        $daftarPetugas = User::whereIn('id', $allPetugasIds)->get();
 
         return view('pimpinan.ShowTicket', [
             'ticket' => $ticket,
             'title' => "Informasi detail untuk tiket",
             'dataPetugas' => $dataPetugas,
             'status' => $ticket->status,
+            'mandat' => $mandat,
+            'daftarPetugas' => $daftarPetugas, // Sekarang berisi object User
             'listKebutuhan' => $listKebutuhan,
-            'deskripsiMandat' => $deskripsiMandat,
+            'deskripsiMandat' => $ticket->ket ?? 'Tidak ada deskripsi',
         ]);
     }
+
 
 
 

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pemohon', function (Blueprint $table) {
             $table->id();
-            $table->enum('tipe_user', ['internal', 'eksternal'])->default('eksternal');
+            $table->enum('jenis_pemohon', ['internal', 'eksternal'])->default('eksternal');
 
             // Data Utama (Wajib untuk semua)
             $table->string('nik', 16)->unique();
@@ -34,7 +34,7 @@ return new class extends Migration
             $table->rememberToken();
 
             // Indexing untuk performa pencarian
-            $table->index(['tipe_user', 'nik', 'email']);
+            $table->index(['jenis_pemohon', 'nik', 'email']);
             $table->timestamps();
         });
     }

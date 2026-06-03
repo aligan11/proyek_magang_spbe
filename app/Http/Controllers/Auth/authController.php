@@ -112,7 +112,7 @@ class AuthController extends Controller
         // dd($request->all());
         // ✅ rules dasar
         $rules = [
-            'tipe_user' => 'required|in:internal,eksternal',
+            'jenis_pemohon' => 'required|in:internal,eksternal',
             'nik' => 'required|digits:16|unique:pemohon,nik',
             'nama_lengkap' => 'required|string|max:255',
             'email' => 'required|email|unique:pemohon,email',
@@ -122,16 +122,17 @@ class AuthController extends Controller
         ];
 
         // ✅ tambahan berdasarkan tipe
-        if ($request->tipe_user === 'internal') {
+        if ($request->jenis_pemohon === 'internal') {
             $rules['nip'] = 'required|digits:18|unique:pemohon,nip';
             $rules['id_instansi'] = 'required|exists:instansi,id';
         }
 
-        if ($request->tipe_user === 'eksternal') {
+        if ($request->jenis_pemohon === 'eksternal') {
             $rules['alamat'] = 'required|string';
         }
 
         $validated = $request->validate($rules);
+
 
         // 🔐 VALIDASI CAPTCHA (SESSION)
         if (strtoupper($request->captcha) !== session('captcha')) {
@@ -149,6 +150,8 @@ class AuthController extends Controller
 
         // ✅ simpan
         Pemohon::create($validated);
+
+
 
         // 🔄 hapus captcha biar tidak reuse
         session()->forget('captcha');

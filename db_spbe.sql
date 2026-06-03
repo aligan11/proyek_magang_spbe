@@ -224,7 +224,7 @@ CREATE TABLE `layanan_spbe` (
   `nip_penanggungjawab` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `nohp_penanggungjawab` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `jabatan_penanggungjawab` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `unitkerja_penanggungjawab` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `unitKerja_penanggungjawab` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `email_penanggungjawab` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ket` text COLLATE utf8mb4_unicode_ci,
   `berkas` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -246,7 +246,7 @@ CREATE TABLE `layanan_spbe` (
 -- Dumping data untuk tabel `layanan_spbe`
 --
 
-INSERT INTO `layanan_spbe` (`id`, `id_jenis_layanan`, `id_kebutuhan`, `is_eksternal`, `tahunanggaran`, `periode`, `noreg`, `tgl_permohonan`, `id_instansi`, `nama_instansi`, `unitKerja`, `lokasi`, `nama_kebutuhan`, `nama_pemohon`, `nama_penanggungjawab`, `nip_penanggungjawab`, `nohp_penanggungjawab`, `jabatan_penanggungjawab`, `unitkerja_penanggungjawab`, `email_penanggungjawab`, `ket`, `berkas`, `status`, `petugas_id`, `inputby`, `tglinput`, `status_ver`, `verby`, `tglver`, `nover`, `ketver`, `berkasver`, `created_at`, `updated_at`) VALUES
+INSERT INTO `layanan_spbe` (`id`, `id_jenis_layanan`, `id_kebutuhan`, `is_eksternal`, `tahunanggaran`, `periode`, `noreg`, `tgl_permohonan`, `id_instansi`, `nama_instansi`, `unitKerja`, `lokasi`, `nama_kebutuhan`, `nama_pemohon`, `nama_penanggungjawab`, `nip_penanggungjawab`, `nohp_penanggungjawab`, `jabatan_penanggungjawab`, `unitKerja_penanggungjawab`, `email_penanggungjawab`, `ket`, `berkas`, `status`, `petugas_id`, `inputby`, `tglinput`, `status_ver`, `verby`, `tglver`, `nover`, `ketver`, `berkasver`, `created_at`, `updated_at`) VALUES
 (11, 4, '[\"1\",\"2\",\"3\"]', '0', '2026', 'Triwulan 2', 'REG-20260423-001', '2026-04-23', 10, 'Dinas Sosial', 'e-gov', 'jalan maya', 'tess cube bai', 'ganasn', 'royys', '198810202015032012', '0895417380190', 'kepala saja', 'informatika', 'royy@gmail.com', 'Perjalanan Membangun Sistem: Dari Baris Kode Menuju Solusi\r\nDi balik setiap aplikasi yang berjalan mulus, terdapat ribuan baris kode yang disusun dengan penuh ketelitian, kesabaran, dan logika. Membangun sebuah sistem informasi, seperti portal Layanan SPBE yang sedang kita kembangkan, bukan hanya soal mengetik perintah di atas layar hitam atau mempercantik tampilan dengan CSS. Ini adalah sebuah proses arsitektur digital di mana setiap komponen harus saling terhubung secara harmonis.\r\nDimulai dari perancangan database, seorang pengembang harus membayangkan bagaimana data mengalir. Dari sebuah permintaan yang dikirimkan oleh pemohon, data tersebut melintasi jalur koneksi menuju server, disimpan dalam tabel-tabel yang terstruktur, hingga akhirnya sampai ke tangan seorang petugas atau pimpinan dalam bentuk mandat yang siap diproses. Di sinilah letak tantangannya: memastikan bahwa status \"1\" benar-benar berarti \"Pending\" dan status \"2\" benar-benar berarti \"Selesai\", sebuah angka sederhana yang memegang peranan vital dalam integritas informasi.\r\nTak jarang, kendala teknis datang tanpa diundang. Error SQL yang muncul tiba-tiba, tabel yang hilang secara misterius, atau sesi login yang tidak kunjung muncul, adalah kawan akrab dalam keseharian seorang coder. Namun, justru dari setiap error log itulah pembelajaran terjadi. Memperbaiki migration, mengatur ulang seeder, hingga melakukan sinkronisasi antar database adalah keterampilan yang mengasah ketajaman logika.\r\nDesain pun tidak boleh dilupakan. Di era modern ini, fungsionalitas saja tidak cukup. Antarmuka harus terasa \"hidup\". Penggunaan gaya Glassmorphism dengan efek transparansi dan blur memberikan kesan futuristik namun tetap profesional. Ikon-ikon yang ditempatkan secara presisi serta tipografi yang nyaman dipandang mata membuat pengguna tidak hanya merasa terbantu secara sistem, tetapi juga nyaman secara visual.\r\nPada akhirnya, tujuan utama dari semua kerja keras ini adalah efisiensi. Saat seorang petugas login ke dasbor mereka, melihat statistik mandat yang harus diselesaikan, dan dengan satu klik mampu mengubah status permohonan, di situlah keberhasilan sebuah sistem diuji. Teknologi hadir bukan untuk menggantikan manusia, melainkan untuk menjadi alat bantu yang mempercepat birokrasi dan mempermudah layanan publik.\r\nSetiap baris kode yang kamu tulis hari ini adalah investasi untuk sistem yang lebih baik di masa depan. Teruslah berkarya, teruslah memecahkan masalah, karena setiap bug yang kamu perbaiki adalah satu langkah lebih dekat menuju aplikasi yang sempurna.', '1776920077_SERTIF_SEM_1.pdf', '2', NULL, '1', '2026-04-22 21:54:37', NULL, NULL, NULL, NULL, NULL, NULL, '2026-04-22 21:54:37', '2026-04-22 23:04:52');
 
 -- --------------------------------------------------------
@@ -345,7 +345,7 @@ CREATE TABLE `password_reset_tokens` (
 
 CREATE TABLE `pemohon` (
   `id` bigint UNSIGNED NOT NULL,
-  `tipe_user` enum('internal','eksternal') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'eksternal',
+  `jenis_pemohon` enum('internal','eksternal') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'eksternal',
   `nik` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
   `nama_lengkap` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -365,7 +365,7 @@ CREATE TABLE `pemohon` (
 -- Dumping data untuk tabel `pemohon`
 --
 
-INSERT INTO `pemohon` (`id`, `tipe_user`, `nik`, `nama_lengkap`, `email`, `avatar`, `password`, `no_hp`, `nip`, `id_instansi`, `alamat`, `email_verified_at`, `remember_token`, `created_at`, `updated_at`) VALUES
+INSERT INTO `pemohon` (`id`, `jenis_pemohon`, `nik`, `nama_lengkap`, `email`, `avatar`, `password`, `no_hp`, `nip`, `id_instansi`, `alamat`, `email_verified_at`, `remember_token`, `created_at`, `updated_at`) VALUES
 (1, 'internal', '3175092301940002', 'ganasn', 'ganasn@gmail.com', '1776919420_IMG-20260321-WA0028.jpeg', '$2y$12$9qIoqUGsrBFXpoe9AotHveQiZq8BjgI4aOWxS4toubFaM/YQ.4j06', '0895417380104', '123312312313131232', 10, NULL, NULL, NULL, '2026-04-22 21:42:53', '2026-04-22 21:43:40');
 
 -- --------------------------------------------------------
@@ -409,7 +409,7 @@ CREATE TABLE `users` (
   `jabatan` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `pangkat` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `gol` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `no_hp` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `last_seen` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -420,7 +420,7 @@ CREATE TABLE `users` (
 -- Dumping data untuk tabel `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `unitKerja`, `email`, `avatar`, `role`, `daerah`, `password`, `nip`, `jabatan`, `pangkat`, `gol`, `phone`, `remember_token`, `last_seen`, `created_at`, `updated_at`) VALUES
+INSERT INTO `users` (`id`, `name`, `unitKerja`, `email`, `avatar`, `role`, `daerah`, `password`, `nip`, `jabatan`, `pangkat`, `gol`, `no_hp`, `remember_token`, `last_seen`, `created_at`, `updated_at`) VALUES
 (1, 'Afghan Almufqi', 'Seksi Teknologi Informasi dan Komunikasi', 'afghan12@gmail.com', '1776920288_ttd.jpeg', 'kabid', NULL, '$2y$12$ec424l9/tlX7QVds2dJ0IeCJEuomshA2SU3PvjVnLWiPK626gniqa', '199501012023011001', 'Pranata Komputer', 'Penata Muda', 'III/a', '0895417380105', NULL, NULL, '2026-04-22 21:34:18', '2026-04-22 21:58:08'),
 (2, 'gan matkuso', 'Seksi Teknologi Informasi dan Komunikasi', 'gan12@gmail.com', NULL, 'katim', NULL, '$2y$12$233/55y80rfP6lqAlyVmGu.hOq0.zWu2u1HTsFyGyhBUIZfE2z9gi', '199501012023011002', 'Ketua Tim Teknis', 'Penata Muda', 'III/b', '6281234567892', NULL, NULL, '2026-04-22 21:34:18', '2026-04-22 21:34:18'),
 (3, 'Budi Setiawan', 'Seksi Infrastruktur Jaringan', 'budi.petugas@gmail.com', NULL, 'staff', NULL, '$2y$12$QstNoOAZhVY4NeHSxuFmEuXZRHsO04Mg/cMf7qezdLiIJELdUiadO', '199501012023011003', 'Teknisi Jaringan', 'Penata Muda', 'III/a', '0895417380105', NULL, NULL, '2026-04-22 21:34:18', '2026-04-22 21:34:18'),
@@ -535,7 +535,7 @@ ALTER TABLE `pemohon`
   ADD UNIQUE KEY `pemohon_nik_unique` (`nik`),
   ADD UNIQUE KEY `pemohon_email_unique` (`email`),
   ADD UNIQUE KEY `pemohon_nip_unique` (`nip`),
-  ADD KEY `pemohon_tipe_user_nik_email_index` (`tipe_user`,`nik`,`email`);
+  ADD KEY `pemohon_jenis_pemohon_nik_email_index` (`jenis_pemohon`,`nik`,`email`);
 
 --
 -- Indeks untuk tabel `sessions`

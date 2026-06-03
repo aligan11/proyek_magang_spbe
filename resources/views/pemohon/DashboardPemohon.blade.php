@@ -39,8 +39,8 @@
                         class="text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 italic">
                         Tipe Akun</p>
                     <span
-                        class="px-2 md:px-3 py-1 rounded-full text-[8px] md:text-[9px] font-black uppercase italic {{ $user->tipe_user === 'internal' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700' }}">
-                        {{ $user->tipe_user }}
+                        class="px-2 md:px-3 py-1 rounded-full text-[8px] md:text-[9px] font-black uppercase italic {{ $user->jenis_pemohon === 'internal' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700' }}">
+                        {{ $user->jenis_pemohon }}
                     </span>
                 </div>
                 <a href="{{ route('pemohon.profile') }}" class="group">
@@ -58,7 +58,7 @@
 
         <!-- Panel Profil (Responsive Grid) -->
         <div
-            class="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 mb-8 md:mb-10 text-white shadow-2xl {{ $user->tipe_user === 'internal' ? 'bg-blue-600 shadow-blue-200' : 'bg-emerald-600 shadow-emerald-200' }}">
+            class="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 mb-8 md:mb-10 text-white shadow-2xl {{ $user->jenis_pemohon === 'internal' ? 'bg-blue-600 shadow-blue-200' : 'bg-emerald-600 shadow-emerald-200' }}">
             <div
                 class="absolute top-0 right-0 w-64 h-64 md:w-80 md:h-80 bg-white/10 rounded-full -mr-20 -mt-20 blur-[80px] md:blur-[100px]">
             </div>
@@ -66,10 +66,10 @@
             <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                 <div class="space-y-4 md:space-y-6">
                     <h2 class="text-2xl md:text-3xl font-black uppercase italic tracking-tighter leading-none">
-                        {{ $user->tipe_user === 'internal' ? 'Profil Kedinasan' : 'Layanan Publik' }}
+                        {{ $user->jenis_pemohon === 'internal' ? 'Profil Kedinasan' : 'Layanan Publik' }}
                     </h2>
 
-                    @if ($user->tipe_user === 'internal')
+                    @if ($user->jenis_pemohon === 'internal')
                         <div class="flex flex-col sm:flex-row gap-6 sm:gap-10">
                             <div>
                                 <p class="text-[10px] font-bold uppercase opacity-60 tracking-widest mb-1">NIP Pegawai</p>

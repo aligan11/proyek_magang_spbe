@@ -1,23 +1,90 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Formulir Permohonan Layanan SPBE</title>
     <style>
-        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11pt; color: #333; line-height: 1.6; }
-        .header { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; margin-bottom: 30px; }
-        .header h1 { margin: 0; font-size: 18pt; text-transform: uppercase; }
-        .header p { margin: 2px 0; font-size: 10pt; }
-        .noreg { text-align: right; font-weight: bold; font-family: monospace; margin-bottom: 20px; font-size: 12pt; }
-        .section-title { background: #f4f4f4; padding: 5px 10px; font-weight: bold; text-transform: uppercase; border-left: 5px solid #2563eb; margin-top: 20px; margin-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        td { padding: 8px 5px; vertical-align: top; }
-        .label { width: 35%; font-weight: bold; color: #666; }
-        .value { width: 65%; border-bottom: 1px solid #eee; }
-        .footer { margin-top: 50px; }
-        .signature-box { float: right; width: 250px; text-align: center; }
-        .signature-space { height: 80px; }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 11pt;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px double #000;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 18pt;
+            text-transform: uppercase;
+        }
+
+        .header p {
+            margin: 2px 0;
+            font-size: 10pt;
+        }
+
+        .noreg {
+            text-align: right;
+            font-weight: bold;
+            font-family: monospace;
+            margin-bottom: 20px;
+            font-size: 12pt;
+        }
+
+        .section-title {
+            background: #f4f4f4;
+            padding: 5px 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-left: 5px solid #2563eb;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        td {
+            padding: 8px 5px;
+            vertical-align: top;
+        }
+
+        .label {
+            width: 35%;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .value {
+            width: 65%;
+            border-bottom: 1px solid #eee;
+        }
+
+        .footer {
+            margin-top: 50px;
+        }
+
+        .signature-box {
+            float: right;
+            width: 250px;
+            text-align: center;
+        }
+
+        .signature-space {
+            height: 80px;
+        }
     </style>
 </head>
+
 <body>
     <div class="header">
         <h1>Dinas Komunikasi dan Informatika</h1>
@@ -35,11 +102,11 @@
         </tr>
         <tr>
             <td class="label">Unit Kerja</td>
-            <td class="value">{{ $detail->unitKerja }}</td>
+            <td class="value">{{ $detail->unitkerja }}</td>
         </tr>
         <tr>
             <td class="label">Nama Pemohon</td>
-            <td class="value">{{ $detail->nama_pemohon }}</td>
+            <td class="value">{{ $detail->inputby }}</td>
         </tr>
         <tr>
             <td class="label">Lokasi Kejadian/Kebutuhan</td>
@@ -97,4 +164,5 @@
         </div>
     </div>
 </body>
+
 </html>

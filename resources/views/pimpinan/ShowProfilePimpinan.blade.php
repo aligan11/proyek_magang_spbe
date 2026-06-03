@@ -58,7 +58,7 @@
                                 </div>
                                 <input type="hidden" name="name" value="{{ $dataPetugas->name }}">
                                 <input type="hidden" name="email" value="{{ $dataPetugas->email }}">
-                                <input type="hidden" name="phone" value="{{ $dataPetugas->phone }}">
+                                <input type="hidden" name="no_hp" value="{{ $dataPetugas->no_hp }}">
                             </form>
 
                             <h2 class="text-2xl font-black text-slate-900 tracking-tight">{{ $dataPetugas->name }}</h2>
@@ -124,7 +124,7 @@
                                     <label
                                         class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Nomor
                                         WhatsApp</label>
-                                    <input type="text" name="phone" value="{{ old('phone', $dataPetugas->phone) }}"
+                                    <input type="text" name="no_hp" value="{{ old('no_hp', $dataPetugas->no_hp) }}"
                                         class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none transition-all font-bold text-slate-700">
                                 </div>
                                 <div class="space-y-2">

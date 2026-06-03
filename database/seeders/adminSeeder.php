@@ -25,7 +25,7 @@ class adminSeeder extends Seeder
                 'jabatan'   => 'Pranata Komputer',
                 'pangkat'   => 'Penata Muda',
                 'gol'       => 'III/a',
-                'phone'     => '0895417380105',
+                'no_hp'     => '0895417380105',
             ],
             [
                 'name'      => 'gan matkuso',
@@ -38,7 +38,7 @@ class adminSeeder extends Seeder
                 'jabatan'   => 'Ketua Tim Teknis',
                 'pangkat'   => 'Penata Muda',
                 'gol'       => 'III/b',
-                'phone'     => '6281234567892',
+                'no_hp'     => '6281234567892',
             ],
             [
                 'name'      => 'Budi Setiawan',
@@ -51,7 +51,7 @@ class adminSeeder extends Seeder
                 'jabatan'   => 'Teknisi Jaringan',
                 'pangkat'   => 'Penata Muda',
                 'gol'       => 'III/a',
-                'phone'     => '6281277665544',
+                'no_hp'     => '6281277665544',
             ],
             [
                 'name'      => 'Super Admin SPBE',
@@ -64,20 +64,20 @@ class adminSeeder extends Seeder
                 'jabatan'   => 'Administrator Sistem',
                 'pangkat'   => 'Penata',
                 'gol'       => 'III/c',
-                'phone'     => '6285211223300',
+                'no_hp'     => '6285211223300',
             ],
             [
-                'name'      => 'Hendra Wijaya',
+                'name'      => 'wijaya petugas',
                 'email'     => 'hendra.pimpinan@gmail.com',
                 'unitKerja' => 'Bidang E-Government',
-                'role'      => 'kabid', // Sebelumnya pimpinan
+                'role'      => 'staff', // Sebelumnya pimpinan
                 'daerah'    => null,
-                'password'  => Hash::make('pimpinan123'),
+                'password'  => Hash::make('petugas123'),
                 'nip'       => '198001012005011005',
                 'jabatan'   => 'Kepala Bidang',
                 'pangkat'   => 'Pembina',
                 'gol'       => 'IV/a',
-                'phone'     => '6281399887766',
+                'no_hp'     => '6281399887766',
             ],
             [
                 'name'      => 'Hilal',
@@ -90,7 +90,7 @@ class adminSeeder extends Seeder
                 'jabatan'   => 'Programmer',
                 'pangkat'   => 'Penata Muda',
                 'gol'       => 'III/a',
-                'phone'     => '082178099027',
+                'no_hp'     => '082178099027',
             ],
             [
                 'name'      => 'Pinkan',
@@ -103,7 +103,7 @@ class adminSeeder extends Seeder
                 'jabatan'   => 'Analis Keamanan Siber',
                 'pangkat'   => 'Penata Muda',
                 'gol'       => 'III/a',
-                'phone'     => '081293172600',
+                'no_hp'     => '081293172600',
             ],
             [
                 'name'      => 'Agus Mulyadi',
@@ -116,7 +116,7 @@ class adminSeeder extends Seeder
                 'jabatan'   => 'Sekretaris Dinas',
                 'pangkat'   => 'Pembina Tk. I',
                 'gol'       => 'IV/b',
-                'phone'     => '6281122334455',
+                'no_hp'     => '6281122334455',
             ],
             [
                 'name'      => 'Rizky Pratama',
@@ -129,7 +129,7 @@ class adminSeeder extends Seeder
                 'jabatan'   => 'Ketua Tim Monitoring',
                 'pangkat'   => 'Penata Muda',
                 'gol'       => 'III/a',
-                'phone'     => '6281200998877',
+                'no_hp'     => '6281200998877',
             ],
         ];
 

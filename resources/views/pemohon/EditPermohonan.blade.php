@@ -90,8 +90,8 @@
                                     class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">
                                     Unit Kerja Pemohon
                                 </label>
-                                <input type="text" name="unit_kerja"
-                                    value="{{ old('unit_kerja', $permohonan->unitKerja) }}"
+                                <input type="text" name="unitKerja"
+                                    value="{{ old('unitKerja', $permohonan->unitKerja) }}"
                                     placeholder="Contoh: Bidang E-Government / Seksi Infrastruktur"
                                     class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none transition-all duration-300 ">
                             </div>

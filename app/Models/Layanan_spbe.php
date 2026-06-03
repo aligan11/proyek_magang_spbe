@@ -17,10 +17,10 @@ class Layanan_spbe extends Model
         'periode',
         'noreg',
         'id_instansi',
+        'id_pemohon',
         'nama_instansi',
         'unitKerja',
         'lokasi',
-        'unitKerja',
         'lokasi',
         'nama_kebutuhan',
         'nama_pemohon',
@@ -28,7 +28,7 @@ class Layanan_spbe extends Model
         'nip_penanggungjawab',
         'nohp_penanggungjawab',
         'jabatan_penanggungjawab',
-        'unitkerja_penanggungjawab',
+        'unitKerja_penanggungjawab',
         'email_penanggungjawab',
         'ket',
         'tgl_permohonan',
@@ -43,6 +43,9 @@ class Layanan_spbe extends Model
         'nover',
         'ketver',
         'berkasver',
+        'status_tl',
+        'tl_by',
+        'tgl_tl',
     ];
 
     const STATUS_PROSES = 3;
@@ -53,6 +56,7 @@ class Layanan_spbe extends Model
         'tgl_permohonan' => 'datetime',
         'tglinput' => 'datetime',
         'id_kebutuhan' => 'array',
+        'petugas_ids' => 'array',
     ];
 
     public function inputer()
@@ -83,5 +87,10 @@ class Layanan_spbe extends Model
     public function petugas()
     {
         return $this->belongsTo(User::class, 'petugas_id');
+    }
+
+    public function tindak_lanjut()
+    {
+        return $this->hasMany(tindak_lanjut_layanan::class, 'id_layanan');
     }
 }

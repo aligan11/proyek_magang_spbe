@@ -24,7 +24,7 @@ class User extends Authenticatable
         'pangkat',
         'gol',
         'avatar',
-        'phone',
+        'no_hp',
         'last_seen',
     ];
 
@@ -67,7 +67,15 @@ class User extends Authenticatable
         return $this->belongsToMany(Mandate::class, 'mandate_petugas', 'petugas_id', 'mandate_id');
     }
 
+    public function tindakLanjut()
+    {
+        return tindak_lanjut_layanan::whereRaw('JSON_CONTAINS(id_petugas, \'["' . $this->id . '"]\')')->get();
+    }
 
+    public function assignedTickets()
+    {
+        return $this->tindakLanjut()->pluck('layanan');
+    }
 
     public function isOnline()
     {

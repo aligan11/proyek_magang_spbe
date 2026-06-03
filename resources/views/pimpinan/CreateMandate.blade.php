@@ -78,6 +78,14 @@
                                     TAMBAH
                                 </button>
                             </div>
+                            <!-- TAMBAHKAN DIV INI -->
+                            <div id="duplicate-error"
+                                class="hidden h-10 items-center gap-3 bg-red-50 border border-red-100 px-4 rounded-2xl mb-3">
+                                <div class="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                                <p class="text-[10px] font-black text-red-600 uppercase tracking-tight">Petugas ini sudah
+                                    masuk dalam daftar!</p>
+                            </div>
+
                             @error('user_ids')
                                 <p class="text-[10px] text-red-500 font-bold mt-1">{{ $message }}</p>
                             @enderror
@@ -103,7 +111,7 @@
                         <i data-lucide="message-square-quote" class="w-4 h-4 text-blue-500"></i>
                         Instruksi Mandat Pimpinan
                     </label>
-                    <textarea placeholder="Tulis instruksi detail untuk petugas..." name="deskripsi" required
+                    <textarea placeholder="Tulis instruksi detail untuk petugas..." name="ket" required
                         class="w-full bg-slate-50 border border-slate-200 rounded-3xl p-5 text-sm text-slate-700 h-40 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all resize-none shadow-inner"></textarea>
                 </div>
 
@@ -161,9 +169,22 @@
             const id = select.value;
             const nama = select.options[select.selectedIndex].getAttribute('data-nama');
 
-            // Cek duplikasi
-            if (document.querySelector(`input[value="${id}"][name="user_ids[]"]`)) {
-                alert('Petugas ini sudah ada dalam daftar.');
+            // CEK DUPLIKASI - Pengganti Alert
+            const existingTag = document.querySelector(`input[value="${id}"][name="user_ids[]"]`);
+            if (existingTag) {
+                const parentTag = existingTag.parentElement;
+
+                // Beri efek getar dan warna merah sementara pada tag yang sudah ada
+                parentTag.classList.remove('border-slate-200');
+                parentTag.classList.add('border-red-500', 'bg-red-50', 'animate-bounce'); // animate-bounce bawaan tailwind
+
+                // Kembalikan ke normal setelah 1 detik
+                setTimeout(() => {
+                    parentTag.classList.remove('border-red-500', 'bg-red-50', 'animate-bounce');
+                    parentTag.classList.add('border-slate-200');
+                }, 1000);
+
+                select.value = ""; // Reset select tetap dilakukan
                 return;
             }
 
@@ -173,14 +194,14 @@
             tag.className =
                 "group flex items-center gap-3 bg-white text-slate-700 border border-slate-200 pl-4 pr-2 py-2.5 rounded-2xl text-xs font-black shadow-sm hover:border-blue-400 transition-all animate-in zoom-in duration-200";
             tag.innerHTML = `
-                <div class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
-                <span>${nama}</span>
-                <input type="hidden" name="user_ids[]" value="${id}">
-                <button type="button" onclick="this.parentElement.remove(); checkPlaceholder();"
-                    class="ml-2 p-1.5 rounded-xl text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                </button>
-            `;
+        <div class="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+        <span>${nama}</span>
+        <input type="hidden" name="user_ids[]" value="${id}">
+        <button type="button" onclick="this.parentElement.remove(); checkPlaceholder();"
+            class="ml-2 p-1.5 rounded-xl text-slate-300 hover:bg-red-50 hover:text-red-500 transition-all">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+    `;
 
             container.appendChild(tag);
             if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -190,8 +211,10 @@
         function checkPlaceholder() {
             const container = document.getElementById('tagContainer');
             const placeholder = document.getElementById('placeholder-text');
-            const tags = container.querySelectorAll('div[class*="group"]');
-            if (tags.length === 0) placeholder.style.display = 'block';
+            // Jika tidak ada input user_ids lagi, tampilkan placeholder
+            if (container.querySelectorAll('input[name="user_ids[]"]').length === 0) {
+                if (placeholder) placeholder.style.display = 'block';
+            }
         }
     </script>
 @endsection

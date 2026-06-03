@@ -138,12 +138,12 @@
                                     </td>
                                     <td
                                         class="px-4 py-4 border-y border-slate-50 bg-slate-50/30 text-sm font-medium text-slate-600">
-                                        {{ $ticket->nama_pemohon }}
+                                        {{ $ticket->inputby }}
                                     </td>
 
                                     <td class="px-4 py-4 rounded-r-2xl border-y border-r border-slate-50 bg-slate-50/30">
                                         <div class="flex items-center gap-2">
-                                            {{-- Button Show --}}
+                                            {{-- Button Show - Selalu Ada --}}
                                             <a href="{{ route('showTicket', $ticket->noreg) }}"
                                                 class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-900 text-white hover:bg-blue-600 transition-all shadow-lg shadow-slate-200 hover:shadow-blue-500/30 active:scale-95">
                                                 <i data-lucide="eye" class="w-3.5 h-3.5"></i>
@@ -151,7 +151,7 @@
                                             </a>
 
                                             @if ($status == 1)
-                                                {{-- TOMBOL MANDAT --}}
+                                                {{-- TOMBOL MANDAT - Muncul hanya saat status 1 --}}
                                                 <a href="{{ route('pimpinan.mandat', $ticket->noreg) }}">
                                                     <button
                                                         class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-[10px] font-bold transition cursor-pointer flex items-center gap-1">
@@ -159,29 +159,32 @@
                                                         MANDAT
                                                     </button>
                                                 </a>
+                                            @else
+                                                {{-- EDIT & DELETE - Muncul HANYA saat status BUKAN 1 --}}
+                                                <div class="flex items-center gap-2 ml-2 pl-2 border-l border-slate-200">
+                                                    {{-- Edit --}}
+                                                    <a href="{{ route('pimpinan.edit', $ticket->id) }}"
+                                                        class="p-2.5 bg-white text-amber-500 border border-slate-200 rounded-xl hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all shadow-sm active:scale-90">
+                                                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                                    </a>
+
+                                                    {{-- Delete --}}
+                                                    <button type="button" onclick="confirmDelete({{ $ticket->id }})"
+                                                        class="p-2.5 bg-white text-rose-500 border border-slate-200 rounded-xl hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all shadow-sm active:scale-90 cursor-pointer">
+                                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                    </button>
+
+                                                    <form id="delete-form-{{ $ticket->id }}"
+                                                        action="{{ route('pimpinan.destroy', $ticket->id) }}"
+                                                        method="POST" class="hidden">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                    </form>
+                                                </div>
                                             @endif
-                                            <div class="flex items-center gap-2 ml-2 pl-2 border-l border-slate-200">
-                                                {{-- Edit --}}
-                                                <a href="{{ route('pimpinan.edit', $ticket->id) }}"
-                                                    class="p-2.5 bg-white text-amber-500 border border-slate-200 rounded-xl hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all shadow-sm active:scale-90">
-                                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
-                                                </a>
-
-                                                {{-- Delete --}}
-                                                <button type="button" onclick="confirmDelete({{ $ticket->id }})"
-                                                    class="p-2.5 bg-white text-rose-500 border border-slate-200 rounded-xl hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all shadow-sm active:scale-90 cursor-pointer">
-                                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                                </button>
-                                                <form id="delete-form-{{ $ticket->id }}"
-                                                    action="{{ route('pimpinan.destroy', $ticket->id) }}" method="POST"
-                                                    class="hidden">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
-                                            </div>
-
                                         </div>
                                     </td>
+
                                 </tr>
                             @endforeach
                         </tbody>

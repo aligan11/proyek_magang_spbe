@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('jabatan');
             $table->string('pangkat');
             $table->string('gol');
-            $table->string('phone');
+            $table->string('no_hp');
             $table->rememberToken();
 
             $table->timestamp('last_seen')->nullable();
