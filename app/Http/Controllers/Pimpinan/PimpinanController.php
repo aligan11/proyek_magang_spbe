@@ -165,7 +165,6 @@ class PimpinanController extends Controller
             'ket' => 'required|string|min:5',
         ]);
 
-        // KARENA URL ADALAH /pimpinan/23 (ID Asli), MAKA GUNAKAN findOrFail SECARA LANGSUNG
         $tindakLanjut = Tindak_lanjut_layanan::findOrFail($id);
 
         // Proses update data ke kolom keterangan

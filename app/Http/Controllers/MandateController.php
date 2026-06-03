@@ -147,7 +147,7 @@ class MandateController extends Controller
         // Update layanan_spbe table
         $ticket->update([
             'tl_by' => $user->id,
-            'status_tl' => 'selesai',
+            'status_tl' => 2,
             'tgl_tl' => now(),
             'status' => 2,
             'status_ver' => 1,

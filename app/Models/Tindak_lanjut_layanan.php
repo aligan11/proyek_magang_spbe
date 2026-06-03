@@ -12,6 +12,7 @@ class Tindak_lanjut_layanan extends Model
     protected $fillable = [
         'id_layanan',
         'id_petugas',
+        'keterangan',
     ];
 
     protected $casts = [
