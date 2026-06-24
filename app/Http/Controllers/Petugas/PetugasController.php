@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Petugas;
 
 use App\Http\Controllers\Controller;
+use App\Models\Berita_acara_pemeriksaan;
 use App\Models\Layanan_spbe;
 use App\Models\Notification;
 use App\Models\Tindak_lanjut_layanan;
@@ -127,6 +128,57 @@ class PetugasController extends Controller
         $title = 'Tugas Saya';
 
         return view('petugas.tugas', compact('tasks', 'stats', 'user', 'title') + $notificationData);
+    }
+
+    public function create()
+    {
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        $user = User::find($idPetugas);
+
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $notificationData = $this->getNotificationsData($idPetugas);
+
+        $allMandat = Tindak_lanjut_layanan::with(['ticket'])->latest()->get();
+
+        $tindakLanjutOptions = $allMandat->filter(function ($mandat) use ($idPetugas) {
+            $ids = is_string($mandat->id_petugas) ? json_decode($mandat->id_petugas, true) : $mandat->id_petugas;
+            $cleanIds = collect($ids)->map(fn($v) => (int) str_replace(['"', '[', ']', ' '], '', $v))->filter()->toArray();
+
+            return in_array((int) $idPetugas, $cleanIds, true);
+        })->values();
+
+        $title = 'Tambah Berita Acara';
+
+        return view('petugas.create', compact('tindakLanjutOptions', 'user', 'title') + $notificationData);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'id_tindak_lanjut' => 'required|exists:tindak_lanjut_layanan,id',
+            'ringkasan_pekerjaan' => 'nullable|string',
+            'ringkasan_masalah' => 'nullable|string',
+            'alternatif_solusi' => 'nullable|string',
+            'lokasi' => 'nullable|string|max:255',
+        ]);
+
+        $idPetugas = Auth::guard('petugas')->user()->id;
+        $mandate = Tindak_lanjut_layanan::findOrFail($validated['id_tindak_lanjut']);
+        $ids = is_string($mandate->id_petugas) ? json_decode($mandate->id_petugas, true) : $mandate->id_petugas;
+        $cleanIds = collect($ids)->map(fn($v) => (int) str_replace(['"', '[', ']', ' '], '', $v))->filter()->toArray();
+
+        if (!in_array((int) $idPetugas, $cleanIds, true)) {
+            abort(403, 'Anda tidak memiliki akses untuk membuat berita acara pada data ini.');
+        }
+
+        Berita_acara_pemeriksaan::create($validated);
+
+        return redirect()
+            ->route('petugas.index')
+            ->with('success', 'Berita acara pemeriksaan berhasil disimpan.');
     }
 
     // Mark notification as read

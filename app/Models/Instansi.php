@@ -6,8 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Instansi extends Model
 {
-    //
+    // SEKARANG SUDAH AKTIF: Menegaskan Laravel untuk membaca tabel 'instansi' di phpMyAdmin
     protected $table = 'instansi';
+
     protected $fillable = [
         'id_induk',
         'kode_instansi',

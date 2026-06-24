@@ -33,6 +33,15 @@ class AuthController extends Controller
         return response()->json(['captcha' => $captcha]);
     }
 
+    public function generateMathCaptcha(Request $request)
+    {
+        $request->validate([
+            'answer' => 'required|integer'
+        ]);
+        session(['math_captcha_answer' => $request->answer]);
+        return response()->json(['status' => 'success']);
+    }
+
     public function loginPemohon(Request $request)
     {
 
@@ -41,12 +50,12 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
-            'captcha_input' => 'required'
+            'captcha_input' => 'required|integer'
         ]);
 
         // 2. Validasi Captcha
-        if (strtoupper($request->captcha_input) !== session('captcha_code')) {
-            return back()->withErrors(['captcha_input' => 'Kode verifikasi salah!'])->withInput();
+        if ($request->captcha_input != session('math_captcha_answer')) {
+            return back()->withErrors(['captcha_input' => 'Jawaban captcha salah!'])->withInput();
         }
 
         // 3. Logika Login (Contoh Auth Laravel)
@@ -59,7 +68,7 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
             // Hapus captcha setelah berhasil login
-            session()->forget('captcha_code');
+            session()->forget('math_captcha_answer');
 
             return redirect()->intended('dashboard-pemohon');
         }
@@ -71,7 +80,7 @@ class AuthController extends Controller
 
     public function showLoginPemohon()
     {
-        return view('auth.loginPemohon  ');
+        return view('auth.loginPemohon');
     }
 
     public function login(Request $request)

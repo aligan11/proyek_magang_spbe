@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Petugas\PetugasController;
 use App\Http\Controllers\Pimpinan\PimpinanController;
 use App\Http\Controllers\TindakLanjutLayananController;
@@ -13,6 +14,8 @@ use App\Http\Controllers\PemohonController;
 use App\Http\Controllers\RequestOpdController;
 use App\Http\Middleware\loginCheckPemohon;
 use App\Models\Pemohon;
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 route::post('/logout', [authController::class, 'logout'])->name('logout');
 route::post('/logout-pemohon', [authController::class, 'logoutPemohon'])->name('logoutPemohon');
@@ -32,13 +35,14 @@ Route::middleware(loginCheck::class)->group(function () {
     route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
     route::get('/register-pemohon', [AuthController::class, 'registerPemohonPage'])->name('registerPage');
-    route::get('/', [AuthController::class, 'showLoginPemohon'])->name('loginPemohon');
+    route::get('/login-pemohon', [AuthController::class, 'showLoginPemohon'])->name('loginPemohon');
     route::get('/forgot-password-pemohon', [ForgotPasswordPemohonController::class, 'forgotPemohon'])->name('forgotPemohon');
 
     route::post('/register-pemohon', [AuthController::class, 'registerPemohon'])->name('registerPemohon');
 
     Route::get('/generate-captcha', [AuthController::class, 'generateCaptcha']);
-    Route::post('/login-pemohon', [AuthController::class, 'loginPemohon'])->name('login.pemohon');
+        Route::post('/generate-math-captcha', [AuthController::class, 'generateMathCaptcha']);
+        Route::post('/login-pemohon', [AuthController::class, 'loginPemohon'])->name('login.pemohon');
     Route::post('/forgot-password', [ForgotPasswordPemohonController::class, 'sendResetLink'])->name('password.email');
     Route::get('/otp-pemohon', [ForgotPasswordPemohonController::class, 'otpPagePemohon'])->name('otp.pemohon');
     Route::get('/update-password-pemohon', [ForgotPasswordPemohonController::class, 'updatePasswordPemohon'])->name('update.passwordPemohon');
@@ -62,7 +66,7 @@ Route::middleware(['check.pemohon'])->group(function () {
 
     Route::get('pemohon/download-pdf/{id}', [PemohonController::class, 'downloadPdf'])->name('pemohon.download.pdf');
     Route::resource('pemohon', PemohonController::class);
-    
+
     // Notification routes for pemohon
     Route::post('pemohon/notifications/{id}/read', [PemohonController::class, 'markNotificationRead'])->name('pemohon.notification.read');
     Route::post('pemohon/notifications/read-all', [PemohonController::class, 'markAllNotificationsRead'])->name('pemohon.notification.read-all');
@@ -71,6 +75,8 @@ Route::middleware(['check.pemohon'])->group(function () {
 
 route::middleware('check.role:staff')->group(function () {
     Route::get('petugas/dashboard', [PetugasController::class, 'index'])->name('petugas.index');
+    Route::get('petugas/berita-acara/create', [PetugasController::class, 'create'])->name('petugas.berita-acara.create');
+    Route::post('petugas/berita-acara', [PetugasController::class, 'store'])->name('petugas.berita-acara.store');
     Route::get('petugas/tugas', [PetugasController::class, 'tugas'])->name('petugas.tugas');
     Route::get('petugas/tugas/{id}', [PetugasController::class, 'show'])->name('petugas.show');
     Route::get('petugas/profile', [PetugasController::class, 'profile'])->name('petugas.profile');

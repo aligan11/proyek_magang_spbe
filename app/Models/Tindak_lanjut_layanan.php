@@ -36,4 +36,9 @@ class Tindak_lanjut_layanan extends Model
     {
         return $this->belongsTo(User::class, 'id_petugas');
     }
+
+    public function beritaAcara()
+    {
+        return $this->hasMany(Berita_acara_pemeriksaan::class);
+    }
 }

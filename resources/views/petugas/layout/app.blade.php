@@ -148,8 +148,7 @@
                             <p class="text-slate-400 text-xs font-medium uppercase tracking-widest">SPBE Diskominfo</p>
                         </div>
                     </div>
-                    <div
-                        class="flex items-center gap-2">
+                    <div class="flex items-center gap-2">
                         <button @click="collapsed = !collapsed"
                             class="hidden lg:inline-flex p-2.5 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition-all"
                             :title="collapsed ? 'Buka sidebar' : 'Ciutkan sidebar'">
@@ -170,22 +169,25 @@
                 <p x-show="!collapsed" x-transition.opacity
                     class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6 px-4">Menu Utama</p>
 
-                <a href="{{ route('petugas.index') }}"
-                    :class="collapsed ? 'justify-center px-4' : 'px-6'"
+                <a href="{{ route('petugas.index') }}" :class="collapsed ? 'justify-center px-4' : 'px-6'"
                     class="nav-link flex items-center gap-4 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.index') ? 'active text-white bg-white/10' : '' }}">
                     <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0"></i>
                     <span x-show="!collapsed" x-transition.opacity class="font-semibold">Dashboard</span>
                 </a>
 
-                <a href="{{ route('petugas.tugas') }}"
-                    :class="collapsed ? 'justify-center px-4' : 'px-6'"
+                <a href="{{ route('petugas.tugas') }}" :class="collapsed ? 'justify-center px-4' : 'px-6'"
                     class="nav-link flex items-center gap-4 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.tugas') || request()->routeIs('petugas.show') ? 'active text-white bg-white/10' : '' }}">
                     <i data-lucide="clipboard-list" class="w-5 h-5 shrink-0"></i>
                     <span x-show="!collapsed" x-transition.opacity class="font-semibold">Tugas Saya</span>
                 </a>
 
-                <a href="{{ route('petugas.profile') }}"
-                    :class="collapsed ? 'justify-center px-4' : 'px-6'"
+                <a href="{{ route('petugas.berita-acara.create') }}" :class="collapsed ? 'justify-center px-4' : 'px-6'"
+                    class="nav-link flex items-center gap-4 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.berita-acara.create') ? 'active text-white bg-white/10' : '' }}">
+                    <i data-lucide="file-plus-2" class="w-5 h-5 shrink-0"></i>
+                    <span x-show="!collapsed" x-transition.opacity class="font-semibold">Berita Acara</span>
+                </a>
+
+                <a href="{{ route('petugas.profile') }}" :class="collapsed ? 'justify-center px-4' : 'px-6'"
                     class="nav-link flex items-center gap-4 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.profile') ? 'active text-white bg-white/10' : '' }}">
                     <i data-lucide="user-circle" class="w-5 h-5 shrink-0"></i>
                     <span x-show="!collapsed" x-transition.opacity class="font-semibold">Profil</span>
@@ -204,8 +206,7 @@
                         <p class="text-white font-bold text-sm truncate">{{ $user->name }}</p>
                         <p class="text-slate-400 text-xs truncate">{{ $user->jabatan ?? 'Petugas Lapangan' }}</p>
                     </div>
-                    <button onclick="toggleLogoutModal()"
-                        x-show="!collapsed" x-transition.opacity
+                    <button onclick="toggleLogoutModal()" x-show="!collapsed" x-transition.opacity
                         class="p-2 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all">
                         <i data-lucide="log-out" class="w-5 h-5"></i>
                     </button>
@@ -214,8 +215,8 @@
         </aside>
 
         <!-- Overlay for mobile -->
-        <div x-cloak x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden"
-            @click="sidebarOpen = false"></div>
+        <div x-cloak x-show="sidebarOpen" x-transition.opacity
+            class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden" @click="sidebarOpen = false"></div>
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col min-h-screen min-w-0">
@@ -233,7 +234,8 @@
                             <i data-lucide="menu" class="w-5 h-5"></i>
                         </button>
                         <div class="min-w-0">
-                            <h2 class="text-slate-800 font-bold text-base sm:text-lg truncate">{{ $title ?? 'Dashboard' }}</h2>
+                            <h2 class="text-slate-800 font-bold text-base sm:text-lg truncate">
+                                {{ $title ?? 'Dashboard' }}</h2>
                             <p class="text-slate-400 text-xs font-medium truncate">
                                 {{ now()->translatedFormat('l, d M Y') }}
                             </p>
@@ -243,46 +245,56 @@
                     <div class="flex items-center gap-2 sm:gap-4 shrink-0">
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open" class="relative p-3 rounded-2xl hover:bg-slate-100 transition-colors">
+                            <button @click="open = !open"
+                                class="relative p-3 rounded-2xl hover:bg-slate-100 transition-colors">
                                 <i data-lucide="bell" class="w-5 h-5 text-slate-500"></i>
-                                @if(isset($unreadCount) && $unreadCount > 0)
-                                    <span class="absolute top-2 right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                @if (isset($unreadCount) && $unreadCount > 0)
+                                    <span
+                                        class="absolute top-2 right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
                                         {{ $unreadCount }}
                                     </span>
                                 @endif
                             </button>
 
                             <!-- Notification Dropdown -->
-                            <div x-show="open" @click.outside="open = false" x-transition class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 z-50">
+                            <div x-show="open" @click.outside="open = false" x-transition
+                                class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 z-50">
                                 <div class="p-4 border-b border-slate-200 flex justify-between items-center">
                                     <h3 class="font-bold text-slate-800">Notifikasi</h3>
-                                    @if(isset($unreadCount) && $unreadCount > 0)
+                                    @if (isset($unreadCount) && $unreadCount > 0)
                                         <form action="{{ route('petugas.notification.read-all') }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="text-xs font-bold text-blue-600 hover:text-blue-700">
+                                            <button type="submit"
+                                                class="text-xs font-bold text-blue-600 hover:text-blue-700">
                                                 Tandai semua dibaca
                                             </button>
                                         </form>
                                     @endif
                                 </div>
                                 <div class="max-h-80 overflow-y-auto">
-                                    @if(isset($notifications) && $notifications->count() > 0)
-                                        @foreach($notifications as $notification)
-                                            <form action="{{ route('petugas.notification.read', $notification->id) }}" method="POST" class="block">
+                                    @if (isset($notifications) && $notifications->count() > 0)
+                                        @foreach ($notifications as $notification)
+                                            <form action="{{ route('petugas.notification.read', $notification->id) }}"
+                                                method="POST" class="block">
                                                 @csrf
-                                                <button type="submit" class="w-full p-4 hover:bg-slate-50 text-left border-b border-slate-100 last:border-0">
+                                                <button type="submit"
+                                                    class="w-full p-4 hover:bg-slate-50 text-left border-b border-slate-100 last:border-0">
                                                     <div class="flex items-start gap-3">
-                                                        <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                            <i data-lucide="briefcase" class="w-5 h-5 text-blue-600"></i>
+                                                        <div
+                                                            class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                                            <i data-lucide="briefcase"
+                                                                class="w-5 h-5 text-blue-600"></i>
                                                         </div>
                                                         <div class="flex-1">
-                                                            <p class="text-sm font-semibold text-slate-800">{{ $notification->message }}</p>
+                                                            <p class="text-sm font-semibold text-slate-800">
+                                                                {{ $notification->message }}</p>
                                                             <p class="text-xs text-slate-400 mt-1">
                                                                 {{ $notification->created_at->diffForHumans() }}
                                                             </p>
                                                         </div>
-                                                        @if(!$notification->is_read)
-                                                            <span class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                                                        @if (!$notification->is_read)
+                                                            <span
+                                                                class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
                                                         @endif
                                                     </div>
                                                 </button>
@@ -321,7 +333,8 @@
             <!-- Footer -->
             <footer class="glass border-t border-slate-200/50 px-4 py-6 sm:px-8">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p class="text-slate-400 text-sm font-medium">© {{ date('Y') }} SPBE Diskominfo Bangka Belitung
+                    <p class="text-slate-400 text-sm font-medium">© {{ date('Y') }} SPBE Diskominfo Bangka
+                        Belitung
                     </p>
                     <div class="flex items-center gap-2 text-slate-400 text-sm">
                         <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
