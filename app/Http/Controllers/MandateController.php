@@ -10,10 +10,11 @@ use App\Models\Petugas;
 use App\Models\Ticket;
 use App\Models\Tindak_lanjut_layanan;
 use App\Models\User;
+use App\Mail\NewMandateMail;
 use GuzzleHttp\Psr7\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http as FacadesHttp;
+use Illuminate\Support\Facades\Mail;
 use PHPUnit\Metadata\Before;
 
 class MandateController extends Controller
@@ -131,81 +132,59 @@ class MandateController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-        $request->validate([
-            'ticket_id' => 'required|exists:layanan_spbe,id',
-            'user_ids' => 'required|array|min:1',
-            'user_ids.*' => 'required|exists:users,id',
-            'ket' => 'required|string|min:10',
-        ]);
-
-        // 1. Ambil data ticket terlebih dahulu
-        $ticket = Layanan_spbe::findOrFail($request->ticket_id);
-        $idPetugas = Auth::guard('petugas')->user()->id;
-        $user = Auth::guard('petugas')->user();
-
-        // Update layanan_spbe table
-        $ticket->update([
-            'tl_by' => $user->id,
-            'status_tl' => 2,
-            'tgl_tl' => now(),
-            'status' => 2,
-            'status_ver' => 1,
-        ]);
-
-        // Insert ke tindak_lanjut_layanan untuk setiap petugas
-        $tindakLanjut = Tindak_lanjut_layanan::create([
-            'id_layanan' => $ticket->id,
-            'id_petugas' => $request->user_ids,
-            'keterangan' => $request->ket,
-        ]);
-
-        $petugas = User::whereIn('id', $request->user_ids)->get();
-
-        // Create notifications for each petugas
-        foreach ($petugas as $p) {
-            Notification::create([
-                'user_id' => $p->id,
-                'type' => 'new_mandate',
-                'message' => "Anda mendapat tugas baru untuk permohonan No. {$ticket->noreg} - {$ticket->nama_kebutuhan}",
-                'related_id' => $tindakLanjut->id,
-                'related_type' => 'tindak_lanjut',
-                'is_read' => false,
-            ]);
-        }
-        $targetNumbers = $petugas->pluck('no_hp')->filter()->implode(',');
-
-        // 2. Susun format pesan untuk WhatsApp
-        // Gunakan *text* untuk menebalkan teks di WhatsApp
-        $urlDetail = route('login'); // Sesuaikan nama route detail kamu
-
-        $urlBerkas = $ticket->berkas ? asset('storage/doc/' . $ticket->berkas) : 'Tidak ada berkas lampiran';
-
-        // 2. Susun format pesan untuk WhatsApp
-        $pesanWhatsapp = "Yth. Petugas Layanan,\n\n" .
-            "Terdapat permohonan baru dengan No. Registrasi: *{$ticket->noreg}*\n" .
-            "Perihal: {$ticket->nama_kebutuhan}\n\n" .
-            "Deskripsi Pimpinan: {$request->ket}\n\n" .
-            "Silahkan akses detail permohonan pada link berikut:\n" .
-            $urlDetail . "\n\n" .
-            "Lihat/Unduh Berkas Lampiran:\n" .
-            $urlBerkas . "\n\n" . // Menampilkan link berkas di sini
-            "Terima kasih.";
-
-        if ($targetNumbers) {
-            $response = FacadesHttp::withHeaders([
-                'authorization' => env('FONNTE_TOKEN'),
-            ])->post('https://api.fonnte.com/send', [
-                'target' => $targetNumbers,
-                'message' => $pesanWhatsapp, // Gunakan variabel pesan yang baru dibuat
+        try {
+            // dd($request->all());
+            $request->validate([
+                'ticket_id' => 'required|exists:layanan_spbe,id',
+                'user_ids' => 'required|array|min:1',
+                'user_ids.*' => 'required|exists:users,id',
+                'ket' => 'required|string|min:10',
             ]);
 
-            if ($response->successful()) {
-                return redirect()->route('indexMandat', 2)->with('success', 'Pesan berhasil dikirim ke ' . $petugas->count() . ' petugas');
+            // 1. Ambil data ticket terlebih dahulu
+            $ticket = Layanan_spbe::findOrFail($request->ticket_id);
+            $idPetugas = Auth::guard('petugas')->user()->id;
+            $user = Auth::guard('petugas')->user();
+
+            // Update layanan_spbe table
+            $ticket->update([
+                'tl_by' => $user->id,
+                'status_tl' => 2,
+                'tgl_tl' => now(),
+                'status' => 2,
+                'status_ver' => 1,
+            ]);
+
+            // Insert ke tindak_lanjut_layanan untuk setiap petugas
+            $tindakLanjut = Tindak_lanjut_layanan::create([
+                'id_layanan' => $ticket->id,
+                'id_petugas' => $request->user_ids,
+                'keterangan' => $request->ket,
+            ]);
+
+            $petugas = User::whereIn('id', $request->user_ids)->get();
+
+            // Create notifications for each petugas
+            foreach ($petugas as $p) {
+                Notification::create([
+                    'user_id' => $p->id,
+                    'type' => 'new_mandate',
+                    'message' => "Anda mendapat tugas baru untuk permohonan No. {$ticket->noreg} - {$ticket->nama_kebutuhan}",
+                    'related_id' => $tindakLanjut->id,
+                    'related_type' => 'tindak_lanjut',
+                    'is_read' => false,
+                ]);
+
+                // Kirim email ke petugas jika email tersedia
+                if ($p->email) {
+                    Mail::to($p->email)->queue(new NewMandateMail($ticket, $tindakLanjut, $user));
+                }
             }
-        }
 
-        return redirect()->route('pimpinan.mandat', $ticket->noreg)->withErrors('Pesan gagal dikirim');
+            return redirect()->route('indexMandat', 2)->with('success', 'Penugasan berhasil dibuat dan email telah dikirim ke ' . $petugas->count() . ' petugas');
+        } catch (\Exception $e) {
+            dd('FATAL ERROR CAUGHT: ' . $e->getMessage() . ' in file ' . $e->getFile() . ' on line ' . $e->getLine());
+        }
     }
 
 

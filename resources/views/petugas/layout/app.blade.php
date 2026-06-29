@@ -190,7 +190,7 @@
                 <a href="{{ route('petugas.profile') }}" :class="collapsed ? 'justify-center px-4' : 'px-6'"
                     class="nav-link flex items-center gap-4 py-4 rounded-2xl text-slate-300 hover:bg-white/10 hover:text-white {{ request()->routeIs('petugas.profile') ? 'active text-white bg-white/10' : '' }}">
                     <i data-lucide="user-circle" class="w-5 h-5 shrink-0"></i>
-                    <span x-show="!collapsed" x-transition.opacity class="font-semibold">Profil</span>
+                    <span x-show="!collapsed" x-transition.opacity class="font-semibold">Pengaturan Akun</span>
                 </a>
             </nav>
 
@@ -316,11 +316,21 @@
                                 <p class="text-sm font-bold text-slate-800">{{ $user->name }}</p>
                                 <p class="text-xs text-slate-400">{{ $user->role ?? 'Petugas' }}</p>
                             </div>
+
+                            <!-- Bagian Avatar dengan Logika Database -->
                             <div
-                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg">
-                                {{ substr($user->name, 0, 1) }}
+                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg overflow-hidden">
+                                @if ($user->avatar)
+                                    <!-- Jika user memiliki foto avatar di database -->
+                                    <img src="{{ asset('storage/avatars/' . $user->avatar) }}"
+                                        class="w-full h-full object-cover">
+                                @else
+                                    <!-- Jika avatar kosong, tampilkan 2 huruf pertama dari nama user -->
+                                    {{ strtoupper(substr($user->name, 0, 2)) }}
+                                @endif
                             </div>
                         </div>
+
                     </div>
                 </div>
             </header>

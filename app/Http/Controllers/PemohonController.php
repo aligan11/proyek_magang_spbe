@@ -8,10 +8,11 @@ use App\Models\Layanan_spbe;
 use App\Models\Notification;
 use App\Models\Pemohon;
 use App\Models\User;
+use App\Mail\NewPermohonanMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -97,97 +98,85 @@ class PemohonController extends Controller
      */
     public function store(Request $request)
     {
-
-        // dd($request->all()); 
-        $request->validate([
-            'nama_kebutuhan'    => 'required|string|max:255',
-            'id_jenis_layanan'  => 'required|integer',
-            'id_kebutuhan'      => 'required|array|min:1',
-            'lokasi'            => 'required|string|max:255',
-            'unitKerja'        => 'required|string|max:255',
-            'berkas'            => 'required|file|mimes:pdf,docx,zip|max:10240',
-            'ket'               => 'nullable|string',
-            'nama_pj'           => 'required|string|max:255',
-            'nip_pj'            => 'required|string|max:50',
-            'jabatan_pj'        => 'required|string|max:255',
-            'unitkerja_pj'      => 'required|string|max:255',
-            'nohp_pj'           => 'required|string|max:20',
-            'email_pj'          => 'required|email|max:255',
-        ]);
-
-        $user = Auth::guard('pemohon')->user();
-        $userWithInstansi = Pemohon::where('id', $user->id)->with('instansi')->first();
-
-        $count = Layanan_spbe::whereDate('tgl_permohonan', now())->count() + 1;
-        $noreg = 'REG-' . date('Ymd') . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
-
-        $fileName = null;
-        if ($request->hasFile('berkas')) {
-            $file = $request->file('berkas');
-            $originalName = str_replace(' ', '_', $file->getClientOriginalName());
-            $fileName = time() . '_' . $originalName;
-            $file->move(public_path('storage/doc'), $fileName);
-        }
-
-        $layanan = Layanan_spbe::create([
-            'id_jenis_layanan' => $request->id_jenis_layanan,
-            'id_kebutuhan' => $request->id_kebutuhan,
-            'nama_kebutuhan'   => $request->nama_kebutuhan,
-            'lokasi'           => $request->lokasi,
-            'unitKerja'        => $request->unitKerja,
-            'ket'              => $request->ket,
-            'berkas'           => $fileName,
-            'noreg'            => $noreg,
-            'tahunanggaran'    => date('Y'),
-            'periode'          => 'Triwulan ' . ceil(date('n') / 3),
-            'tgl_permohonan'   => now(),
-            'status'           => 1, // Sesuai default database
-            'is_eksternal'     => empty($user->id_instansi) ? "ya" : "tidak",
-            'nama_penanggungjawab'      => $request->nama_pj,
-            'nip_penanggungjawab'       => $request->nip_pj,
-            'nohp_penanggungjawab'      => $request->nohp_pj,
-            'jabatan_penanggungjawab'   => $request->jabatan_pj,
-            'unitKerja_penanggungjawab' => $request->unitKerja_pj, // Sesuaikan dengan DB (huruf kecil)
-            'email_penanggungjawab'     => $request->email_pj,
-            'inputby'          => $user->nama_lengkap,
-            'tglinput'         => now(),
-            'id_instansi'      => $user->id_instansi,
-            'id_pemohon'     => $user->id,
-            'nama_instansi'    => $userWithInstansi->instansi->nama_instansi ?? '-',
-        ]);
-
-
-        // Notifikasi Fonnte
-        $semuaKabid = User::where('role', 'kabid')->get();
-        $targetNumbers = $semuaKabid->pluck('no_hp')->filter()->implode(',');
-
-        if ($targetNumbers) {
-            $urlDetail = route('login');
-            $urlBerkas = asset('storage/doc/' . $layanan->berkas);
-
-            $pesanWhatsapp = "Yth. Petugas Layanan (Kabid),\n\n" .
-                "Terdapat *Permohonan Baru* masuk:\n\n" .
-                "No. Reg: *{$noreg}*\n" .
-                "Instansi: " . ($userWithInstansi->instansi->nama_instansi ?? '-') . "\n" .
-                "Perihal: {$request->nama_kebutuhan}\n" .
-                "Lokasi: {$request->lokasi}\n" .
-                "Tgl Pengajuan: " . date('d-m-Y H:i') . "\n\n" .
-                "Silahkan cek detail pada link berikut:\n" .
-                $urlDetail . "\n\n" .
-                "Unduh Berkas:\n" .
-                $urlBerkas . "\n\n" .
-                "Terima kasih.";
-
-            Http::withHeaders([
-                'authorization' => env('FONNTE_TOKEN'),
-            ])->post('https://api.fonnte.com/send', [
-                'target' => $targetNumbers,
-                'message' => $pesanWhatsapp,
+        try {
+            // dd($request->all());
+            $request->validate([
+                'nama_kebutuhan'    => 'required|string|max:255',
+                'id_jenis_layanan'  => 'required|integer',
+                'id_kebutuhan'      => 'required|array|min:1',
+                'lokasi'            => 'required|string|max:255',
+                'unitKerja'        => 'required|string|max:255',
+                'berkas'            => 'required|file|mimes:pdf,docx,zip|max:10240',
+                'ket'               => 'nullable|string',
+                'nama_pj'           => 'required|string|max:255',
+                'nip_pj'            => 'required|string|max:50',
+                'jabatan_pj'        => 'required|string|max:255',
+                'unitkerja_pj'      => 'required|string|max:255',
+                'nohp_pj'           => 'required|string|max:20',
+                'email_pj'          => 'required|email|max:255',
             ]);
-        }
 
-        Alert::success('Berhasil', 'Permohonan berhasil dikirim dengan No. Registrasi: ' . $noreg);
-        return redirect()->route('pemohon.index');
+            $user = Auth::guard('pemohon')->user();
+            $userWithInstansi = Pemohon::where('id', $user->id)->with('instansi')->first();
+
+            $count = Layanan_spbe::whereDate('tgl_permohonan', now())->count() + 1;
+            $noreg = 'REG-' . date('Ymd') . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+
+            $fileName = null;
+            if ($request->hasFile('berkas')) {
+                $file = $request->file('berkas');
+                $originalName = str_replace(' ', '_', $file->getClientOriginalName());
+                $fileName = time() . '_' . $originalName;
+                $file->move(public_path('storage/doc'), $fileName);
+            }
+
+            $layanan = Layanan_spbe::create([
+                'id_jenis_layanan' => $request->id_jenis_layanan,
+                'id_kebutuhan' => $request->id_kebutuhan,
+                'nama_kebutuhan'   => $request->nama_kebutuhan,
+                'lokasi'           => $request->lokasi,
+                'unitKerja'        => $request->unitKerja,
+                'ket'              => $request->ket,
+                'berkas'           => $fileName,
+                'noreg'            => $noreg,
+                'tahunanggaran'    => date('Y'),
+                'periode'          => 'Triwulan ' . ceil(date('n') / 3),
+                'tgl_permohonan'   => now(),
+                'status'           => 1, // Sesuai default database
+                'is_eksternal'     => empty($user->id_instansi) ? "ya" : "tidak",
+                'nama_penanggungjawab'      => $request->nama_pj,
+                'nip_penanggungjawab'       => $request->nip_pj,
+                'nohp_penanggungjawab'      => $request->nohp_pj,
+                'jabatan_penanggungjawab'   => $request->jabatan_pj,
+                'unitKerja_penanggungjawab' => $request->unitKerja_pj, // Sesuaikan dengan DB (huruf kecil)
+                'email_penanggungjawab'     => $request->email_pj,
+                'inputby'          => $user->nama_lengkap,
+                'tglinput'         => now(),
+                'id_instansi'      => $user->id_instansi,
+                'id_pemohon'     => $user->id,
+                'nama_instansi'    => $userWithInstansi->instansi->nama_instansi ?? '-',
+            ]);
+
+
+            // Notifikasi Email ke Pimpinan (Kabid)
+            $semuaKabid = User::where('role', 'kabid')->get();
+            $emailPenerima = $semuaKabid->pluck('email')->filter()->toArray();
+
+            // Fallback email jika tidak ada kabid dengan email
+            if (empty($emailPenerima)) {
+                $emailPenerima = ['admin@example.com'];
+            }
+
+            // Kirim email ke setiap penerima (gunakan queue untuk mencegah hanging)
+            foreach ($emailPenerima as $email) {
+                Mail::to($email)->queue(new NewPermohonanMail($layanan, $user));
+            }
+
+            Alert::success('Berhasil', 'Permohonan berhasil dikirim dengan No. Registrasi: ' . $noreg);
+            return redirect()->route('pemohon.index');
+        } catch (\Exception $e) {
+            dd('FATAL ERROR CAUGHT: ' . $e->getMessage() . ' in file ' . $e->getFile() . ' on line ' . $e->getLine());
+        }
     }
 
     /**

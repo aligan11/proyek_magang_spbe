@@ -103,7 +103,7 @@ class AuthController extends Controller
 
             // Gunakan switch atau match jika role bertambah di kemudian hari
             return match ($user->role) {
-                'kabid' => redirect()->route('pimpinan.index'),
+                'kabid', 'katim' => redirect()->route('pimpinan.index'),
                 'staff' => redirect()->route('petugas.index'),
                 default => FacadesAuth::guard('petugas')->logout()
                     && abort(403, 'Role tidak terdaftar.'),
