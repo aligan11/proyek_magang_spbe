@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Waktu pembuatan: 03 Jun 2026 pada 06.19
+-- Waktu pembuatan: 29 Jun 2026 pada 23.11
 -- Versi server: 8.0.30
 -- Versi PHP: 8.4.16
 
@@ -48,8 +48,8 @@ CREATE TABLE `activity_logs` (
 --
 
 CREATE TABLE `berita_acara_pemeriksaan` (
-  `id` int NOT NULL,
-  `id_tindak_lanjut` int NOT NULL,
+  `id` bigint UNSIGNED NOT NULL,
+  `id_tindak_lanjut` bigint UNSIGNED NOT NULL,
   `ringkasan_pekerjaan` text,
   `ringkasan_masalah` text,
   `alternatif_solusi` text,
@@ -57,6 +57,19 @@ CREATE TABLE `berita_acara_pemeriksaan` (
   `created_at` timestamp NOT NULL,
   `updated_at` timestamp NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data untuk tabel `berita_acara_pemeriksaan`
+--
+
+INSERT INTO `berita_acara_pemeriksaan` (`id`, `id_tindak_lanjut`, `ringkasan_pekerjaan`, `ringkasan_masalah`, `alternatif_solusi`, `lokasi`, `created_at`, `updated_at`) VALUES
+(22, 23, 'Pemeriksaan dan optimalisasi infrastruktur jaringan FO (Fiber Optik) untuk persiapan integrasi aplikasi SPBE lintas perangkat daerah telah dilaksanakan pada titik distribusi utama layanan pemerintahan digital.', 'Terjadi degradasi bandwidth pada core switch yang berdampak pada keterlambatan sinkronisasi data antarperangkat daerah.', 'Melakukan instalasi ulang modul SFP, penataan ulang patch cord, serta konfigurasi ulang manajemen bandwidth pada jalur prioritas layanan.', 'Ruang Data Center Dinas Komunikasi dan Informatika', '2026-06-09 22:21:36', '2026-06-09 22:21:36'),
+(23, 24, 'Tim melakukan verifikasi kesiapan perangkat server dan pemetaan layanan aktif untuk mendukung penguatan tata kelola pemerintahan berbasis elektronik secara terukur.', 'Ditemukan utilisasi penyimpanan server yang mendekati ambang batas serta dokumentasi backup harian yang belum seragam.', 'Disarankan penambahan kapasitas penyimpanan, pembaruan SOP backup, dan monitoring kapasitas secara berkala melalui dashboard infrastruktur.', 'Ruang Server Utama Pemerintah Daerah', '2026-06-09 22:21:36', '2026-06-09 22:21:36'),
+(24, 23, 'Dilakukan pemeriksaan perangkat akses jaringan pada area pelayanan publik sebagai bagian dari upaya peningkatan kualitas konektivitas layanan digital masyarakat.', 'Terdapat beberapa access point dengan penurunan performa sinyal akibat penempatan perangkat yang kurang optimal dan interferensi kanal.', 'Melakukan reposisi access point, penyesuaian kanal frekuensi, dan pembaruan firmware perangkat agar cakupan sinyal lebih stabil.', 'Mal Pelayanan Publik Kabupaten', '2026-06-09 22:21:36', '2026-06-09 22:21:36'),
+(25, 24, 'Pemeriksaan keamanan dasar sistem informasi dilakukan melalui validasi konfigurasi akun operator, hak akses pengguna, dan status pembaruan perangkat lunak pendukung layanan.', 'Masih ditemukan penggunaan kata sandi lemah pada beberapa akun operasional serta pembaruan sistem yang tertunda.', 'Menerapkan kebijakan password yang lebih kuat, menjadwalkan update keamanan terpusat, dan melakukan audit akses secara berkala.', 'Bidang Aplikasi Informatika', '2026-06-09 22:21:36', '2026-06-09 22:21:36'),
+(26, 23, 'Tim melaksanakan pemeriksaan workstation operator layanan untuk memastikan kesiapan perangkat dalam pengelolaan arsip digital dan dokumen berita acara pemeriksaan.', 'Sebagian perangkat memiliki kapasitas memori yang terbatas sehingga menghambat proses pengolahan berkas digital berukuran besar.', 'Direkomendasikan peningkatan kapasitas RAM, pembersihan file sementara, dan standardisasi spesifikasi minimal perangkat operator.', 'Ruang Operator Layanan SPBE', '2026-06-09 22:21:36', '2026-06-09 22:21:36'),
+(27, 24, 'Verifikasi lapangan terhadap jaringan distribusi antarbidang telah dilakukan guna memastikan kelancaran akses aplikasi persuratan, pelaporan, dan dashboard monitoring pimpinan.', 'Terdapat inkonsistensi konfigurasi VLAN pada beberapa titik distribusi yang menyebabkan segmentasi jaringan belum berjalan optimal.', 'Melakukan penyeragaman konfigurasi VLAN, pembaruan dokumentasi topologi jaringan, dan uji konektivitas menyeluruh setelah implementasi.', 'Gedung Kantor Induk Pemerintah Daerah', '2026-06-09 22:21:36', '2026-06-09 22:21:36'),
+(28, 24, 'Bertanggung jawab atas pengembangan, pemeliharaan, dan optimalisasi aplikasi web berbasis Laravel dan ReactJS. Tugas utama meliputi perancangan arsitektur database, pembuatan API yang aman, serta integrasi layanan pihak ketiga (seperti payment gateway dan sistem notifikasi WhatsApp). Bekerja sama secara lintas fungsi dengan tim UI/UX dan produk untuk memastikan aplikasi berjalan responsif, minim kendala (bug-free), dan memiliki performa tinggi.', 'Terjadi lonjakan beban server (CPU usage mencapai 98%) setiap kali pengguna mengunduh laporan PDF bulanan secara bersamaan pada pukul 16.00 WIB. Hal ini menyebabkan aplikasi mengalami timeout, gagal memuat halaman dashboard utama, dan memicu beberapa permintaan database menjadi deadlock.', 'bebas yang penting biikin', 'ruang server', '2026-06-23 20:01:33', '2026-06-23 20:01:33');
 
 -- --------------------------------------------------------
 
@@ -534,7 +547,7 @@ INSERT INTO `kebutuhan_layanan_spbe` (`id`, `id_jenis_layanan_spbe`, `no_kebutuh
 CREATE TABLE `layanan_spbe` (
   `id` bigint UNSIGNED NOT NULL,
   `id_jenis_layanan` bigint UNSIGNED DEFAULT NULL,
-  `id_kebutuhan` varchar(255) DEFAULT NULL,
+  `id_kebutuhan` json DEFAULT NULL,
   `is_eksternal` enum('Ya','Tidak') CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   `tahunanggaran` varchar(10) DEFAULT '',
   `nama_pemohon` varchar(255) DEFAULT NULL,
@@ -564,7 +577,7 @@ CREATE TABLE `layanan_spbe` (
   `nover` varchar(100) DEFAULT NULL,
   `ketver` text,
   `berkasver` varchar(200) DEFAULT NULL,
-  `status_tl` enum('proses','selesai','pending') CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `status_tl` char(1) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
   `tl_by` varchar(40) DEFAULT NULL,
   `tgl_tl` date DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -577,9 +590,10 @@ CREATE TABLE `layanan_spbe` (
 --
 
 INSERT INTO `layanan_spbe` (`id`, `id_jenis_layanan`, `id_kebutuhan`, `is_eksternal`, `tahunanggaran`, `nama_pemohon`, `periode`, `noreg`, `id_instansi`, `nama_instansi`, `unitkerja`, `lokasi`, `id_pemohon`, `nama_penanggungjawab`, `nip_penanggungjawab`, `nohp_penanggungjawab`, `jabatan_penanggungjawab`, `unitkerja_penanggungjawab`, `email_penanggungjawab`, `ket`, `tgl_permohonan`, `nama_kebutuhan`, `berkas`, `status`, `inputby`, `tglinput`, `status_ver`, `verby`, `tglver`, `nover`, `ketver`, `berkasver`, `status_tl`, `tl_by`, `tgl_tl`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(26, 4, '[\"2\",\"3\",\"4\"]', 'Tidak', '2026', NULL, 'Triwulan 2', 'REG-20260507-003', 11, 'BIRO HUMAS DAN PROTOKOL', 'e-gov', 'jalan maya 12', 10, 'mayy', '198810202015032013', '0895417380191', 'kepala bai', NULL, 'mayy@gmail.com', '\"tessss Segera lakukan investigasi menyeluruh terkait laporan penurunan performa server pada cluster B. Pastikan petugas yang ditunjuk melakukan audit log dalam 24 jam terakhir dan laporkan hasilnya sebelum jam rapat sore ini. Koordinasikan dengan tim IT Support jika ditemukan anomali pada hardware.\"', '2026-05-07', 'tess ajaa nyube', '1778135705_SERTIF_SEM_5.pdf', '2', 'gan asn', '2026-05-07', '2', 'wijaya petugas', '2026-06-03', NULL, 'asdasd', 'ver_1780456259_doa_via_.pdf', 'selesai', '45', '2026-05-12', '2026-05-06 23:35:05', '2026-06-02 20:10:59', NULL),
-(27, 4, '[\"2\",\"3\",\"4\"]', 'Tidak', '2026', NULL, 'Triwulan 2', 'REG-20260603-001', 11, 'BIRO HUMAS DAN PROTOKOL', 'e-gov', 'jalan maya', 10, 'royy', '198810202015032013', '0895417380191', 'kepala saja', NULL, 'royy@gmail.com', 'asdadad', '2026-06-03', 'tess cube bai', '1780462501_doa_via_.pdf', '2', 'gan asn', '2026-06-03', '1', NULL, NULL, NULL, NULL, NULL, 'selesai', '45', '2026-06-03', '2026-06-02 21:55:01', '2026-06-02 22:40:19', NULL),
-(28, 4, '[\"2\",\"3\",\"4\"]', 'Tidak', '2026', NULL, 'Triwulan 2', 'REG-20260603-002', 11, 'BIRO HUMAS DAN PROTOKOL', 'e-gov', 'jalan maya1', 10, 'royys', '198810202015032013', '0895417380190', 'kepala bai', NULL, 'royy@gmail.com', 'asdasda', '2026-06-03', 'tess ajaa nyube', '1780467483_doa_via_.pdf', '1', 'gan asn', '2026-06-03', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-06-02 23:18:03', '2026-06-02 23:18:03', NULL);
+(26, 4, '[\"2\", \"3\", \"4\"]', 'Tidak', '2026', NULL, 'Triwulan 2', 'REG-20260507-003', 11, 'BIRO HUMAS DAN PROTOKOL', 'e-gov', 'jalan maya 12', 10, 'mayy', '198810202015032013', '0895417380191', 'kepala bai', NULL, 'mayy@gmail.com', '\"tessss Segera lakukan investigasi menyeluruh terkait laporan penurunan performa server pada cluster B. Pastikan petugas yang ditunjuk melakukan audit log dalam 24 jam terakhir dan laporkan hasilnya sebelum jam rapat sore ini. Koordinasikan dengan tim IT Support jika ditemukan anomali pada hardware.\"', '2026-05-07', 'tess ajaa nyube', '1778135705_SERTIF_SEM_5.pdf', '2', 'gan asn', '2026-05-07', '2', 'wijaya petugas', '2026-06-03', NULL, 'asdasd', 'ver_1780456259_doa_via_.pdf', '2', '45', '2026-05-12', '2026-05-06 23:35:05', '2026-06-02 20:10:59', NULL),
+(27, 4, '[\"2\", \"3\", \"4\"]', 'Tidak', '2026', NULL, 'Triwulan 2', 'REG-20260603-001', 11, 'BIRO HUMAS DAN PROTOKOL', 'e-gov', 'jalan maya', 10, 'royy', '198810202015032013', '0895417380191', 'kepala saja', NULL, 'royy@gmail.com', 'asdadad', '2026-06-03', 'tess cube bai', '1780462501_doa_via_.pdf', '2', 'gan asn', '2026-06-03', '2', 'wijaya petugas', '2026-06-03', NULL, 'oke lanjutkan', 'ver_1780469783_SERTIF_SEM_5.pdf', '2', '45', '2026-06-03', '2026-06-02 21:55:01', '2026-06-02 23:56:23', NULL),
+(28, 4, '[\"2\", \"3\", \"4\"]', 'Tidak', '2026', NULL, 'Triwulan 2', 'REG-20260603-002', 11, 'BIRO HUMAS DAN PROTOKOL', 'e-gov', 'jalan maya1', 10, 'royys', '198810202015032013', '0895417380190', 'kepala bai', NULL, 'royy@gmail.com', 'asdasda', '2026-06-03', 'tess ajaa nyube', '1780467483_doa_via_.pdf', '1', 'gan asn', '2026-06-03', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-06-02 23:18:03', '2026-06-02 23:18:03', NULL),
+(38, 4, '[\"2\", \"1\"]', 'Tidak', '2026', NULL, 'Triwulan 2', 'REG-20260624-001', 11, 'BIRO HUMAS DAN PROTOKOL', 'e-gov', 'jalan maya', 10, 'royys', '198810202015032015', '0895417380193', 'kepala saja', NULL, 'royy@gmail.com', 'Sistem Pemerintahan Berbasis Elektronik (SPBE) merupakan penyelenggaraan pemerintahan yang memanfaatkan teknologi informasi dan komunikasi untuk memberikan layanan kepada masyarakat secara efektif, efisien, transparan, dan akuntabel. Implementasi SPBE bertujuan untuk meningkatkan kualitas pelayanan publik, mempercepat proses administrasi, serta mendukung terwujudnya tata kelola pemerintahan yang baik (good governance). Dalam pelaksanaannya, setiap instansi pemerintah diharapkan mampu mengintegrasikan proses bisnis, data, dan layanan sehingga tercipta ekosistem digital yang terintegrasi dan berkelanjutan.', '2026-06-24', 'coba bae 1', '1782276317_Table_Diagram_SPBE_New.pdf', '1', 'gan asn', '2026-06-24', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2026-06-23 21:45:17', '2026-06-23 21:45:17', NULL);
 
 -- --------------------------------------------------------
 
@@ -605,7 +619,10 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (5, '2025_01_01_000004_create_website_members_table', 2),
 (6, '2025_01_01_000005_create_issues_table', 2),
 (7, '2025_01_01_000006_create_milestones_activity_logs_table', 2),
-(9, '2026_06_03_035917_create_notifications_table', 3);
+(9, '2026_06_03_035917_create_notifications_table', 3),
+(10, '2026_06_06_053052_add_driver_and_staff_gudang_roles_to_users_table', 4),
+(11, '2026_06_06_053208_create_penugasan_logistiks_table', 5),
+(12, '2026_06_06_053307_create_panens_table', 6);
 
 -- --------------------------------------------------------
 
@@ -838,7 +855,26 @@ CREATE TABLE `notifications` (
 
 INSERT INTO `notifications` (`id`, `user_id`, `pemohon_id`, `type`, `message`, `related_id`, `related_type`, `is_read`, `created_at`, `updated_at`) VALUES
 (1, 47, NULL, 'new_mandate', 'Anda mendapat tugas baru untuk permohonan No. REG-20260603-001 - tess cube bai', 24, 'tindak_lanjut', 0, '2026-06-02 22:40:19', '2026-06-02 22:40:19'),
-(2, 49, NULL, 'new_mandate', 'Anda mendapat tugas baru untuk permohonan No. REG-20260603-001 - tess cube bai', 24, 'tindak_lanjut', 0, '2026-06-02 22:40:19', '2026-06-02 22:40:19');
+(2, 49, NULL, 'new_mandate', 'Anda mendapat tugas baru untuk permohonan No. REG-20260603-001 - tess cube bai', 24, 'tindak_lanjut', 1, '2026-06-02 22:40:19', '2026-06-02 23:37:41'),
+(3, NULL, 10, 'status_completed', 'Permohonan Anda dengan nomor registrasi REG-20260603-001 telah selesai ditindaklanjuti.', 27, 'layanan_spbe', 1, '2026-06-02 23:56:23', '2026-06-16 23:54:32');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `panens`
+--
+
+CREATE TABLE `panens` (
+  `id` bigint UNSIGNED NOT NULL,
+  `tanggal_panen` date NOT NULL,
+  `lokasi_kebun_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tenaga_pemanen_id` bigint UNSIGNED NOT NULL,
+  `jumlah` int NOT NULL,
+  `keterangan` text COLLATE utf8mb4_unicode_ci,
+  `status` enum('Pending','Proses','Selesai') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Pending',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -886,7 +922,7 @@ CREATE TABLE `pemohon` (
 INSERT INTO `pemohon` (`id`, `id_instansi`, `nik`, `nama_lengkap`, `avatar`, `jenis_pemohon`, `username`, `no_hp`, `email`, `email_verified_at`, `nip`, `jabatan`, `unit_kerja`, `alamat`, `password`, `remember_token`, `created_at`, `updated_at`) VALUES
 (8, NULL, '1901399292920002', 'Muhammad Hilal', NULL, 'eksternal', 'hilal', '08123456789', 'hilal@gmail.com', NULL, NULL, NULL, NULL, NULL, '$2y$12$7XYFz8vw7oLNpPyIUT6tauIZTFIaTWl4wKhTQkiXxGPjTdcVrabY2', NULL, '2026-04-28 21:48:04', '2026-04-28 21:48:04'),
 (9, NULL, '1901399292920003', 'Dahrul Ulum', NULL, 'internal', 'dahrul', '089876543210', 'dahrul@gmail.com', NULL, '1234567890', 'Kepala Dinas', 'Dinas Tenaga Kerja', NULL, '$2y$12$cfB77FFl2GZcgUkHret2p.DhEL1x6hriBe9FfaX4mZSLNy6gFl0O.', NULL, '2026-04-28 21:48:05', '2026-04-28 21:48:05'),
-(10, 11, '3175092301940001', 'gan asn', '1778040478_kebun.jpg', 'internal', NULL, '0895417380105', 'ganasn@gmail.com', NULL, '123312312313131234', NULL, NULL, NULL, '$2y$12$FeaY1HJNvJ.gfCwL3G3Lp.f6JRPHuYU3xwRFqiC3InD3WmCv6XbZi', '1GrTLeECpfwooSE9EK7qbhs5T5WbaDc9BJWtZoXmnYRutTSBdSlrLEJNQGW9', '2026-05-05 21:06:31', '2026-05-05 21:07:58');
+(10, 11, '3175092301940001', 'gan asn', '1781678871_images.jpg', 'internal', NULL, '0895417380105', 'ganasn@gmail.com', NULL, '123312312313131234', NULL, NULL, NULL, '$2y$12$FeaY1HJNvJ.gfCwL3G3Lp.f6JRPHuYU3xwRFqiC3InD3WmCv6XbZi', 'lQzWjYk72PwAbNIN5dw92yZtUP5AftrEqvauNP8X0XWYTFndVqRXIE3ROKOb', '2026-05-05 21:06:31', '2026-06-16 23:47:51');
 
 -- --------------------------------------------------------
 
@@ -1353,7 +1389,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('gQney4SixWr9C32BaA8h8G7jlgvHa8mOmmsGNYB7', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36', 'YTo1OntzOjY6Il90b2tlbiI7czo0MDoiWUpFTmRyQVdwT1RueU1mTlNZbnFVcWpGaWtrYnNZblA1RXhZd29GRyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mjk6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9wZW1vaG9uIjtzOjU6InJvdXRlIjtzOjEzOiJwZW1vaG9uLmluZGV4Ijt9czo1NDoibG9naW5fcGVtb2hvbl81OWJhMzZhZGRjMmIyZjk0MDE1ODBmMDE0YzdmNThlYTRlMzA5ODlkIjtpOjEwO3M6NToiYWxlcnQiO2E6MDp7fX0=', 1780467483);
+('cGOqiRy2qK0a9ZsoYiOv2c4ZmiCl6wgfFKQsYjB5', 46, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiTXlEQnA3UHRYUXRjWXBSTk9saXlXU0phcEt0SWo0ekJSeFV2OTZINiI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9tYW5kYXQtaW5kZXgvMSI7czo1OiJyb3V0ZSI7czoxMToiaW5kZXhNYW5kYXQiO31zOjU0OiJsb2dpbl9wZXR1Z2FzXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6NDY7fQ==', 1782774511);
 
 -- --------------------------------------------------------
 
@@ -1403,7 +1439,7 @@ CREATE TABLE `tindak_lanjut_layanan` (
 --
 
 INSERT INTO `tindak_lanjut_layanan` (`id`, `id_layanan`, `id_petugas`, `keterangan`, `created_at`, `updated_at`) VALUES
-(23, 26, '[\"47\", \"49\"]', '\"Tolong segera tindak lanjuti kendala akses aplikasi yang dilaporkan pengguna. Prioritaskan pengecekan pada modul integrasi database dan pastikan tidak ada data yang korup. Jika perlu, lakukan restart service pada jam istirahat untuk meminimalisir dampak ke pengguna lain.\"', '2026-05-11 20:38:27', '2026-05-11 20:38:27'),
+(23, 26, '[\"47\", \"49\"]', '\"Tolong segera tindak lanjuti kendala akses aplikasi yang dilaporkan pengguna. Prioritaskan pengecekan pada modul integrasi database dan pastikan tidak ada data yang korup. Jika perlu, lakukan restart service pada jam istirahat untuk meminimalisir dampak ke pengguna lain\"', '2026-05-11 20:38:27', '2026-06-02 23:26:09'),
 (24, 27, '[\"47\", \"49\"]', NULL, '2026-06-02 22:40:19', '2026-06-02 22:40:19');
 
 -- --------------------------------------------------------
@@ -1417,7 +1453,7 @@ CREATE TABLE `users` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `role` enum('admin','kabid','katim','staff') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` enum('admin','kabid','katim','staff') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'staff',
   `no_hp` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `nip` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `gol` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -1438,11 +1474,11 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `role`, `no_hp`, `nip`, `gol`, `jabatan`, `unit_kerja`, `password`, `daerah`, `pangkat`, `avatar`, `remember_token`, `last_seen`, `created_at`, `updated_at`) VALUES
-(45, 'Afghan Almufqi', 'afghan12@gmail.com', NULL, 'kabid', '0895417380105', '199501012023011001', 'III/a', 'Pranata Komputer', 'Seksi Teknologi Informasi dan Komunikasi', '$2y$12$MAvrciLQDz0EO44iGbGsEuHdt8jcbtaSzN7dvEyvGSituJLoiqKx6', NULL, 'Penata Muda', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
-(46, 'gan matkuso', 'gan12@gmail.com', NULL, 'katim', '6281234567892', '199501012023011002', 'III/b', 'Ketua Tim Teknis', 'Seksi Teknologi Informasi dan Komunikasi', '$2y$12$SPsM9ssTvs0RKLCSUT9n7umalf0cyb2dGe.ZxzgSgOCOwyaq40AyS', NULL, 'Penata Muda', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
+(45, 'Afghan Almufqi', 'kakarotuchiha5@gmail.com', NULL, 'kabid', '0895417380105', '199501012023011001', 'III/a', 'Pranata Komputer', 'Seksi Teknologi Informasi dan Komunikasi', '$2y$12$MAvrciLQDz0EO44iGbGsEuHdt8jcbtaSzN7dvEyvGSituJLoiqKx6', NULL, 'Penata Muda', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
+(46, 'gan matkuso', 'gan12@gmail.com', NULL, 'kabid', '6281234567892', '199501012023011002', 'III/b', 'Ketua Tim Teknis', 'Seksi Teknologi Informasi dan Komunikasi', '$2y$12$SPsM9ssTvs0RKLCSUT9n7umalf0cyb2dGe.ZxzgSgOCOwyaq40AyS', NULL, 'Penata Muda', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
 (47, 'gan oy', 'budi.petugas@gmail.com', NULL, 'staff', '0895417380105', '199501012023011003', 'III/a', 'Teknisi Jaringan', 'Seksi Infrastruktur Jaringan', '$2y$12$uImpqipECg59jGk97u7MUefRKRcjDNRJ9/m0/v306vCSJ8hrlrocW', NULL, 'Penata Muda', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
 (48, 'Super Admin SPBE', 'admin@spbe.go.id', NULL, 'admin', '6285211223300', '198805122015031000', 'III/c', 'Administrator Sistem', 'Sekretariat', '$2y$12$MBh.CQObeMGtGDhG0HKWl.xtrDe0ia1tGgwUj3UHFTOv/dZC9tHW2', 'Pusat', 'Penata', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
-(49, 'wijaya petugas', 'petugas@gmail.com', NULL, 'staff', '6281399887766', '198001012005011005', 'IV/a', 'Kepala Bidang', 'Bidang E-Government', '$2y$12$0.OJK/rl9de9SR/HbBqw0O7Ut3NSiCtDscs6ZxRT1kenjDnt8vxO2', NULL, 'Pembina', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
+(49, 'wijaya petugas', 'petugas@gmail.com', NULL, 'staff', '6281399887766', '198001012005011005', 'IV/a', 'Kepala Bidang', 'Bidang E-Government', '$2y$12$0.OJK/rl9de9SR/HbBqw0O7Ut3NSiCtDscs6ZxRT1kenjDnt8vxO2', NULL, 'Pembina', '1782773596_images (1).jpg', NULL, NULL, '2026-05-05 21:03:11', '2026-06-29 15:53:16'),
 (50, 'Hilal', 'rina.petugas@gmail.com', NULL, 'staff', '082178099027', '199702202024012002', 'III/a', 'Programmer', 'Seksi Aplikasi Dasar', '$2y$12$JTkcvgHN6X4iKBqpd3/lX.qVeAiyzNTKRBNAkYDcQF5920AumL5r6', NULL, 'Penata Muda', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
 (51, 'Pinkan', 'linda.petugas@gmail.com', NULL, 'staff', '081293172600', '199608152023022004', 'III/a', 'Analis Keamanan Siber', 'Seksi Keamanan Informasi', '$2y$12$exFtuQzmc8i7U1GR1zMzL.ZHjvStKCbxy9qsUBYgZr4J/kYIxUDku', NULL, 'Penata Muda', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
 (52, 'Agus Mulyadi', 'agus.pimpinan@gmail.com', NULL, 'kabid', '6281122334455', '197504121998031002', 'IV/b', 'Sekretaris Dinas', 'Sekretariat Diskominfo', '$2y$12$c7ulNuBGZIMIyUMCwGjyUOnhdYwiVwTn/PBifkPYT8x0WWQ96snt.', NULL, 'Pembina Tk. I', NULL, NULL, NULL, '2026-05-05 21:03:11', '2026-05-05 21:03:11'),
@@ -1625,7 +1661,8 @@ ALTER TABLE `activity_logs`
 -- Indeks untuk tabel `berita_acara_pemeriksaan`
 --
 ALTER TABLE `berita_acara_pemeriksaan`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `instansi_foreign2` (`id_tindak_lanjut`);
 
 --
 -- Indeks untuk tabel `cache`
@@ -1718,6 +1755,13 @@ ALTER TABLE `notifications`
   ADD PRIMARY KEY (`id`),
   ADD KEY `notifications_user_id_foreign` (`user_id`),
   ADD KEY `notifications_pemohon_id_foreign` (`pemohon_id`);
+
+--
+-- Indeks untuk tabel `panens`
+--
+ALTER TABLE `panens`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `panens_tenaga_pemanen_id_foreign` (`tenaga_pemanen_id`);
 
 --
 -- Indeks untuk tabel `password_reset_tokens`
@@ -1834,7 +1878,7 @@ ALTER TABLE `activity_logs`
 -- AUTO_INCREMENT untuk tabel `berita_acara_pemeriksaan`
 --
 ALTER TABLE `berita_acara_pemeriksaan`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT untuk tabel `failed_jobs`
@@ -1858,7 +1902,7 @@ ALTER TABLE `issues`
 -- AUTO_INCREMENT untuk tabel `jobs`
 --
 ALTER TABLE `jobs`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT untuk tabel `kebutuhan_layanan_spbe`
@@ -1870,13 +1914,13 @@ ALTER TABLE `kebutuhan_layanan_spbe`
 -- AUTO_INCREMENT untuk tabel `layanan_spbe`
 --
 ALTER TABLE `layanan_spbe`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT untuk tabel `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT untuk tabel `milestones`
@@ -1888,7 +1932,13 @@ ALTER TABLE `milestones`
 -- AUTO_INCREMENT untuk tabel `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT untuk tabel `panens`
+--
+ALTER TABLE `panens`
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT untuk tabel `pemohon`
@@ -1961,6 +2011,12 @@ ALTER TABLE `activity_logs`
   ADD CONSTRAINT `activity_logs_website_id_foreign` FOREIGN KEY (`website_id`) REFERENCES `websites` (`id`) ON DELETE CASCADE;
 
 --
+-- Ketidakleluasaan untuk tabel `berita_acara_pemeriksaan`
+--
+ALTER TABLE `berita_acara_pemeriksaan`
+  ADD CONSTRAINT `instansi_foreign2` FOREIGN KEY (`id_tindak_lanjut`) REFERENCES `tindak_lanjut_layanan` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--
 -- Ketidakleluasaan untuk tabel `issues`
 --
 ALTER TABLE `issues`
@@ -1986,6 +2042,12 @@ ALTER TABLE `milestones`
 ALTER TABLE `notifications`
   ADD CONSTRAINT `notifications_pemohon_id_foreign` FOREIGN KEY (`pemohon_id`) REFERENCES `pemohon` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `notifications_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `panens`
+--
+ALTER TABLE `panens`
+  ADD CONSTRAINT `panens_tenaga_pemanen_id_foreign` FOREIGN KEY (`tenaga_pemanen_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Ketidakleluasaan untuk tabel `phases`
