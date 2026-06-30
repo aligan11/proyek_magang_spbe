@@ -81,7 +81,6 @@
 
                     <!-- Right section -->
                     <div class="flex items-center gap-4">
-                        <i data-lucide="bell" class="text-slate-400 w-6 h-6 hidden sm:block"></i>
 
                         <div class="flex items-center gap-3">
                             <div class="text-right hidden sm:block">

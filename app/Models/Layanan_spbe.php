@@ -64,6 +64,11 @@ class Layanan_spbe extends Model
         return $this->belongsTo(Pemohon::class, 'inputby');
     }
 
+    public function pemohon()
+    {
+        return $this->belongsTo(Pemohon::class, 'id_pemohon');
+    }
+
     public function instansi_rel()
     {
         return $this->belongsTo(Instansi::class, 'id_instansi');

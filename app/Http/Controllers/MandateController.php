@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Kebutuhan_layanan_spbe;
 use App\Models\Layanan_spbe;
 use App\Models\Mandate;
-use App\Models\Notification;
 use App\Models\Petugas;
 use App\Models\Ticket;
 use App\Models\Tindak_lanjut_layanan;
 use App\Models\User;
 use App\Mail\NewMandateMail;
+use App\Mail\TindakLanjutNotification;
 use GuzzleHttp\Psr7\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -143,7 +143,6 @@ class MandateController extends Controller
 
             // 1. Ambil data ticket terlebih dahulu
             $ticket = Layanan_spbe::findOrFail($request->ticket_id);
-            $idPetugas = Auth::guard('petugas')->user()->id;
             $user = Auth::guard('petugas')->user();
 
             // Update layanan_spbe table
@@ -164,24 +163,30 @@ class MandateController extends Controller
 
             $petugas = User::whereIn('id', $request->user_ids)->get();
 
-            // Create notifications for each petugas
+            // Kirim email ke setiap petugas yang ditugaskan
             foreach ($petugas as $p) {
-                Notification::create([
-                    'user_id' => $p->id,
-                    'type' => 'new_mandate',
-                    'message' => "Anda mendapat tugas baru untuk permohonan No. {$ticket->noreg} - {$ticket->nama_kebutuhan}",
-                    'related_id' => $tindakLanjut->id,
-                    'related_type' => 'tindak_lanjut',
-                    'is_read' => false,
-                ]);
-
-                // Kirim email ke petugas jika email tersedia
                 if ($p->email) {
                     Mail::to($p->email)->queue(new NewMandateMail($ticket, $tindakLanjut, $user));
                 }
             }
 
-            return redirect()->route('indexMandat', 2)->with('success', 'Penugasan berhasil dibuat dan email telah dikirim ke ' . $petugas->count() . ' petugas');
+            // Kirim email ke pemohon untuk memberitahukan bahwa permohonan sudah ditindaklanjuti
+            // Prioritas: cek email_penanggungjawab, lalu inputby (pemohon), lalu fallback ke admin
+            $emailPemohon = null;
+            if (!empty($ticket->email_penanggungjawab)) {
+                $emailPemohon = $ticket->email_penanggungjawab;
+            } elseif (!empty($ticket->inputby)) {
+                $pemohon = \App\Models\Pemohon::find($ticket->inputby);
+                if ($pemohon && $pemohon->email) {
+                    $emailPemohon = $pemohon->email;
+                }
+            }
+
+            if ($emailPemohon) {
+                Mail::to($emailPemohon)->queue(new TindakLanjutNotification($ticket, $tindakLanjut, $user));
+            }
+
+            return redirect()->route('indexMandat', 2)->with('success', 'Penugasan berhasil dibuat dan email telah dikirim ke ' . $petugas->count() . ' petugas dan pemohon');
         } catch (\Exception $e) {
             dd('FATAL ERROR CAUGHT: ' . $e->getMessage() . ' in file ' . $e->getFile() . ' on line ' . $e->getLine());
         }

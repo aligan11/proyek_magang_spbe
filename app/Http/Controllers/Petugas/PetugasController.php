@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Petugas;
 
 use App\Http\Controllers\Controller;
+use App\Mail\NotifikasiSelesaiMail;
 use App\Models\Berita_acara_pemeriksaan;
 use App\Models\Layanan_spbe;
 use App\Models\Notification;
@@ -12,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class PetugasController extends Controller
 {
@@ -21,15 +23,7 @@ class PetugasController extends Controller
     const STATUS_PROSES  = 3;
 
     // Helper to get notifications data
-    private function getNotificationsData($userId)
-    {
-        $notifications = Notification::where('user_id', $userId)
-            ->where('is_read', false)
-            ->latest()
-            ->get();
-        $unreadCount = $notifications->count();
-        return compact('notifications', 'unreadCount');
-    }
+
 
     public function index()
     {
@@ -40,7 +34,6 @@ class PetugasController extends Controller
             return redirect()->route('login');
         }
 
-        $notificationData = $this->getNotificationsData($idPetugas);
 
         // 1. Ambil semua data tindak lanjut layanan
         $allMandat = Tindak_lanjut_layanan::with(['ticket', 'ticket.jenis_layanan'])->latest()->get();
@@ -73,7 +66,7 @@ class PetugasController extends Controller
         $latestTasks = $filteredMandates->take(5);
         $title = 'Dashboard';
 
-        return view('petugas.index', compact('stats', 'latestTasks', 'user', 'title') + $notificationData);
+        return view('petugas.index', compact('stats', 'latestTasks', 'user', 'title'));
     }
 
     public function tugas()
@@ -85,7 +78,6 @@ class PetugasController extends Controller
             return redirect()->route('login');
         }
 
-        $notificationData = $this->getNotificationsData($idPetugas);
 
         // 1. Fetch all transactional data with eager loaded relations
         $allMandat = Tindak_lanjut_layanan::with(['ticket', 'ticket.jenis_layanan'])->latest()->get();
@@ -127,7 +119,7 @@ class PetugasController extends Controller
 
         $title = 'Tugas Saya';
 
-        return view('petugas.tugas', compact('tasks', 'stats', 'user', 'title') + $notificationData);
+        return view('petugas.tugas', compact('tasks', 'stats', 'user', 'title'));
     }
 
     public function create()
@@ -139,7 +131,6 @@ class PetugasController extends Controller
             return redirect()->route('login');
         }
 
-        $notificationData = $this->getNotificationsData($idPetugas);
 
         $allMandat = Tindak_lanjut_layanan::with(['ticket'])->latest()->get();
 
@@ -152,7 +143,7 @@ class PetugasController extends Controller
 
         $title = 'Tambah Berita Acara';
 
-        return view('petugas.create', compact('tindakLanjutOptions', 'user', 'title') + $notificationData);
+        return view('petugas.create', compact('tindakLanjutOptions', 'user', 'title'));
     }
 
     public function store(Request $request)
@@ -181,21 +172,6 @@ class PetugasController extends Controller
             ->with('success', 'Berita acara pemeriksaan berhasil disimpan.');
     }
 
-    // Mark notification as read
-    public function markNotificationRead($id)
-    {
-        $notification = Notification::findOrFail($id);
-        $notification->update(['is_read' => true]);
-        return back();
-    }
-
-    // Mark all notifications as read
-    public function markAllNotificationsRead()
-    {
-        $idPetugas = Auth::guard('petugas')->user()->id;
-        Notification::where('user_id', $idPetugas)->update(['is_read' => true]);
-        return back();
-    }
 
 
     public function show($id)
@@ -207,7 +183,6 @@ class PetugasController extends Controller
             return redirect()->route('login');
         }
 
-        $notificationData = $this->getNotificationsData($idPetugas);
 
         // Cari data berdasarkan ID utama
         $mandate = Tindak_lanjut_layanan::with(['ticket', 'ticket.jenis_layanan', 'ticket.instansi_rel'])->findOrFail($id);
@@ -223,12 +198,15 @@ class PetugasController extends Controller
         $task = $mandate->ticket;
         $title = 'Detail Mandat';
 
-        return view('petugas.show', compact('task', 'mandate', 'user', 'title') + $notificationData);
+        return view('petugas.show', compact('task', 'mandate', 'user', 'title'));
     }
+
+
+
+
 
     public function updateStatus(Request $request, $id)
     {
-
         $request->validate([
             'status' => 'required|in:selesai',
             'ketver' => 'required|string',
@@ -242,11 +220,9 @@ class PetugasController extends Controller
             return redirect()->route('login');
         }
 
-        // Ambil data mandat berdasarkan ID utama
         $mandate = Tindak_lanjut_layanan::findOrFail($id);
-        $task = $mandate->ticket;
+        $task = $mandate->ticket; // Instance tabel layanan_spbe
 
-        // Siapkan data update tiket
         $dataTicket = [
             'status_ver' => self::STATUS_SELESAI,
             'ketver'     => $request->ketver,
@@ -254,7 +230,6 @@ class PetugasController extends Controller
             'tglver'     => now(),
         ];
 
-        // Proses penyimpanan berkas
         if ($request->hasFile('berkasver')) {
             $file = $request->file('berkasver');
             $fileName = 'ver_' . time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
@@ -262,21 +237,37 @@ class PetugasController extends Controller
             $dataTicket['berkasver'] = $fileName;
         }
 
-        // Eksekusi update pada table layanan_spbe
+        // 1. Jalankan update data ke database
         $task->update($dataTicket);
 
-        // Create notification for pemohon
-        Notification::create([
-            'pemohon_id' => $task->id_pemohon,
-            'type' => 'status_completed',
-            'message' => "Permohonan Anda dengan nomor registrasi {$task->noreg} telah selesai ditindaklanjuti.",
-            'related_id' => $task->id,
-            'related_type' => 'layanan_spbe',
-            'is_read' => false,
-        ]);
+        // 2. Kumpulkan email Pemohon & Penanggung Jawab dengan aman (anti-crash)
+        $recipients = [];
 
-        return redirect()->route('petugas.tugas')->with('success', 'Mandat telah diselesaikan!');
+        // A. Email Pemohon (dari relasi id_pemohon)
+        $emailPemohon = optional($task->pemohon)->email ?? optional($task->inputer)->email ?? null;
+        if (!empty($emailPemohon)) {
+            $recipients[] = $emailPemohon;
+        }
+
+        // B. Email Penanggung Jawab (dari kolom email_penanggungjawab di layanan_spbe)
+        $emailPenanggungJawab = $task->email_penanggungjawab ?? null;
+        if (!empty($emailPenanggungJawab)) {
+            $recipients[] = $emailPenanggungJawab;
+        }
+
+        // Hapus duplikat email (jika ada yang sama)
+        $recipients = array_unique($recipients);
+
+        // 3. Kirim ke Gmail jika daftar penerima tidak kosong
+        if (count($recipients) > 0) {
+            Mail::to($recipients)->send(new NotifikasiSelesaiMail($task, $user));
+        }
+
+        return redirect()->route('petugas.tugas')->with('success', 'Mandat selesai dan email notifikasi berhasil dikirim!');
     }
+
+
+
 
     public function profile()
     {
@@ -287,9 +278,8 @@ class PetugasController extends Controller
             return redirect()->route('login');
         }
 
-        $notificationData = $this->getNotificationsData($idPetugas);
         $title = 'Profil';
-        return view('petugas.profile', compact('user', 'title') + $notificationData);
+        return view('petugas.profile', compact('user', 'title'));
     }
 
     public function updatePassword(Request $request)

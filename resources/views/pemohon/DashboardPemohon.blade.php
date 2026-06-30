@@ -34,77 +34,7 @@
 
             <div class="flex items-center space-x-2 md:space-x-4">
                 <!-- Notification Bell -->
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="relative p-3 rounded-xl md:rounded-2xl hover:bg-slate-100 transition-colors">
-                        <i data-lucide="bell"
-                            class="w-5 h-5 transform group-hover:rotate-12 transition-transform duration-300"></i>
-                        @if (isset($unreadCount) && $unreadCount > 0)
-                            <span
-                                class="absolute top-1 right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                                {{ $unreadCount }}
-                            </span>
-                        @endif
-                    </button>
-                    <!-- Notification Dropdown -->
-                    <div x-show="open" @click.outside="open = false" x-transition
-                        class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-200 z-50">
-                        <div class="p-4 border-b border-slate-200 flex justify-between items-center">
-                            <h3 class="font-bold text-slate-800">Notifikasi</h3>
-                            @if (isset($unreadCount) && $unreadCount > 0)
-                                <form action="{{ route('pemohon.notification.read-all') }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="text-xs font-bold text-blue-600 hover:text-blue-700">
-                                        Tandai semua dibaca
-                                    </button>
-                                </form>
-                            @endif
-                        </div>
-                        <div class="max-h-80 overflow-y-auto">
-                            @if (isset($notifications) && $notifications->count() > 0)
-                                @foreach ($notifications as $notification)
-                                    <form action="{{ route('pemohon.notification.read', $notification->id) }}"
-                                        method="POST" class="block">
-                                        @csrf
-                                        <button type="submit"
-                                            class="w-full p-4 hover:bg-slate-50 text-left border-b border-slate-100 last:border-0">
-                                            <div class="flex items-start gap-3">
-                                                <div
-                                                    class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-600"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                        stroke-width="1.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M15.75 8.25v7.5h-7.5v-7.5h7.5zm0-2.25h-7.5a2.25 2.25 0 00-2.25 2.25v7.5a2.25 2.25 0 002.25 2.25h7.5a2.25 2.25 0 002.25-2.25v-7.5a2.25 2.25 0 00-2.25-2.25z" />
-                                                    </svg>
-                                                </div>
-                                                <div class="flex-1">
-                                                    <p class="text-sm font-semibold text-slate-800">
-                                                        {{ $notification->message }}</p>
-                                                    <p class="text-xs text-slate-400 mt-1">
-                                                        {{ $notification->created_at->diffForHumans() }}
-                                                    </p>
-                                                </div>
-                                                @if (!$notification->is_read)
-                                                    <span class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
-                                                @endif
-                                            </div>
-                                        </button>
-                                    </form>
-                                @endforeach
-                            @else
-                                <div class="p-8 text-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 mx-auto mb-3 text-slate-300"
-                                        viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M14.857 17.082a9 9 0 0 0 5.141 0M6.043 17.082a9 9 0 0 1-5.141 0M15 17a3 3 0 0 1-6 0M12 9V12.75V15" />
-                                    </svg>
-                                    <p class="text-sm text-slate-500">Tidak ada notifikasi baru</p>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
+
                 <!-- Status Akun: Tersembunyi di Mobile Sangat Kecil -->
                 <div class="text-right hidden sm:block border-r border-slate-100 pr-3 md:pr-4">
                     <p

@@ -151,8 +151,6 @@
                 <!-- Right section -->
                 <!-- Right section -->
                 <div class="flex items-center gap-4">
-                    <i data-lucide="bell" class="text-slate-400 w-6 h-6 hidden sm:block"></i>
-
                     <!-- Profile Link -->
                     <a href="{{ route('pimpinan.profile') }}"
                         class="flex items-center gap-3 hover:bg-slate-50 p-2 rounded-xl transition-colors duration-200">
