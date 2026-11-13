@@ -42,12 +42,26 @@
                         </p>
                     </div>
                     <div class="space-y-3">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Nama
-                            Kebutuhan</label>
-                        <p
-                            class="text-sm sm:text-base font-extrabold text-slate-700 bg-gradient-to-r from-blue-50 to-indigo-50 px-5 sm:px-6 py-4 rounded-2xl border border-blue-100">
-                            {{ $task->nama_kebutuhan ?? '-' }}
-                        </p>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                            Nama Kebutuhan
+                        </label>
+
+                        <div class="space-y-2">
+                            @forelse ($task->kebutuhans as $keb)
+                                <div
+                                    class="flex items-center gap-3 px-5 sm:px-6 py-4 bg-gradient-to-r from-blue-50/70 to-indigo-50/70 rounded-2xl border border-blue-100/80 shadow-sm transition-all hover:bg-white">
+                                    <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
+                                    <p class="text-sm sm:text-base font-extrabold text-slate-700 leading-snug">
+                                        {{ $keb->nama_kebutuhan ?? '-' }}
+                                    </p>
+                                </div>
+                            @empty
+                                <div class="px-5 py-4 bg-slate-50 rounded-2xl border border-slate-100 text-center">
+                                    <span class="text-xs text-slate-400 font-medium italic">Tidak ada rincian
+                                        kebutuhan</span>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
                     <div class="space-y-3 md:col-span-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Keterangan /

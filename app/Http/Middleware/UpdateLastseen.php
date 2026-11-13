@@ -20,14 +20,15 @@ class UpdateLastseen
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $idPetugas = session('id_petugas');
-        $pimpinan = User::where('id', $idPetugas)->get();
-        if ($pimpinan::check()) {
-            $pimpinan::update([
+
+        $petugas = Auth::guard('petugas')->user();
+
+        if ($petugas) {
+            // Update langsung lewat query builder modelnya
+            User::where('id', $petugas->id)->update([
                 'last_seen' => now(),
             ]);
         }
-
         return $next($request);
     }
 }

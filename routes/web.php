@@ -31,7 +31,7 @@ Route::post('password/reset', [ForgotPasswordController::class, 'reset'])->name(
 
 
 Route::middleware(loginCheck::class)->group(function () {
-    route::get('/login-pimpinan', [AuthController::class, 'showLoginForm'])->name('login');
+    route::get('/login-sistem', [AuthController::class, 'showLoginForm'])->name('login');
     route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
     route::get('/register-pemohon', [AuthController::class, 'registerPemohonPage'])->name('registerPage');
@@ -39,10 +39,12 @@ Route::middleware(loginCheck::class)->group(function () {
     route::get('/forgot-password-pemohon', [ForgotPasswordPemohonController::class, 'forgotPemohon'])->name('forgotPemohon');
 
     route::post('/register-pemohon', [AuthController::class, 'registerPemohon'])->name('registerPemohon');
+    // Route untuk refresh captcha via AJAX 
+    Route::get('/refresh-captcha', [AuthController::class, 'refreshCaptcha'])->name('refresh.captcha');
 
     Route::get('/generate-captcha', [AuthController::class, 'generateCaptcha']);
-        Route::post('/generate-math-captcha', [AuthController::class, 'generateMathCaptcha']);
-        Route::post('/login-pemohon', [AuthController::class, 'loginPemohon'])->name('login.pemohon');
+    Route::post('/generate-math-captcha', [AuthController::class, 'generateMathCaptcha']);
+    Route::post('/login-pemohon', [AuthController::class, 'loginPemohon'])->name('login.pemohon');
     Route::post('/forgot-password', [ForgotPasswordPemohonController::class, 'sendResetLink'])->name('password.email');
     Route::get('/otp-pemohon', [ForgotPasswordPemohonController::class, 'otpPagePemohon'])->name('otp.pemohon');
     Route::get('/update-password-pemohon', [ForgotPasswordPemohonController::class, 'updatePasswordPemohon'])->name('update.passwordPemohon');
@@ -73,7 +75,7 @@ Route::middleware(['check.pemohon'])->group(function () {
 });
 
 
-route::middleware('check.role:staff')->group(function () {
+route::middleware(['check.role:staff', 'petugas.online'])->group(function () {
     Route::get('petugas/dashboard', [PetugasController::class, 'index'])->name('petugas.index');
     Route::get('petugas/berita-acara/create', [PetugasController::class, 'create'])->name('petugas.berita-acara.create');
     Route::post('petugas/berita-acara', [PetugasController::class, 'store'])->name('petugas.berita-acara.store');

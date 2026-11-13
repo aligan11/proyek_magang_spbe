@@ -64,7 +64,7 @@ class MandateController extends Controller
 
         $availablePetugas = User::where('role', 'staff')->get();
         $petugasOnline = User::where('role', 'staff')
-            ->where('last_seen', '>=', now()->subMinutes(5))
+            ->where('last_seen', '>=', now()->subMinutes(2))
             ->get();
 
         return view('pimpinan.RequestOpd', compact(

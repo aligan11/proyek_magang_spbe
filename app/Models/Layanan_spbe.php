@@ -28,7 +28,7 @@ class Layanan_spbe extends Model
         'nip_penanggungjawab',
         'nohp_penanggungjawab',
         'jabatan_penanggungjawab',
-        'unitKerja_penanggungjawab',
+        'unitkerja_penanggungjawab',
         'email_penanggungjawab',
         'ket',
         'tgl_permohonan',
@@ -82,6 +82,13 @@ class Layanan_spbe extends Model
     public function kebutuhan()
     {
         return $this->belongsTo(Kebutuhan_layanan_spbe::class);
+    }
+
+    // Tambahkan method ini di dalam class Layanan_spbe
+    public function getKebutuhansAttribute()
+    {
+        // Pastikan model Kebutuhan_layanan_spbe sudah ada
+        return Kebutuhan_layanan_spbe::whereIn('id', $this->id_kebutuhan ?? [])->get();
     }
 
     public function mandates()

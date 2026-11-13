@@ -91,7 +91,7 @@
                                     Unit Kerja Pemohon
                                 </label>
                                 <input type="text" name="unitKerja"
-                                    value="{{ old('unitKerja', $permohonan->unitKerja) }}"
+                                    value="{{ old('unitKerja', $permohonan->unitkerja) }}"
                                     placeholder="Contoh: Bidang E-Government / Seksi Infrastruktur"
                                     class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none transition-all duration-300 ">
                             </div>

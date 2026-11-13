@@ -167,7 +167,7 @@
                                     & Lokasi</p>
                                 <h3 class="text-xl sm:text-2xl font-black text-slate-800 leading-tight">
                                     {{ $detail->nama_instansi }}</h3>
-                                <p class="text-slate-500 font-bold mt-1 text-sm sm:text-base">{{ $detail->unitKerja }}</p>
+                                <p class="text-slate-500 font-bold mt-1 text-sm sm:text-base">{{ $detail->unitkerja }}</p>
                                 <div class="flex items-center mt-4 text-rose-500 space-x-2">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd"

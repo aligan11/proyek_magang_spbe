@@ -82,30 +82,41 @@
                             x-transition:enter-start="opacity-0 translate-y-4"
                             x-transition:enter-end="opacity-100 translate-y-0" class="p-8 sm:p-12 text-left">
 
-                            <form action="{{ route('pemohon.profile.update') }}" method="POST" enctype="multipart/form-data">
+                            <form action="{{ route('pemohon.profile.update') }}" method="POST"
+                                enctype="multipart/form-data">
                                 @csrf
                                 @method('PUT')
 
                                 <div class="flex flex-col md:flex-row items-center gap-8 mb-12">
                                     <div class="relative group" x-data="{ photoPreview: '{{ $user->avatar ? asset('storage/avatars/' . $user->avatar) : null }}' }">
-                                        <div class="w-32 h-32 rounded-3xl bg-slate-100 overflow-hidden border-4 border-white shadow-xl">
+                                        <div
+                                            class="w-32 h-32 rounded-3xl bg-slate-100 overflow-hidden border-4 border-white shadow-xl">
                                             <template x-if="photoPreview">
                                                 <img :src="photoPreview" class="w-full h-full object-cover">
                                             </template>
                                             <template x-if="!photoPreview">
                                                 <div class="w-full h-full flex items-center justify-center text-slate-300">
-                                                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                                    <svg class="w-12 h-12" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                                        </path>
                                                     </svg>
                                                 </div>
                                             </template>
                                         </div>
-                                        <label class="absolute -bottom-2 -right-2 bg-blue-600 p-2 rounded-xl text-white shadow-lg cursor-pointer hover:bg-blue-700 transition-all active:scale-90">
+                                        <label
+                                            class="absolute -bottom-2 -right-2 bg-blue-600 p-2 rounded-xl text-white shadow-lg cursor-pointer hover:bg-blue-700 transition-all active:scale-90">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             </svg>
-                                            <input type="file" name="avatar" class="hidden" @change="
+                                            <input type="file" name="avatar" class="hidden"
+                                                @change="
                                                 const file = $event.target.files[0];
                                                 if (file) {
                                                     const reader = new FileReader();
@@ -116,8 +127,10 @@
                                         </label>
                                     </div>
                                     <div>
-                                        <h2 class="text-xl font-black text-slate-800 tracking-tight uppercase">Foto Profil</h2>
-                                        <p class="text-slate-400 text-xs mt-1">Gunakan foto formal format JPG atau PNG (Max. 2MB)</p>
+                                        <h2 class="text-xl font-black text-slate-800 tracking-tight uppercase">Foto Profil
+                                        </h2>
+                                        <p class="text-slate-400 text-xs mt-1">Gunakan foto formal format JPG atau PNG
+                                            (Max. 2MB)</p>
                                     </div>
                                 </div>
 
@@ -129,7 +142,8 @@
                                             </path>
                                         </svg>
                                     </div>
-                                    <h2 class="text-xl font-black text-slate-800 tracking-tight uppercase">Data Pribadi</h2>
+                                    <h2 class="text-xl font-black text-slate-800 tracking-tight uppercase">Data Pribadi
+                                    </h2>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -137,7 +151,8 @@
                                         <label
                                             class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Nama
                                             Lengkap</label>
-                                        <input type="text" name="nama" value="{{ old('nama', $user->nama_lengkap) }}"
+                                        <input type="text" name="nama"
+                                            value="{{ old('nama', $user->nama_lengkap) }}"
                                             class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none transition-all font-bold text-slate-700 @error('nama') border-rose-300 @enderror">
                                         @error('nama')
                                             <p class="text-rose-500 text-[10px] font-bold mt-1 ml-2">{{ $message }}</p>
@@ -147,7 +162,8 @@
                                         <label
                                             class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">NIP
                                             / Identitas</label>
-                                        <input type="text" name="nip" value="{{ old('nip', $user->nip) }}"
+                                        <input type="text" name="nip"
+                                            value="{{ old('nip', $user->nip ?? $user->nik) }}"
                                             class="w-full px-6 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-600 outline-none transition-all font-bold text-slate-700 @error('nip') border-rose-300 @enderror">
                                         @error('nip')
                                             <p class="text-rose-500 text-[10px] font-bold mt-1 ml-2">{{ $message }}</p>
@@ -166,7 +182,8 @@
                                         <label
                                             class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Nama
                                             Instansi</label>
-                                        <input type="text" disabled value="{{ $user->instansi->nama_instansi }}"
+                                        <input type="text" disabled
+                                            value="{{ $user->instansi->nama_instansi ?? '-' }}"
                                             class="w-full px-6 py-4 bg-slate-100 border border-slate-200 rounded-2xl font-bold text-slate-400 cursor-not-allowed italic">
                                     </div>
                                 </div>

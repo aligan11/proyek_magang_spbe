@@ -180,6 +180,15 @@ class AuthController extends Controller
         return view('Auth.registerPemohon', compact('captcha', 'instansi'));
     }
 
+    // refresh captcha
+    public function refreshCaptcha()
+    {
+        $captcha = strtoupper(Str::random(5));
+        session(['captcha' => $captcha]);
+
+        return response()->json(['captcha' => $captcha]);
+    }
+
 
 
     public function logout(Request $request)

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\Password as RulesPassword;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class PemohonController extends Controller
@@ -87,24 +88,26 @@ class PemohonController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            // dd($request->all());
-            $request->validate([
-                'nama_kebutuhan'    => 'required|string|max:255',
-                'id_jenis_layanan'  => 'required|integer',
-                'id_kebutuhan'      => 'required|array|min:1',
-                'lokasi'            => 'required|string|max:255',
-                'unitKerja'        => 'required|string|max:255',
-                'berkas'            => 'required|file|mimes:pdf,docx,zip|max:10240',
-                'ket'               => 'nullable|string',
-                'nama_pj'           => 'required|string|max:255',
-                'nip_pj'            => 'required|string|max:50',
-                'jabatan_pj'        => 'required|string|max:255',
-                'unitkerja_pj'      => 'required|string|max:255',
-                'nohp_pj'           => 'required|string|max:20',
-                'email_pj'          => 'required|email|max:255',
-            ]);
+        // 1. VALIDASI DI LUAR TRY-CATCH
+        // Kalau gagal, Laravel otomatis redirect back() bawa pesan error & input lama.
+        $request->validate([
+            'id_jenis_layanan'  => 'required|integer',
+            'id_kebutuhan'      => 'required|array|min:1',
+            'lokasi'            => 'required|string|max:255',
+            'nama_kebutuhan'            => 'required|string|max:255',
+            'unitKerja'         => 'required|string|max:255',
+            'berkas'            => 'required|file|mimes:pdf,docx,zip|max:10240',
+            'ket'               => 'nullable|string',
+            'nama_pj'           => 'required|string|max:255',
+            'nip_pj'            => 'required|string|max:50',
+            'jabatan_pj'        => 'required|string|max:255',
+            'unitkerja_pj'      => 'required|string|max:255',
+            'nohp_pj'           => 'required|string|max:20',
+            'email_pj'          => 'required|email|max:255',
+        ]);
 
+        // 2. TRY-CATCH HANYA UNTUK PROSES DATABASE & EMAIL
+        try {
             $user = Auth::guard('pemohon')->user();
             $userWithInstansi = Pemohon::where('id', $user->id)->with('instansi')->first();
 
@@ -122,8 +125,8 @@ class PemohonController extends Controller
             $layanan = Layanan_spbe::create([
                 'id_jenis_layanan' => $request->id_jenis_layanan,
                 'id_kebutuhan' => $request->id_kebutuhan,
-                'nama_kebutuhan'   => $request->nama_kebutuhan,
                 'lokasi'           => $request->lokasi,
+                'nama_kebutuhan'           => $request->nama_kebutuhan,
                 'unitKerja'        => $request->unitKerja,
                 'ket'              => $request->ket,
                 'berkas'           => $fileName,
@@ -131,32 +134,29 @@ class PemohonController extends Controller
                 'tahunanggaran'    => date('Y'),
                 'periode'          => 'Triwulan ' . ceil(date('n') / 3),
                 'tgl_permohonan'   => now(),
-                'status'           => 1, // Sesuai default database
+                'status'           => 1,
                 'is_eksternal'     => empty($user->id_instansi) ? "ya" : "tidak",
                 'nama_penanggungjawab'      => $request->nama_pj,
                 'nip_penanggungjawab'       => $request->nip_pj,
                 'nohp_penanggungjawab'      => $request->nohp_pj,
                 'jabatan_penanggungjawab'   => $request->jabatan_pj,
-                'unitKerja_penanggungjawab' => $request->unitKerja_pj, // Sesuaikan dengan DB (huruf kecil)
+                'unitkerja_penanggungjawab' => $request->unitkerja_pj,
                 'email_penanggungjawab'     => $request->email_pj,
                 'inputby'          => $user->nama_lengkap,
                 'tglinput'         => now(),
                 'id_instansi'      => $user->id_instansi,
-                'id_pemohon'     => $user->id,
+                'id_pemohon'       => $user->id,
                 'nama_instansi'    => $userWithInstansi->instansi->nama_instansi ?? '-',
             ]);
-
 
             // Notifikasi Email ke Pimpinan (Kabid)
             $semuaKabid = User::where('role', 'kabid')->get();
             $emailPenerima = $semuaKabid->pluck('email')->filter()->toArray();
 
-            // Fallback email jika tidak ada kabid dengan email
             if (empty($emailPenerima)) {
                 $emailPenerima = ['admin@example.com'];
             }
 
-            // Kirim email ke setiap penerima (gunakan queue untuk mencegah hanging)
             foreach ($emailPenerima as $email) {
                 Mail::to($email)->queue(new NewPermohonanMail($layanan, $user));
             }
@@ -164,7 +164,10 @@ class PemohonController extends Controller
             Alert::success('Berhasil', 'Permohonan berhasil dikirim dengan No. Registrasi: ' . $noreg);
             return redirect()->route('pemohon.index');
         } catch (\Exception $e) {
-            dd('FATAL ERROR CAUGHT: ' . $e->getMessage() . ' in file ' . $e->getFile() . ' on line ' . $e->getLine());
+            // Catch ini sekarang MURNI buat nangkap error database / email yang gagal, 
+            // bukan error validasi input form lagi.
+            Alert::error('Gagal', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+            return back()->withInput();
         }
     }
 
@@ -234,63 +237,70 @@ class PemohonController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $idPemohon = Auth::guard('pemohon')->user()->id;
-        $permohonan = Layanan_spbe::where('id', $id)
-            ->where('id_pemohon', $idPemohon)
-            ->firstOrFail();
+        try {
 
-        if ($permohonan->status != Layanan_spbe::STATUS_PENDING) {
-            Alert::error('Gagal', 'Permohonan yang sedang diproses tidak dapat diubah.');
-            return redirect()->route('pemohon.index');
-        }
 
-        $request->validate([
-            'nama_kebutuhan'    => 'required|string|max:255',
-            'id_jenis_layanan'  => 'required|integer',
-            'id_kebutuhan'      => 'required|array|min:1',
-            'lokasi'            => 'required|string|max:255',
-            'unitKerja'        => 'required|string|max:255',
-            'berkas'            => 'nullable|file|mimes:pdf,docx,zip|max:10240',
-            'ket'               => 'nullable|string',
-            'nama_pj'           => 'required|string|max:255',
-            'nip_pj'            => 'required|string|max:50',
-            'jabatan_pj'        => 'required|string|max:255',
-            'unitKerja_pj'      => 'required|string|max:255',
-            'nohp_pj'           => 'required|string|max:20',
-            'email_pj'          => 'required|email|max:255',
-        ]);
+            $idPemohon = Auth::guard('pemohon')->user()->id;
+            $permohonan = Layanan_spbe::where('id', $id)
+                ->where('id_pemohon', $idPemohon)
+                ->firstOrFail();
 
-        $data = [
-            'id_jenis_layanan' => $request->id_jenis_layanan,
-            'id_kebutuhan' => $request->id_kebutuhan,
-            'nama_kebutuhan'   => $request->nama_kebutuhan,
-            'lokasi'           => $request->lokasi,
-            'unitKerja'        => $request->unitKerja,
-            'ket'              => $request->ket,
-            'nama_penanggungjawab'      => $request->nama_pj,
-            'nip_penanggungjawab'       => $request->nip_pj,
-            'nohp_penanggungjawab'      => $request->nohp_pj,
-            'jabatan_penanggungjawab'   => $request->jabatan_pj,
-            'unitKerja_penanggungjawab' => $request->unitKerja_pj,
-            'email_penanggungjawab'     => $request->email_pj,
-        ];
-
-        if ($request->hasFile('berkas')) {
-            if ($permohonan->berkas && file_exists(public_path('storage/doc/' . $permohonan->berkas))) {
-                unlink(public_path('storage/doc/' . $permohonan->berkas));
+            if ($permohonan->status != Layanan_spbe::STATUS_PENDING) {
+                Alert::error('Gagal', 'Permohonan yang sedang diproses tidak dapat diubah.');
+                return redirect()->route('pemohon.index');
             }
 
-            $file = $request->file('berkas');
-            $originalName = str_replace(' ', '_', $file->getClientOriginalName());
-            $fileName = time() . '_' . $originalName;
-            $file->move(public_path('storage/doc'), $fileName);
-            $data['berkas'] = $fileName;
+            $request->validate([
+                'nama_kebutuhan'    => 'required|string|max:255',
+                'id_jenis_layanan'  => 'required|integer',
+                'id_kebutuhan'      => 'required|array|min:1',
+                'lokasi'            => 'required|string|max:255',
+                'unitKerja'        => 'required|string|max:255',
+                'berkas'            => 'nullable|file|mimes:pdf,docx,zip|max:10240',
+                'ket'               => 'nullable|string',
+                'nama_pj'           => 'required|string|max:255',
+                'nip_pj'            => 'required|string|max:50',
+                'jabatan_pj'        => 'required|string|max:255',
+                'unitkerja_pj'      => 'required|string|max:255',
+                'nohp_pj'           => 'required|string|max:20',
+                'email_pj'          => 'required|email|max:255',
+            ]);
+
+            $data = [
+                'id_jenis_layanan' => $request->id_jenis_layanan,
+                'id_kebutuhan' => $request->id_kebutuhan,
+                'lokasi'           => $request->lokasi,
+                'unitkerja'        => $request->unitKerja,
+                'ket'              => $request->ket,
+                'nama_penanggungjawab'      => $request->nama_pj,
+                'nip_penanggungjawab'       => $request->nip_pj,
+                'nohp_penanggungjawab'      => $request->nohp_pj,
+                'jabatan_penanggungjawab'   => $request->jabatan_pj,
+                'unitkerja_penanggungjawab' => $request->unitKerja_pj,
+                'email_penanggungjawab'     => $request->email_pj,
+            ];
+
+            if ($request->hasFile('berkas')) {
+                if ($permohonan->berkas && file_exists(public_path('storage/doc/' . $permohonan->berkas))) {
+                    unlink(public_path('storage/doc/' . $permohonan->berkas));
+                }
+
+                $file = $request->file('berkas');
+                $originalName = str_replace(' ', '_', $file->getClientOriginalName());
+                $fileName = time() . '_' . $originalName;
+                $file->move(public_path('storage/doc'), $fileName);
+                $data['berkas'] = $fileName;
+            }
+
+            $permohonan->update($data);
+
+            Alert::success('Berhasil', 'Permohonan berhasil diperbarui!');
+            return redirect()->route('pemohon.index');
+            //code...
+        } catch (\Exception $e) {
+            Alert::error('gagal', 'terjadi error:  ' . $e->getMessage());
+            return back()->withInput();
         }
-
-        $permohonan->update($data);
-
-        Alert::success('Berhasil', 'Permohonan berhasil diperbarui!');
-        return redirect()->route('pemohon.index');
     }
 
     /**
@@ -368,19 +378,26 @@ class PemohonController extends Controller
      */
     public function updatePassword(Request $request)
     {
+        // 1. Pisahkan validasi di luar try-catch agar error validasi muncul normal di Blade
         $request->validate([
-            'current_password' => 'required|current_password',
-            'new_password' => ['required', 'confirmed', Password::defaults()],
+            'current_password' => ['required', 'current_password:pemohon'], // <-- Tambahkan :pemohon
+            'new_password'     => ['required', 'confirmed', RulesPassword::defaults()],
         ]);
 
-        $id = Auth::guard('pemohon')->user()->id;
-        $user = Pemohon::find($id);
-        $user->update([
-            'password' => Hash::make($request->new_password),
-        ]);
+        try {
+            $id = Auth::guard('pemohon')->id();
+            $user = Pemohon::findOrFail($id);
 
-        Alert::success('Berhasil', 'Kata sandi berhasil diubah!');
-        return redirect()->back();
+            $user->update([
+                'password' => Hash::make($request->new_password),
+            ]);
+
+            Alert::success('Berhasil', 'Kata sandi berhasil diubah!');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Alert::error('Gagal', 'Terjadi error: ' . $e->getMessage());
+            return back()->withInput();
+        }
     }
 
     /**

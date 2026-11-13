@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Portal Hub Layanan Terintegrasi SPBE</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         (() => {
             const storedTheme = localStorage.getItem('theme');
@@ -187,61 +188,26 @@
                 </div>
             </div>
 
-            <!-- Grid Cards -->
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-                @forelse ($latestBeritaAcara as $berita)
-                    <article
-                        class="flex h-full flex-col rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900">
-                        <!-- Kategori Layanan (Header Card) -->
-                        <header class="mb-3">
-                            <span
-                                class="inline-flex items-center rounded-full bg-pink-100 px-3 py-1 text-xs font-black uppercase tracking-[0.25em] text-pink-700 dark:bg-pink-500/10 dark:text-pink-400">
-                                {{ $berita->tindakLanjut?->layanan?->jenis_layanan?->namajenis ?? 'Layanan Administrasi Pemerintahan' }}
-                            </span>
-                        </header>
-
-                        <!-- Sub Header (Sektor) -->
-                        <div class="mb-4">
-                            <p class="text-sm italic text-slate-500 dark:text-slate-400">
-                                Sektor: {{ $berita->tindakLanjut?->layanan?->nama_instansi ?? 'Umum' }}
-                            </p>
-                        </div>
-
-                        <!-- Body Card -->
-                        <div class="mb-6 flex-1">
-                            <h4 class="text-xl font-black text-slate-900 dark:text-white">
-                                {{ $berita->ringkasan_pekerjaan ? \Illuminate\Support\Str::limit($berita->ringkasan_pekerjaan, 80) : 'Berita Acara Pemeriksaan' }}
-                            </h4>
-
-                            <p class="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                                {{ $berita->ringkasan_masalah ? \Illuminate\Support\Str::limit($berita->ringkasan_masalah, 100) : 'Deskripsi layanan dan ringkasan pemeriksaan tersedia di halaman detail.' }}
-                            </p>
-                        </div>
-
-                        <!-- Footer Card -->
-                        <footer class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
-                            <div class="flex items-center justify-between gap-4">
-                                <span class="text-xs font-bold uppercase tracking-[0.25em] text-slate-400">
-                                    {{ $berita->created_at?->locale('id')->translatedFormat('d F Y') ?? '-' }}
-                                </span>
-
-                                <a href="#"
-                                    class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm transition hover:bg-blue-700">
-                                    🔗 Detail
-                                </a>
-                            </div>
-                        </footer>
-                    </article>
-                @empty
-                    <div
-                        class="col-span-full rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 px-8 py-16 text-center dark:border-slate-700 dark:bg-slate-900">
-                        <p class="text-lg font-black text-slate-800 dark:text-white">Belum ada layanan tersedia</p>
-                        <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">
-                            Silakan jalankan seeder untuk memuat data layanan.
-                        </p>
-                    </div>
-                @endforelse
+            {{-- Input Search Berita Acara tanpa Refresh --}}
+            <div class="mb-8">
+                <div class="relative flex-1">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400">
+                        <i data-lucide="search" class="w-4 h-4"></i>
+                    </span>
+                    <input type="text" id="searchBeritaInput" placeholder="Cari ringkasan pekerjaan atau masalah..."
+                        class="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm">
+                </div>
             </div>
+
+            {{-- Container tempat grid card & pagination berada --}}
+            <div id="berita-wrapper">
+                @include('partials.berita-grid')
+            </div>
+
+
+
+
+
         </section>
     </main>
 
@@ -297,6 +263,49 @@
                 localStorage.setItem('theme', isDark ? 'dark' : 'light');
             });
         }
+    </script>
+
+
+    <script>
+        lucide.createIcons();
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let debounceTimer;
+
+            // Gunakan event delegation agar aman dari masalah waktu render DOM
+            document.addEventListener('input', function(e) {
+                if (e.target && e.target.id === 'searchBeritaInput') {
+                    const searchInput = e.target;
+                    const beritaWrapper = document.getElementById('berita-wrapper');
+
+                    if (!beritaWrapper) return;
+
+                    clearTimeout(debounceTimer);
+                    const keyword = searchInput.value;
+
+                    debounceTimer = setTimeout(() => {
+                        const searchUrl = `/?searchBerita=${encodeURIComponent(keyword)}`;
+
+                        fetch(searchUrl, {
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            })
+                            .then(response => response.text())
+                            .then(html => {
+                                beritaWrapper.innerHTML = html;
+                                if (typeof lucide !== 'undefined') {
+                                    lucide.createIcons();
+                                }
+                            })
+                            .catch(error => console.error('Error fetching search:', error));
+                    }, 300); // Jeda 300ms
+                }
+            });
+
+
+        });
     </script>
 </body>
 

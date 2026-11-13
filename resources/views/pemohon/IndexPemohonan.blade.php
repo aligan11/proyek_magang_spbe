@@ -90,11 +90,37 @@
                                         </div>
                                     </td>
                                     <td class="px-8 py-6">
+                                        <!-- Nama Kebutuhan Utama -->
                                         <div
                                             class="font-bold text-slate-800 text-base group-hover:text-blue-600 transition-colors">
-                                            {{ $item->nama_kebutuhan }}</div>
-                                        <div class="text-[11px] font-bold text-slate-400 mt-1 uppercase tracking-tight">
-                                            {{ $item->nama_instansi }}</div>
+                                            {{ $item->nama_kebutuhan }}
+                                        </div>
+
+                                        <!-- Badge Kebutuhan (Array id_kebutuhan) -->
+                                        <div class="flex flex-wrap gap-1 mt-1.5">
+                                            @foreach ($item->kebutuhans as $keb)
+                                                <span
+                                                    class="px-2 py-0.5 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-md">
+                                                    {{ $keb->nama_kebutuhan }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+
+                                        <!-- INFORMASI TAMBAHAN: Jenis Layanan & Instansi -->
+                                        <div
+                                            class="flex items-center gap-2 mt-2 text-[11px] font-bold text-slate-400 uppercase tracking-tight">
+                                            <!-- Jenis Layanan -->
+                                            @if ($item->jenis_layanan)
+                                                <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded">
+                                                    {{ $item->jenis_layanan->namajenis }}
+                                                    <!-- Sesuaikan nama kolom jenis layanan di tabelnya -->
+                                                </span>
+                                                <span>•</span>
+                                            @endif
+
+                                            <!-- Nama Instansi -->
+                                            <span>{{ $item->nama_instansi }}</span>
+                                        </div>
                                     </td>
                                     <td class="px-8 py-6 text-center text-sm font-bold text-slate-600">
                                         {{ $item->tglinput->format('d/m/Y') }}</td>

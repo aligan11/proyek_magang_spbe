@@ -164,22 +164,24 @@
                     <!-- LEFT: CAPTCHA DISPLAY -->
                     <div class="flex items-center gap-3">
 
-                        <!-- TEXT CAPTCHA -->
-                        <div
-                            class="bg-white px-5 py-2 rounded-xl shadow-sm border border-blue-200 font-mono font-extrabold text-blue-600 tracking-[0.35em] text-lg select-none italic">
+                        <!-- TEXT CAPTCHA (Tambahkan transisi CSS transition-all duration-300) -->
+                        <div id="captcha-display"
+                            class="bg-white px-5 py-2 rounded-xl shadow-sm border border-blue-200 font-mono font-extrabold text-blue-600 tracking-[0.35em] text-lg select-none italic transition-all duration-300 transform opacity-100 scale-100">
                             {{ session('captcha') }}
                         </div>
 
-                        <!-- REFRESH -->
-                        <a href="{{ route('registerPage') }}"
-                            class="p-2 rounded-lg text-blue-600 hover:bg-blue-100 transition flex items-center justify-center"
+                        <!-- REFRESH BUTTON -->
+                        <button type="button" id="refresh-captcha-btn"
+                            class="p-2 rounded-lg text-blue-600 hover:bg-blue-100 transition flex items-center justify-center cursor-pointer"
                             title="Refresh Captcha">
 
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <!-- Tambahkan id="refresh-icon" di SVG agar bisa di-animate pakai JS -->
+                            <svg id="refresh-icon" class="w-5 h-5 transition-transform duration-500" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
-                        </a>
+                        </button>
 
                     </div>
 
@@ -196,6 +198,8 @@
                     </div>
 
                 </div>
+
+
                 <!-- Register Button -->
                 <button type="submit"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-xl shadow-blue-200 transition-all duration-300 transform active:scale-[0.98]">
@@ -209,6 +213,41 @@
             </form>
         </div>
     </div>
+    <!-- SCRIPT DENGAN ANIMASI -->
+    <script>
+        document.getElementById('refresh-captcha-btn').addEventListener('click', function() {
+            const captchaDisplay = document.getElementById('captcha-display');
+            const refreshIcon = document.getElementById('refresh-icon');
+
+            // 1. Efek putar pada icon (menambahkan class Tailwind rotate-180 atau animate-spin)
+            refreshIcon.classList.add('rotate-180');
+
+            // 2. Efek fade-out & sedikit menyusut pada teks captcha saat proses fetch
+            captchaDisplay.classList.add('opacity-0', 'scale-95');
+
+            fetch("{{ route('refresh.captcha') }}")
+                .then(response => response.json())
+                .then(data => {
+                    setTimeout(() => {
+                        // Ganti teks setelah jeda dikit biar transisinya mulus
+                        captchaDisplay.innerText = data.captcha;
+
+                        // 3. Kembalikan animasi teks jadi fade-in (muncul kembali)
+                        captchaDisplay.classList.remove('opacity-0', 'scale-95');
+                    }, 150); // Delay 150ms pas transisi memudar
+                })
+                .catch(error => {
+                    console.error('Error refreshing captcha:', error);
+                    captchaDisplay.classList.remove('opacity-0', 'scale-95');
+                })
+                .finally(() => {
+                    // Hapus putaran icon setelah animasi selesai
+                    setTimeout(() => {
+                        refreshIcon.classList.remove('rotate-180');
+                    }, 500);
+                });
+        });
+    </script>
 </body>
 
 </html>

@@ -3,6 +3,7 @@
 use App\Http\Middleware\AuthenticatePemohon;
 use App\Http\Middleware\CheckPetugas;
 use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\UpdateLastseen;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,9 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         //a
         $middleware->alias([
-            'pimpinan',
             'check.role' => CheckRole::class,
             'check.pemohon' => AuthenticatePemohon::class,
+            'petugas.online' => UpdateLastseen::class,
 
         ]);
     })

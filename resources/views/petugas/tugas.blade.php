@@ -72,94 +72,112 @@
                 <tbody>
                     @forelse($tasks as $mandate)
                         <tr class="group transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 rounded-2xl">
+                            <!-- Kolom Nomor Reg -->
                             <td
-                                class="px-6 py-8 bg-white/60 group-hover:bg-white rounded-l-[2.5rem] border-y border-l border-slate-100/50">
+                                class="px-6 py-6 bg-white/60 group-hover:bg-white rounded-l-[2.5rem] border-y border-l border-slate-100/50 align-top">
                                 <span
-                                    class="font-mono text-[10px] font-bold text-blue-600 bg-blue-50 px-5 py-2.5 rounded-xl border border-blue-100 shadow-inner">
+                                    class="font-mono text-[10px] font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 shadow-inner inline-block">
                                     {{ $mandate->ticket->noreg ?? 'N/A' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-8 bg-white/60 group-hover:bg-white border-y border-slate-100/50">
+
+                            <!-- Kolom Pemohon & Instansi -->
+                            <td class="px-6 py-6 bg-white/60 group-hover:bg-white border-y border-slate-100/50 align-top">
                                 <div class="flex items-center gap-4">
                                     <div
-                                        class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold uppercase text-sm shadow-lg">
+                                        class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold uppercase text-sm shadow-lg shrink-0">
                                         {{ substr($mandate->ticket->inputby ?? 'U', 0, 1) }}
                                     </div>
                                     <div>
-                                        <p class="text-sm font-extrabold text-slate-800 leading-none">
+                                        <p class="text-sm font-extrabold text-slate-800 leading-tight">
                                             {{ $mandate->ticket->inputby ?? '-' }}
                                         </p>
-                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-2">
+                                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">
                                             {{ $mandate->ticket->nama_instansi ?? '-' }}
                                         </p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-8 bg-white/60 group-hover:bg-white border-y border-slate-100/50">
-                                <p class="text-sm font-bold text-slate-700 line-clamp-1 mb-2">
-                                    {{ $mandate->ticket->nama_kebutuhan ?? ($mandate->ticket->kebutuhan->kebutuhan ?? 'Layanan Umum') }}
-                                </p>
-                                <div class="flex items-center gap-2">
-                                    <i data-lucide="calendar" class="w-3 h-3 text-slate-300"></i>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+
+                            <!-- Kolom Daftar Kebutuhan & Tanggal -->
+                            <td class="px-6 py-6 bg-white/60 group-hover:bg-white border-y border-slate-100/50 align-top">
+                                <!-- Daftar Kebutuhan (Model Badge/Pills ke samping biar rapi) -->
+                                <div class="flex flex-wrap gap-1.5 mb-3">
+                                    @forelse ($mandate->ticket->kebutuhans as $keb)
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100/60">
+                                            {{ $keb->nama_kebutuhan ?? ($keb->kebutuhan->kebutuhan ?? 'Layanan Umum') }}
+                                        </span>
+                                    @empty
+                                        <span class="text-xs text-slate-400 italic">Tidak ada rincian kebutuhan</span>
+                                    @endforelse
+                                </div>
+
+                                <!-- Tanggal -->
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+                                    <span class="text-[11px] font-medium text-slate-500">
                                         {{ $mandate->ticket?->tglinput ? $mandate->ticket->tglinput->format('d M Y') : '-' }}
                                     </span>
                                 </div>
                             </td>
-                            <td class="px-6 py-8 bg-white/60 group-hover:bg-white border-y border-slate-100/50 text-center">
+
+                            <!-- Kolom Status Verifikasi -->
+                            <td
+                                class="px-6 py-6 bg-white/60 group-hover:bg-white border-y border-slate-100/50 text-center align-middle">
                                 @php
-                                    // Mengambil status_ver dari tabel layanan_spbe melalui relasi layanan
                                     $statusVer = $mandate->ticket->status_ver;
                                 @endphp
 
                                 @if ($statusVer == 2)
                                     {{-- Status SELESAI (2) --}}
                                     <span
-                                        class="status-selesai px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.1em] shadow-sm inline-flex items-center gap-2">
+                                        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm inline-flex items-center gap-2">
                                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                         Selesai
                                     </span>
                                 @elseif($statusVer == 3)
                                     {{-- Status PROSES (3) --}}
                                     <span
-                                        class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.1em] bg-blue-50 text-blue-600 border border-blue-100 shadow-sm inline-flex items-center gap-2">
+                                        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] bg-blue-50 text-blue-600 border border-blue-100 shadow-sm inline-flex items-center gap-2">
                                         <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                                         Proses
                                     </span>
                                 @else
                                     {{-- Status PENDING (1 atau NULL) --}}
                                     <span
-                                        class="status-pending px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.1em] shadow-sm inline-flex items-center gap-2">
+                                        class="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.1em] bg-amber-50 text-amber-600 border border-amber-100 shadow-sm inline-flex items-center gap-2">
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                                         Pending
                                     </span>
                                 @endif
                             </td>
 
+                            <!-- Kolom Aksi Detail -->
                             <td
-                                class="px-6 py-8 bg-white/60 group-hover:bg-white rounded-r-[2.5rem] border-y border-r border-slate-100/50 text-right">
+                                class="px-6 py-6 bg-white/60 group-hover:bg-white rounded-r-[2.5rem] border-y border-r border-slate-100/50 text-right align-middle">
                                 <a href="{{ route('petugas.show', $mandate->id) }}"
-                                    class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:shadow-xl hover:shadow-blue-500/30 transition-all">
-                                    <i data-lucide="eye" class="w-4 h-4"></i> Detail
+                                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:shadow-lg hover:shadow-blue-500/30 transition-all">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i> Detail
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="5" class="py-24 text-center">
-                                <div class="flex flex-col items-center gap-8">
+                                <div class="flex flex-col items-center gap-6">
                                     <div
-                                        class="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center text-slate-200 border-4 border-dashed border-slate-100">
-                                        <i data-lucide="folder-open" class="w-16 h-16"></i>
+                                        class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 border-4 border-dashed border-slate-100">
+                                        <i data-lucide="folder-open" class="w-12 h-12"></i>
                                     </div>
                                     <div class="max-w-md mx-auto">
-                                        <h3 class="text-2xl font-black text-slate-700 tracking-tight uppercase">Belum Ada
+                                        <h3 class="text-xl font-black text-slate-700 tracking-tight uppercase">Belum Ada
                                             Mandat</h3>
-                                        <p class="text-slate-400 text-sm font-medium mt-3">Daftar tugas Anda masih kosong.
-                                            Silakan hubungi admin jika terjadi kesalahan.</p>
+                                        <p class="text-slate-400 text-xs font-medium mt-2">Daftar tugas Anda masih kosong.
+                                            Silakan periksa kembali nanti.</p>
                                     </div>
                                     <a href="{{ route('petugas.index') }}"
-                                        class="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 text-blue-600 rounded-xl text-sm font-bold hover:bg-blue-600 hover:text-white transition-all">
+                                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
                                         <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Dashboard
                                     </a>
                                 </div>

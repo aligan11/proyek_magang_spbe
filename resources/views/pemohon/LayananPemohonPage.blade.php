@@ -224,14 +224,22 @@
                             <label
                                 class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Dokumen
                                 Pendukung</label>
+
+                            <!-- PESAN ERROR MUNCUL DI ATAS KOTAK UPLOAD -->
+                            @error('berkas')
+                                <span class="text-red-500 text-xs block mb-2 font-semibold">{{ $message }}</span>
+                            @enderror
+
                             <div
-                                class="relative group border-2 border-dashed border-slate-200 rounded-3xl p-8 text-center hover:border-blue-500 hover:bg-blue-50/50 transition-all cursor-pointer">
+                                class="relative group border-2 border-dashed @error('berkas') border-red-400 bg-red-50/30 @else border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 @enderror rounded-3xl p-8 text-center transition-all cursor-pointer">
+
                                 <input type="file" name="berkas" required
                                     @change="fileName = $event.target.files[0].name"
-                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+
                                 <div class="space-y-3 text-slate-600 font-medium">
-                                    <svg class="mx-auto h-12 w-12 text-blue-600" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
+                                    <svg class="mx-auto h-12 w-12 @error('berkas') text-red-500 @else text-blue-600 @enderror"
+                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
                                         </path>
@@ -243,15 +251,17 @@
                                 </div>
                             </div>
                         </div>
+
                         <div>
                             <label
                                 class="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Keterangan
                                 Tambahan</label>
                             <textarea name="ket" rows="3" placeholder="Tambahkan informasi pelengkap jika ada..."
-                                class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none resize-none"></textarea>
+                                class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 outline-none resize-none">{{ old('ket') }}</textarea>
                         </div>
                     </div>
                 </div>
+
 
                 <button type="submit" :disabled="loading"
                     class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl shadow-lg transition-all flex items-center justify-center space-x-3">
