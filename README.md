@@ -13,6 +13,7 @@ Dibangun dengan **Laravel 12** (arsitektur MVC) dan **Tailwind CSS 4**, sistem i
 - [Peran & Hak Akses](#peran--hak-akses)
 - [Struktur Database & Relasi](#struktur-database--relasi)
 - [Alur Kerja Sistem](#alur-kerja-sistem)
+- [Cuplikan Layar (Screenshots)](#cuplikan-layar-screenshots)
 - [Struktur Direktori](#struktur-direktori)
 - [Prasyarat](#prasyarat)
 - [Instalasi Lokal](#instalasi-lokal)
@@ -26,6 +27,7 @@ Dibangun dengan **Laravel 12** (arsitektur MVC) dan **Tailwind CSS 4**, sistem i
 ## Fitur Utama
 
 ### Modul Pemohon (Internal & Eksternal)
+
 - Registrasi akun Pemohon **Internal (ASN/Pegawai)** dan **Eksternal (Masyarakat Umum)** dengan validasi NIK/NIP dan captcha.
 - Login multi-guard dengan verifikasi **captcha matematika**.
 - Pengajuan permohonan layanan dengan form terstruktur dan unggah **berkas pendukung** (PDF/DOCX/ZIP, maks. 10 MB).
@@ -37,6 +39,7 @@ Dibangun dengan **Laravel 12** (arsitektur MVC) dan **Tailwind CSS 4**, sistem i
 - Manajemen profil & ubah kata sandi (dengan unggah avatar).
 
 ### Modul Pimpinan (Kabid / Katim)
+
 - Dashboard ringkasan statistik permohonan (Total / Pending / Proses / Selesai).
 - Daftar semua permohonan dengan pencarian nomor registrasi.
 - Tinjau detail permohonan dan berkas pendukung.
@@ -47,6 +50,7 @@ Dibangun dengan **Laravel 12** (arsitektur MVC) dan **Tailwind CSS 4**, sistem i
 - Ubah profil & kata sandi.
 
 ### Modul Petugas (Staff)
+
 - Dashboard daftar tugas yang ditugaskan beserta statistik.
 - Detail tugas dan berkas pendukung (dengan proteksi akses per-petugas).
 - Pengisian **Berita Acara Pemeriksaan (BAP)**: ringkasan pekerjaan, ringkasan masalah, alternatif solusi, dan lokasi.
@@ -55,11 +59,13 @@ Dibangun dengan **Laravel 12** (arsitektur MVC) dan **Tailwind CSS 4**, sistem i
 - Ubah profil & kata sandi.
 
 ### Portal Publik
+
 - Beranda publik yang menampilkan daftar **Berita Acara Pemeriksaan** terbaru.
 - Pencarian BAP dan paginasi (AJAX partial refresh).
 - Statistik jumlah BAP dan instansi.
 
 ### Notifikasi Email
+
 - Email ke Pimpinan saat ada **permohonan baru** (`NewPermohonanMail`, terlampir berkas).
 - Email ke Petugas saat ada **penugasan baru** (`NewMandateMail`, terlampir berkas).
 - Email ke Pemohon saat permohonan **ditindaklanjuti** (`TindakLanjutNotification`).
@@ -70,27 +76,30 @@ Dibangun dengan **Laravel 12** (arsitektur MVC) dan **Tailwind CSS 4**, sistem i
 ## Tech Stack
 
 ### Backend (dari `composer.json`)
-| Paket | Versi | Kegunaan |
-| --- | --- | --- |
-| PHP | `^8.2` | Bahasa pemrograman |
-| laravel/framework | `^12.0` | Framework utama (MVC) |
-| barryvdh/laravel-dompdf | `^3.1` | Generate laporan PDF |
-| maatwebsite/excel | `^3.1` | Ekspor laporan Excel |
-| realrashid/sweet-alert | `^7.3` | Notifikasi alert |
-| laravel/tinker | `^2.10` | REPL untuk debugging |
+
+| Paket                   | Versi   | Kegunaan              |
+| ----------------------- | ------- | --------------------- |
+| PHP                     | `^8.2`  | Bahasa pemrograman    |
+| laravel/framework       | `^12.0` | Framework utama (MVC) |
+| barryvdh/laravel-dompdf | `^3.1`  | Generate laporan PDF  |
+| maatwebsite/excel       | `^3.1`  | Ekspor laporan Excel  |
+| realrashid/sweet-alert  | `^7.3`  | Notifikasi alert      |
+| laravel/tinker          | `^2.10` | REPL untuk debugging  |
 
 **Dev tools:** PHPUnit `^11.5`, Laravel Pint, Laravel Pail, Laravel Sail, Faker, Mockery, Collision.
 
 ### Frontend (dari `package.json`)
-| Paket | Versi | Kegunaan |
-| --- | --- | --- |
-| tailwindcss | `^4.1.18` | Utility-first CSS framework |
-| @tailwindcss/vite | `^4.1.18` | Integrasi Tailwind dengan Vite |
-| vite | `^7.0.7` | Build tool & HMR |
-| laravel-vite-plugin | `^2.0.0` | Integrasi Vite ↔ Laravel |
-| axios | `^1.11.0` | HTTP client untuk request AJAX |
+
+| Paket               | Versi     | Kegunaan                       |
+| ------------------- | --------- | ------------------------------ |
+| tailwindcss         | `^4.1.18` | Utility-first CSS framework    |
+| @tailwindcss/vite   | `^4.1.18` | Integrasi Tailwind dengan Vite |
+| vite                | `^7.0.7`  | Build tool & HMR               |
+| laravel-vite-plugin | `^2.0.0`  | Integrasi Vite ↔ Laravel       |
+| axios               | `^1.11.0` | HTTP client untuk request AJAX |
 
 ### Lainnya
+
 - **Database:** MySQL (default) — mendukung SQLite.
 - **Autentikasi:** Multi-guard session (`petugas` → `User`, `pemohon` → `Pemohon`).
 - **Email:** SMTP (Gmail, port 587/TLS) dengan dukungan queue.
@@ -102,15 +111,16 @@ Dibangun dengan **Laravel 12** (arsitektur MVC) dan **Tailwind CSS 4**, sistem i
 
 Sistem menggunakan **Multi-Guard Authentication** yang memisahkan Pemohon (`pemohon`) dari pengguna internal (`petugas`).
 
-| Guard | Model | Role | Deskripsi |
-| --- | --- | --- | --- |
-| `petugas` | `User` | `admin` | Administrator sistem |
-| `petugas` | `User` | `kabid` | Kepala Bidang — disposisi & laporan |
-| `petugas` | `User` | `katim` | Ketua Tim — disposisi & laporan |
-| `petugas` | `User` | `staff` | Petugas teknis — penanganan tugas |
-| `pemohon` | `Pemohon` | — | Pemohon internal/eksternal |
+| Guard     | Model     | Role    | Deskripsi                           |
+| --------- | --------- | ------- | ----------------------------------- |
+| `petugas` | `User`    | `admin` | Administrator sistem                |
+| `petugas` | `User`    | `kabid` | Kepala Bidang — disposisi & laporan |
+| `petugas` | `User`    | `katim` | Ketua Tim — disposisi & laporan     |
+| `petugas` | `User`    | `staff` | Petugas teknis — penanganan tugas   |
+| `pemohon` | `Pemohon` | —       | Pemohon internal/eksternal          |
 
 Middleware yang digunakan:
+
 - `check.role:<role>` → membatasi akses berdasarkan role internal.
 - `check.pemohon` → membatasi akses area Pemohon.
 - `loginCheck` → redirect otomatis jika sudah login.
@@ -124,19 +134,19 @@ Diagram ERD tersedia di [Table Diagram SPBE New-2.png](public/laporan/Table%20Di
 
 ### Tabel Utama
 
-| Tabel | Keterangan |
-| --- | --- |
-| `users` | Akun pengguna internal (admin, kabid, katim, staff). |
-| `pemohon` | Akun Pemohon internal (ASN) & eksternal (umum). |
-| `instansi` | Data instansi/OPD (master referensi). |
-| `jenis_layanan_spbe` | Master jenis layanan SPBE. |
-| `kebutuhan_layanan_spbe` | Master kebutuhan per jenis layanan. |
-| `layanan_spbe` | Data permohonan layanan (inti transaksi). |
-| `tindak_lanjut_layanan` | Disposisi/mandate penugasan ke Petugas. |
-| `berita_acara_pemeriksaan` | BAP hasil pemeriksaan Petugas. |
-| `mandates` | Struktur mandate (relasi Pimpinan ↔ Tiket). |
-| `mandate_petugas` | Pivot many-to-many mandate ↔ petugas. |
-| `notifications` | Notifikasi in-app. |
+| Tabel                                                | Keterangan                                               |
+| ---------------------------------------------------- | -------------------------------------------------------- |
+| `users`                                              | Akun pengguna internal (admin, kabid, katim, staff).     |
+| `pemohon`                                            | Akun Pemohon internal (ASN) & eksternal (umum).          |
+| `instansi`                                           | Data instansi/OPD (master referensi).                    |
+| `jenis_layanan_spbe`                                 | Master jenis layanan SPBE.                               |
+| `kebutuhan_layanan_spbe`                             | Master kebutuhan per jenis layanan.                      |
+| `layanan_spbe`                                       | Data permohonan layanan (inti transaksi).                |
+| `tindak_lanjut_layanan`                              | Disposisi/mandate penugasan ke Petugas.                  |
+| `berita_acara_pemeriksaan`                           | BAP hasil pemeriksaan Petugas.                           |
+| `mandates`                                           | Struktur mandate (relasi Pimpinan ↔ Tiket).              |
+| `mandate_petugas`                                    | Pivot many-to-many mandate ↔ petugas.                    |
+| `notifications`                                      | Notifikasi in-app.                                       |
 | `sessions`, `password_reset_tokens`, `cache`, `jobs` | Tabel bawaan Laravel (session, OTP reset, cache, queue). |
 
 ### Relasi Kunci
@@ -162,6 +172,7 @@ mandates >──< users (Petugas)   (via pivot mandate_petugas)
 **Catatan desain:** kolom `tindak_lanjut_layanan.id_petugas` bertipe `JSON` untuk menyimpan array ID Petugas yang ditugaskan, dan `layanan_spbe.id_kebutuhan` juga bertipe `JSON` untuk menyimpan array kebutuhan terpilih.
 
 ### Status Permohonan (`layanan_spbe.status`)
+
 - `1` — **Pending** (menunggu disposisi Pimpinan).
 - `2` — **Proses** (sudah ditugaskan ke Petugas).
 - `3` — **Selesai** (BAP telah dibuat).
@@ -176,6 +187,48 @@ mandates >──< users (Petugas)   (via pivot mandate_petugas)
 4. **Portal Publik** menampilkan BAP yang telah diselesaikan dan dapat diunduh masyarakat umum.
 
 Activity diagram tersedia di [public/laporan](public/laporan).
+
+---
+
+## Cuplikan Layar (Screenshots)
+
+Berikut beberapa tampilan antarmuka utama Sistem Informasi Layanan SPBE, disusun mengikuti alur kerja pengguna. Seluruh berkas gambar tersimpan pada folder [`docs/`](docs).
+
+### Portal Publik — Beranda
+
+Halaman publik yang menampilkan daftar Berita Acara Pemeriksaan terbaru, statistik layanan, dan akses informasi layanan SPBE bagi masyarakat umum.
+
+![Portal Publik - Beranda SPBE](docs/dashboardAwal.png)
+
+### Login Pemohon
+
+Autentikasi Pemohon (internal maupun eksternal) yang dilengkapi verifikasi captcha matematika sebagai lapisan keamanan tambahan.
+
+![Halaman Login Pemohon](docs/Halaman%20Login%20Pemohon.png)
+
+### Form Pengajuan Permohonan
+
+Formulir pengajuan permohonan layanan yang terstruktur, mencakup data pemohon, penanggung jawab, detail kebutuhan layanan, serta unggah berkas pendukung.
+
+![Form Pengajuan Permohonan](docs/Pengajuan%20Permohonan.png)
+
+### Dashboard Pimpinan & Disposisi Tugas
+
+Dashboard Pimpinan (Kabid/Katim) yang menyajikan ringkasan statistik permohonan serta daftar permohonan yang siap didisposisikan.
+
+![Dashboard Pimpinan dan Disposisi Tugas](docs/Dashboard%20Pimpinan%20%26%20Disposisi%20Tugas.png)
+
+### Disposisi Tugas
+
+Modal pemberian disposisi/mandate kepada satu atau lebih Petugas teknis, disertai instruksi penanganan permohonan.
+
+![Disposisi Tugas](docs/Disposisi%20Tugas.png)
+
+### Berita Acara Pemeriksaan
+
+Formulir Berita Acara Pemeriksaan (BAP) bagi Petugas, memuat ringkasan pekerjaan, ringkasan masalah, alternatif solusi, dan unggah bukti verifikasi.
+
+![Berita Acara Pemeriksaan](docs/Berita%20Acara%20Pemeriksaan.png)
 
 ---
 
@@ -317,12 +370,12 @@ QUEUE_CONNECTION=database
 
 Dijalankan melalui `php artisan migrate --seed` (seeder `adminSeeder`):
 
-| Role | Email | Password |
-| --- | --- | --- |
+| Role             | Email                     | Password      |
+| ---------------- | ------------------------- | ------------- |
 | Pimpinan (kabid) | `agus.pimpinan@gmail.com` | `pimpinan123` |
-| Pimpinan (katim) | `gan12@gmail.com` | `pimpinan123` |
-| Petugas (staff) | `afghan12@gmail.com` | `password123` |
-| Admin | `admin@spbe.go.id` | `admin123` |
+| Pimpinan (katim) | `gan12@gmail.com`         | `pimpinan123` |
+| Petugas (staff)  | `afghan12@gmail.com`      | `password123` |
+| Admin            | `admin@spbe.go.id`        | `admin123`    |
 
 Pemohon dapat didaftarkan sendiri melalui halaman **Register Pemohon**.
 
@@ -349,7 +402,7 @@ composer test
 - **Nomor registrasi:** dibuat otomatis dengan format `REG-YYYYMMDD-NNN` berdasarkan jumlah permohonan pada tanggal tersebut.
 - **Status permohonan:** tersimpan pada kolom `status` (1/2/3) dan `status_ver` pada tabel `layanan_spbe`.
 - **Lingkungan lokal:** pada `config/mail.php`, parameter `verify_peer` dan `verify_peer_name` dapat diatur ke `false` untuk mengizinkan bypass verifikasi SSL stream saat pengembangan.
-
+- **Dokumentasi lengkap:** lihat [DOKUMENTASI_SISTEM_SPBE.md](DOKUMENTASI_SISTEM_SPBE.md) untuk SRS (Software Requirements Specification), use case, activity diagram, wireframe, dan persyaratan fungsional/non-fungsional.
 
 ---
 
