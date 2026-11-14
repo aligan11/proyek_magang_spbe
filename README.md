@@ -349,7 +349,7 @@ composer test
 - **Nomor registrasi:** dibuat otomatis dengan format `REG-YYYYMMDD-NNN` berdasarkan jumlah permohonan pada tanggal tersebut.
 - **Status permohonan:** tersimpan pada kolom `status` (1/2/3) dan `status_ver` pada tabel `layanan_spbe`.
 - **Lingkungan lokal:** pada `config/mail.php`, parameter `verify_peer` dan `verify_peer_name` dapat diatur ke `false` untuk mengizinkan bypass verifikasi SSL stream saat pengembangan.
-- **Dokumentasi lengkap:** lihat [DOKUMENTASI_SISTEM_SPBE.md](DOKUMENTASI_SISTEM_SPBE.md) untuk SRS (Software Requirements Specification), use case, activity diagram, wireframe, dan persyaratan fungsional/non-fungsional.
+
 
 ---
 
