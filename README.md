@@ -192,28 +192,43 @@ Activity diagram tersedia di [public/laporan](public/laporan).
 
 ## Cuplikan Layar (Screenshots)
 
-Tampilan fitur utama sistem (alur Pemohon → Pimpinan → Petugas).
-Ganti placeholder di bawah dengan berkas gambar asli, misalnya dengan menyimpannya di `docs/screenshots/` lalu ubah tautannya menjadi `docs/screenshots/nama-file.png`.
+Berikut beberapa tampilan antarmuka utama Sistem Informasi Layanan SPBE, disusun mengikuti alur kerja pengguna. Seluruh berkas gambar tersimpan pada folder [`docs/`](docs).
 
-**1. Portal Publik — Daftar Berita Acara**
+### Portal Publik — Beranda
 
-![Portal Publik - Daftar Berita Acara Pemeriksaan](https://placehold.co/1200x630?text=Portal+Publik)
+Halaman publik yang menampilkan daftar Berita Acara Pemeriksaan terbaru, statistik layanan, dan akses informasi layanan SPBE bagi masyarakat umum.
 
-**2. Halaman Login Pemohon**
+![Portal Publik - Beranda SPBE](docs/dashboardAwal.png)
 
-![Halaman Login Pemohon](https://placehold.co/1200x630?text=Login+Pemohon)
+### Login Pemohon
 
-**3. Form Pengajuan Permohonan**
+Autentikasi Pemohon (internal maupun eksternal) yang dilengkapi verifikasi captcha matematika sebagai lapisan keamanan tambahan.
 
-![Form Pengajuan Permohonan Layanan SPBE](https://placehold.co/1200x630?text=Form+Pengajuan+Permohonan)
+![Halaman Login Pemohon](docs/Halaman%20Login%20Pemohon.png)
 
-**4. Dashboard Pimpinan & Disposisi Tugas**
+### Form Pengajuan Permohonan
 
-![Dashboard Pimpinan dan Modal Disposisi Tugas](https://placehold.co/1200x630?text=Dashboard+Pimpinan+-+Disposisi)
+Formulir pengajuan permohonan layanan yang terstruktur, mencakup data pemohon, penanggung jawab, detail kebutuhan layanan, serta unggah berkas pendukung.
 
-**5. Form Berita Acara Pemeriksaan (Petugas)**
+![Form Pengajuan Permohonan](docs/Pengajuan%20Permohonan.png)
 
-![Form Berita Acara Pemeriksaan](https://placehold.co/1200x630?text=Berita+Acara+Pemeriksaan)
+### Dashboard Pimpinan & Disposisi Tugas
+
+Dashboard Pimpinan (Kabid/Katim) yang menyajikan ringkasan statistik permohonan serta daftar permohonan yang siap didisposisikan.
+
+![Dashboard Pimpinan dan Disposisi Tugas](docs/Dashboard%20Pimpinan%20%26%20Disposisi%20Tugas.png)
+
+### Disposisi Tugas
+
+Modal pemberian disposisi/mandate kepada satu atau lebih Petugas teknis, disertai instruksi penanganan permohonan.
+
+![Disposisi Tugas](docs/Disposisi%20Tugas.png)
+
+### Berita Acara Pemeriksaan
+
+Formulir Berita Acara Pemeriksaan (BAP) bagi Petugas, memuat ringkasan pekerjaan, ringkasan masalah, alternatif solusi, dan unggah bukti verifikasi.
+
+![Berita Acara Pemeriksaan](docs/Berita%20Acara%20Pemeriksaan.png)
 
 ---
 
